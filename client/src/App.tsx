@@ -7,7 +7,7 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* Add more routes for other pages/components as needed */}
+        {/* Dodaj nowe strony... */}
       </Routes>
     </Router>
   );

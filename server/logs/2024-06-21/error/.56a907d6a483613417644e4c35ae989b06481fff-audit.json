@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\luksz\\Desktop\\Praktyki\\GIT\\CRM_system_04-08_24\\server\\logs\\2024-06-21\\error\\.56a907d6a483613417644e4c35ae989b06481fff-audit.json",
+    "files": [
+        {
+            "date": 1718966991622,
+            "name": "C:\\Users\\luksz\\Desktop\\Praktyki\\GIT\\CRM_system_04-08_24\\server\\logs\\2024-06-21\\error\\2024-06-21.log",
+            "hash": "171988c62cf36fdeffa66c0f45b3a301787b210bbc6cfe09cada3ce67dce906c"
+        }
+    ],
+    "hashType": "sha256"
+}

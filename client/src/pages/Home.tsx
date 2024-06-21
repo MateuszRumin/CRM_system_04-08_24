@@ -1,5 +1,3 @@
-// client/src/pages/Home.tsx
-
 import React from 'react';
 import logo from '../assets/logo.jpg';
 
