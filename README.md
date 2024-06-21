@@ -25,7 +25,8 @@
 ## Frontend
 
 - cd client
-- npx vite
+- npm run dev
 
 ## Database
+
 ...

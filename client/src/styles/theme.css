@@ -1,0 +1,34 @@
+/* Główne globalne zmienne css [theme.css] */
+body {
+	--font-size-default: 16px;
+	--font-family-default: Helvetica, Arial, sans-serif;
+
+	--color-theme-main: #24304F;
+	--color-text-default: #000000;
+
+	--color-outline-gray: #E0E0E0;
+	--color-text-gray: #7a7a7a;
+	
+
+	/* Opcjonalnie */
+	--color-white: #ffffff;
+	--color-gray: #6D6D6D;
+
+
+
+	/* Statusy */
+	--color-status-red-bg: #FBE7E8;
+	--color-status-red-text: #A30D11;
+
+	--color-status-green-bg: #EBF9F1;
+	--color-status-green-text: #1F9254;
+
+	--color-status-yellow-bg: #FEFFC0;
+	--color-status-yellow-text: #726D00;
+
+	--color-status-gray-bg: #E4E4E4;
+	--color-status-gray-text: #6D6D6D;
+
+	
+
+}
