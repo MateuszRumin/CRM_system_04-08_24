@@ -3,7 +3,6 @@ import './styles/globals.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Kreator } from './views/Kreator/Kreator.tsx'
 import { Faktury } from './views/Faktury/Faktury.tsx'
@@ -21,7 +20,7 @@ const router = createBrowserRouter([
 		element: <Layout />,
 		children: [
 			{
-				path: '/strona-glowna',
+				path: '/',
 				element: <StronaGlowna />,
 			},
 			{
@@ -39,6 +38,12 @@ const router = createBrowserRouter([
 			{
 				path: '/projekty',
 				element: <Projekty />,
+				children: [
+					{
+						path: '/projekty/test/',
+						element: <Projekty />,
+					},
+				],
 			},
 			{
 				path: '/pracownicy',

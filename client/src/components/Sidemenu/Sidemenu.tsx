@@ -4,7 +4,7 @@ import styles from './Sidemenu.module.css'
 const menuItems = [
 	{
 		name: 'Strona główna',
-		path: '/strona-glowna',
+		path: '/',
 		icon: 'home.svg',
 	},
 	{
@@ -51,12 +51,7 @@ export const Sidemenu = () => {
 				return (
 					<li key={item.path}>
 						<NavLink className={styles.item} to={item.path}>
-							<img
-								className={styles.iconItem}
-								
-								src={`/menu_icons/${item.icon}`}
-								alt={item.name}
-							/>
+							<img className={styles.iconItem} src={`/menu_icons/${item.icon}`} alt={item.name} />
 							<span>{item.name}</span>
 						</NavLink>
 					</li>

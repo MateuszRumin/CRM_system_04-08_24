@@ -1,3 +1,6 @@
+import styles from './StronGlowna.module.css'
+
+
 export const StronaGlowna = () => {
-	return <>Strona główna</>
+	return <><div className={styles.stronaglowna}>strona glowna</div></>
 }

@@ -6,7 +6,6 @@ export const Sidebar = () => {
 		<div className={styles.sidebarContent}>
 			<Logo />
 			<Sidemenu />
-            
 		</div>
 	)
 }
