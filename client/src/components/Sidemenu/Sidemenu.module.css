@@ -1,0 +1,28 @@
+.sidemenu {
+	margin-top: 30px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.item {
+	display: flex;
+	gap: 16px;
+	padding: 0 16px;
+	background-color: var(--background-menu-item);
+	height: 40px;
+	align-items: center;
+	transition: background 0.3s;
+}
+.item:hover {
+	background-color: var(--color-outline-gray);
+}
+
+.item:global(.active) {
+	background-color: #24304f;
+	color: white;
+}
+
+.item:global(.active) .iconItem{
+	filter: brightness(0%) sepia(100%) saturate(10000%) invert(95%) ;
+}

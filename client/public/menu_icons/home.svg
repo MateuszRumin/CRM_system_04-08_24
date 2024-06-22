@@ -1,0 +1,6 @@
+<svg width="24" height="25" class='testowa' viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Icon">
+<path id="Vector"  d="M3 9.60645L12 2.60645L21 9.60645V20.6064C21 21.1369 20.7893 21.6456 20.4142 22.0207C20.0391 22.3957 19.5304 22.6064 19 22.6064H5C4.46957 22.6064 3.96086 22.3957 3.58579 22.0207C3.21071 21.6456 3 21.1369 3 20.6064V9.60645Z" stroke="#24304F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_2" class='testowa' d="M9 22.6064V12.6064H15V22.6064" stroke="#24304F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>
