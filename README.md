@@ -20,7 +20,7 @@
 ## Backend
 
 - cd server
-- npx ts-node src/index.ts
+- npm start
 
 ## Frontend
 
@@ -29,4 +29,11 @@
 
 ## Database
 
-...
+in .env file set connection witch this schema:
+DATABASE_URL="mysql://User_name:password@host:port/database_name"
+SHADOW_DATABASE_URL="mysql://User_name:password@host:port/database2_name"
+
+to run mirations:
+-npm run migrate
+
+

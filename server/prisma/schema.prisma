@@ -4,12 +4,68 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+generator client {
+  provider =  "prisma-client-js"
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+
+model Users {
+  user_id Int @id @default(autoincrement())
+  username String
+  email String
+  password String
+
+  UserData UserDatas? 
+  UserRole UserRoles[]
 }
 
+model UserDatas {
+  user_data_id Int @id @default(autoincrement())
+  user_id Int @unique
+  first_name String 
+  second_name String
+  employed_from DateTime
+  employed_to DateTime
+  tel_number String 
+  concract String
+
+  User Users @relation(fields: [user_id],references: [user_id])
+}
+
+model Modules {
+  module_id Int @id @default(autoincrement())
+  name String
+  
+  Permission Permissions[]
+}
+
+model Roles {
+  role_id Int @id @default(autoincrement())
+  name String
+
+  Permission Permissions[]
+}
+
+model Permissions {
+  permission_id Int @id @default(autoincrement())
+  module_id Int
+  role_id Int
+  acces Boolean
+
+  Module Modules @relation(fields: [module_id],references: [module_id])
+  Role Roles @relation(fields: [role_id],references: [role_id])
+}
+
+model UserRoles {
+  user_role_id Int @id @default(autoincrement())
+  user_id Int
+  role_id Int
+
+  User Users @relation(fields: [user_id],references: [user_id])
+}
