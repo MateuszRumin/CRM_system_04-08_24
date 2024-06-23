@@ -1,10 +1,23 @@
 import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs'
+import { Logout } from '../Logout/Logout'
+import { Notifications } from '../Notifications/Notifications'
+import { Profile } from '../Profile/Profile'
+import { Settings } from '../Settings/Settings'
 import styles from './Topbar.module.css'
 
 export const Topbar = () => {
 	return (
-		<div className={styles.topbar}>
+		<header className={styles.topbar}>
 			<Breadcrumbs />
-		</div>
+
+			<section className={styles.topbaricons}>
+				<section>
+					<Logout />
+					<Settings />
+					<Notifications />
+				</section>
+				<Profile />
+			</section>
+		</header>
 	)
 }
