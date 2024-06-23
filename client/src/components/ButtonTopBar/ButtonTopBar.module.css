@@ -1,0 +1,23 @@
+.buttontopbar {
+	width: 44px;
+	height: 44px;
+	text-decoration: none;
+	border: none;
+	border-radius: 50%;
+	background-color: white;
+	box-shadow: 0px 3px 4px 0px #000000;
+	transition: background 0.3s, box-shadow 0.3s;
+	margin: 0 10px;
+}
+.buttontopbar img {
+	transition: filter 0.3s;
+	filter: invert(30%);
+}
+.buttontopbar:hover {
+	background-color: var(--background-menu-item);
+	box-shadow: 0px 5px 4px 0px #000000;
+}
+
+.buttontopbar:hover img {
+	filter: invert(0);
+}
