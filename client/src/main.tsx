@@ -13,6 +13,8 @@ import { Uprawnienia } from './views/Uprawnienia/Uprawnienia.tsx'
 import { Klienci } from './views/Klienci/Klienci.tsx'
 import { StronaGlowna } from './views/StronaGlowna/StronaGlowna.tsx'
 import { Layout } from './components/Layout/Layout.tsx'
+import { Logowanie } from './views/Logowanie/Logowanie.tsx'
+
 
 const router = createBrowserRouter([
 	{
@@ -58,6 +60,10 @@ const router = createBrowserRouter([
 				element: <Klienci />,
 			},
 		],
+	},
+	{
+		path: '/login',
+		element: <Logowanie />,
 	},
 ])
 
