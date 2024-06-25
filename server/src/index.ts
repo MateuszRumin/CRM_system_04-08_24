@@ -17,14 +17,10 @@ app.use(express.json());
 
 
 
-// Inicjalizacja Prisma Client
-try {
-    const prisma = new PrismaClient();
-    app.set('../../prisma', prisma);
-}catch (error)  {
-    logger.error(`Database connection Error: ${error}`)
-    console.log(`Database connection Error: ${error}`)
-}
+//inicjalizacja klienta prisma
+const prisma = new PrismaClient();
+app.set('prisma', prisma);
+
 
 // przekierownie routningu
 const route = require('./router/mainRouter')
