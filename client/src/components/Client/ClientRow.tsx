@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './ClientRow.module.css';
 import ThreeDotsSettings from '../../assets/ClientPage/three_dots_settings.svg';
 
 interface Client {
+  id: number; // Add this if you have an ID field
   name: string;
   status: string;
   projects: string;
@@ -11,6 +13,10 @@ interface Client {
 }
 
 export const ClientRow: React.FC<{ client: Client }> = ({ client }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+
   const getStatusClass = (status: string) => {
     switch (status) {
       case 'Niepodjęty':
@@ -26,6 +32,24 @@ export const ClientRow: React.FC<{ client: Client }> = ({ client }) => {
     }
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleEdit = () => {
+    navigate(`/klienci/edit-client/${client.name}`); // Update the path
+  };
+
+  const handleDelete = () => {
+    setIsModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    // Logika usunięcia użytkownika
+    console.log('Usuń:', client.name);
+    setIsModalOpen(false);
+  };
+
   return (
     <tr className={styles.row}>
       <td>{client.name}</td>
@@ -33,9 +57,30 @@ export const ClientRow: React.FC<{ client: Client }> = ({ client }) => {
       <td>{client.projects}</td>
       <td>{client.nextPayment}</td>
       <td>{client.addedOn}</td>
-      <td>
-        <img src={ThreeDotsSettings} alt="Settings" className={styles.settingsIcon} />
+      <td className={styles.settingsContainer}>
+        <img 
+          src={ThreeDotsSettings} 
+          alt="Settings" 
+          className={styles.settingsIcon} 
+          onClick={toggleMenu} 
+        />
+        {isMenuOpen && (
+          <div className={styles.contextMenu}>
+            <div onClick={handleEdit}>Edytuj</div>
+            <div onClick={handleDelete}>Usuń</div>
+          </div>
+        )}
       </td>
+
+      {isModalOpen && (
+        <div className={styles.modalBackdrop}>
+          <div className={styles.modal}>
+            <p>Czy na pewno chcesz usunąć tego użytkownika?</p>
+            <button onClick={confirmDelete}>Tak</button>
+            <button onClick={() => setIsModalOpen(false)}>Nie</button>
+          </div>
+        </div>
+      )}
     </tr>
   );
 };

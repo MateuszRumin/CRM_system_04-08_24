@@ -1,11 +1,17 @@
+import React from 'react';
 import faSearch from '../../assets/ClientPage/faSearch.svg';
-import styles from './SearchClient.module.css'; // Importuj style CSS Modules
+import styles from './SearchClient.module.css';
 
 interface Props {
   placeholder?: string;
+  onSearch: (term: string) => void;
 }
 
-export function SearchClient({ placeholder = 'Wyszukaj klienta' }: Props) {
+export function SearchClient({ placeholder = 'Wyszukaj klienta', onSearch }: Props) {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onSearch(event.target.value);
+  };
+
   return (
     <div className={styles['search-client']}>
       <img src={faSearch} alt="Search Icon" className={styles['search-icon']} />
@@ -13,6 +19,7 @@ export function SearchClient({ placeholder = 'Wyszukaj klienta' }: Props) {
         type="text"
         placeholder={placeholder}
         className={styles['searchInput']}
+        onChange={handleChange}
       />
     </div>
   );
