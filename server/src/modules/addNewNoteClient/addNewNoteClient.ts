@@ -11,7 +11,7 @@ exports.addNewNoteClient = (req: Request, res: Response, next: NextFunction) => 
 
 
 
-res.status(200).json(req.body)
+    res.status(200).json(req.body.client_id)
 
 
 

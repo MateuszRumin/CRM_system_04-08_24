@@ -1,5 +1,5 @@
 import express, { response } from 'express';
-import logger from '../modules/logger/logger'
+
 const router = express.Router()
 
 
@@ -13,7 +13,8 @@ router.post('/test', (req,res,next) =>{
 
 
 const {addNewClient} = require('../modules/addNewClient/addNewClient')
-router.post('/NewClient', addNewClient)
+const {addNewNoteClient} = require('../modules/addNewNoteClient/addNewNoteClient')
+router.post('/NewClient', addNewClient,addNewNoteClient)
 
 
 
@@ -23,6 +24,7 @@ router.post('/NewClient', addNewClient)
 
 
 router.use('/', (req,res,next) =>{
+    const logger = req.app.get('logger')
     logger.error(`Próba połączenia z nieobsługiwaną scierzką klient`);
     res.status(404).json({error : "Nie obsługiwana ścieżka"});
 })

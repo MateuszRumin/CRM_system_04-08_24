@@ -24,6 +24,7 @@ model Users {
   UserData UserDatas? 
   UserRole UserRoles[]
   Client Clients[]
+  Task Tasks[]
 }
 
 model UserDatas {
@@ -92,11 +93,11 @@ model Clients {
   krs String @default("brak") 
   company_name String @default("brak")
   address String
-  source String
-
+  
   Status Statuses @relation(fields: [status_id], references: [status_id])
   User Users @relation(fields: [user_id],references: [user_id])
   ClientNote ClientNotes[]
+  ClientTask ClientTasks[]
 }
 
 enum statusTypeValues {
@@ -113,6 +114,7 @@ model Statuses {
   name String
 
   Client Clients[]
+  Task Tasks[]
 }
 
 model Notes {
@@ -134,3 +136,29 @@ model ClientNotes {
   Client Clients @relation(fields: [client_id],references: [client_id])
   Note Notes @relation(fields: [note_id],references: [note_id])
 }
+
+
+
+model Tasks {
+  task_id Int @id @default(autoincrement())
+  status_id Int
+  user_id Int
+  task_name String @default("brak")
+  task_text String
+  deadline DateTime
+  created_at DateTime @default(now())
+
+  Status Statuses @relation(fields: [status_id], references: [status_id])
+  User Users @relation(fields: [user_id],references: [user_id])
+  ClientTask ClientTasks[]
+}
+
+model ClientTasks {
+  client_task_id Int @id @default(autoincrement())
+  client_id Int
+  task_id Int
+
+  Client Clients @relation(fields: [client_id],references: [client_id])
+  Task Tasks @relation(fields: [task_id],references: [task_id])
+}
+
