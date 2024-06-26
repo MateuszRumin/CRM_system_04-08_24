@@ -18,8 +18,8 @@ const {addNewTaskClient} = require("../modules/addNewTaskClient/addNewTaskClient
 router.post('/NewClient', addNewClient,addNewNoteClient,addNewTaskClient)
 
 
-
-
+const  {selectAllClients} = require('../modules/selectAllClients/selectAllClients')
+router.post('/listAllClient',selectAllClients)
 
 
 

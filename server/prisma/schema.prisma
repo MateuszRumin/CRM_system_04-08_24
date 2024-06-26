@@ -159,7 +159,7 @@ model Tasks {
   user_id Int
   task_name String @default("brak")
   task_text String
-  deadline DateTime
+  deadline DateTime? 
   created_at DateTime @default(now())
 
   Status Statuses @relation(fields: [status_id], references: [status_id])

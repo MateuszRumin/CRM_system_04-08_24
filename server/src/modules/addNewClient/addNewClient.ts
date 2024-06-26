@@ -11,9 +11,23 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
     const prisma = req.app.get('prisma')
     try  {
         
+        
         const initData = req.body.client
+        const status = await prisma.Statuses.findFirst({
+            select:{
+                status_id:true
+            },
+            where:{
+                name:initData.status_name,
+                status_type:"Klient",
+            }
+
+        })
+
+        
+
         const insertData = {
-            status_id: initData.status_id,
+            status_id: status.status_id,
             user_id: initData.user_id,
             client_type: initData.client_type,  
             first_name: initData.first_name,
@@ -38,7 +52,7 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
 
         
         req.body.client_id = client.client_id
-        req.body.user_id = insertData.user_id
+        req.body.user_id = initData.user_id
 
         
 

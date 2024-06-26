@@ -35,7 +35,21 @@ async function main() {
     data:{
         status_type:'Klient',
         default:true,
-        name:'Nowy'
+        name:'Niepodjęty'
+    }  
+  })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Klient',
+        default:true,
+        name:'W trakcie'
+    }  
+  })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Klient',
+        default:true,
+        name:'Zdobyty'
     }  
   })
   Status = await prisma.statuses.create({
@@ -47,23 +61,9 @@ async function main() {
   })
   Status = await prisma.statuses.create({
     data:{
-        status_type:'Klient',
-        default:true,
-        name:'Pozyskany'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Klient',
-        default:true,
-        name:'Niepewny'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
         status_type:'Zadanie',
         default:true,
-        name:'Nowe'
+        name:'Nie zaczęty'
     }  
   })
   Status = await prisma.statuses.create({
@@ -77,14 +77,14 @@ async function main() {
     data:{
         status_type:'Zadanie',
         default:true,
-        name:'Nieudane'
+        name:'Zrobiony'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Zadanie',
         default:true,
-        name:'Zakończone'
+        name:'Porażka'
     }  
   })
 
