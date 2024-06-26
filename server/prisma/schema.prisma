@@ -17,12 +17,15 @@ datasource db {
 
 model Users {
   user_id Int @id @default(autoincrement())
-  username String
-  email String
+  username String @unique
+  email String @unique
   password String
 
   UserData UserDatas? 
   UserRole UserRoles[]
+  Client Clients[]
+  Task Tasks[]
+  Note Notes[]
 }
 
 model UserDatas {
@@ -50,6 +53,7 @@ model Roles {
   name String
 
   Permission Permissions[]
+  UserRole UserRoles[]
 }
 
 model Permissions {
@@ -64,8 +68,111 @@ model Permissions {
 
 model UserRoles {
   user_role_id Int @id @default(autoincrement())
-  user_id Int
+  user_id Int 
   role_id Int
 
   User Users @relation(fields: [user_id],references: [user_id])
+  Role Roles @relation(fields: [role_id],references: [role_id])
 }
+
+enum clientTypeValues {
+  Prywatny
+  Firma
+}
+
+
+model Clients {
+  client_id Int @id @default(autoincrement())
+  status_id Int
+  user_id Int
+  client_type clientTypeValues @default(Prywatny)
+  registration_date DateTime @default(now())
+  first_name String
+  second_name String
+  regon String @default("brak") 
+  nip String @default("brak") 
+  krs String @default("brak") 
+  company_name String @default("brak")
+  address String
+  
+  Status Statuses @relation(fields: [status_id], references: [status_id])
+  User Users @relation(fields: [user_id],references: [user_id])
+  ClientNote ClientNotes[]
+  ClientTask ClientTasks[]
+  ClientContact ClientContacts[]
+}
+
+model ClientContacts {
+  client_contacts_id Int @id @default(autoincrement())
+  client_id Int
+  first_name String
+  second_name String
+  email String @default("Brak")
+  tel_number String @default("Brak")
+
+  Client Clients @relation(fields: [client_id], references: [client_id])
+}
+
+enum statusTypeValues {
+  Klient
+  Pojekt
+  Zadanie
+  Faktura
+}
+
+model Statuses {
+  status_id Int @id @default(autoincrement())
+  status_type statusTypeValues
+  default Boolean @default(false)
+  name String
+
+  Client Clients[]
+  Task Tasks[]
+}
+
+model Notes {
+  note_id Int @id @default(autoincrement())
+  user_id Int
+  note_name String @default("Brak")
+  note_text String
+  data_link String @default("Brak")
+  created_at DateTime @default(now())
+
+  ClientNote ClientNotes[]
+  User Users @relation(fields: [user_id],references: [user_id])
+}
+
+model ClientNotes {
+  client_note_id Int @id @default(autoincrement())
+  client_id Int 
+  note_id Int 
+
+  Client Clients @relation(fields: [client_id],references: [client_id])
+  Note Notes @relation(fields: [note_id],references: [note_id])
+}
+
+
+
+model Tasks {
+  task_id Int @id @default(autoincrement())
+  status_id Int
+  user_id Int
+  task_name String @default("brak")
+  task_text String
+  deadline DateTime? 
+  created_at DateTime @default(now())
+
+  Status Statuses @relation(fields: [status_id], references: [status_id])
+  User Users @relation(fields: [user_id],references: [user_id])
+  ClientTask ClientTasks[]
+}
+
+model ClientTasks {
+  client_task_id Int @id @default(autoincrement())
+  client_id Int
+  task_id Int
+
+  Client Clients @relation(fields: [client_id],references: [client_id])
+  Task Tasks @relation(fields: [task_id],references: [task_id])
+}
+
