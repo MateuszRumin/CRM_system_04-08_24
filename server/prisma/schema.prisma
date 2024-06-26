@@ -25,6 +25,7 @@ model Users {
   UserRole UserRoles[]
   Client Clients[]
   Task Tasks[]
+  Note Notes[]
 }
 
 model UserDatas {
@@ -98,6 +99,18 @@ model Clients {
   User Users @relation(fields: [user_id],references: [user_id])
   ClientNote ClientNotes[]
   ClientTask ClientTasks[]
+  ClientContact ClientContacts[]
+}
+
+model ClientContacts {
+  client_contacts_id Int @id @default(autoincrement())
+  client_id Int
+  first_name String
+  second_name String
+  email String @default("Brak")
+  tel_number String @default("Brak")
+
+  Client Clients @relation(fields: [client_id], references: [client_id])
 }
 
 enum statusTypeValues {
@@ -126,6 +139,7 @@ model Notes {
   created_at DateTime @default(now())
 
   ClientNote ClientNotes[]
+  User Users @relation(fields: [user_id],references: [user_id])
 }
 
 model ClientNotes {

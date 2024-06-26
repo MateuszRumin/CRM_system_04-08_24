@@ -10,6 +10,7 @@ import { IResponse } from '../../../../globalTypes/iResponce';
 exports.addNewClient = async (req: Request, res: Response, next: NextFunction) => {
     const prisma = req.app.get('prisma')
     try  {
+        
         const initData = req.body.client
         const insertData = {
             status_id: initData.status_id,
@@ -27,7 +28,7 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
         initData.krs ? Object.assign(insertData, {krs:initData.krs}):void 0
         initData.company_name ? Object.assign(insertData, {company_name:initData.company_name}):void 0
         
-        console.log(initData);
+        
 
         
 
@@ -35,9 +36,9 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
             data:insertData
         })
 
-        console.log(client);
+        
         req.body.client_id = client.client_id
-
+        req.body.user_id = insertData.user_id
 
         
 

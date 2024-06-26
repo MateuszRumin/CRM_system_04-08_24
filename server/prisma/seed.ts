@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 async function main() {
-
+  
   let admin = await prisma.users.create({
     data:{
         username:"Administrator",
@@ -57,6 +57,34 @@ async function main() {
         status_type:'Klient',
         default:true,
         name:'Niepewny'
+    }  
+  })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Zadanie',
+        default:true,
+        name:'Nowe'
+    }  
+  })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Zadanie',
+        default:true,
+        name:'W trakcie'
+    }  
+  })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Zadanie',
+        default:true,
+        name:'Nieudane'
+    }  
+  })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Zadanie',
+        default:true,
+        name:'Zakończone'
     }  
   })
 

@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "prisma":{
-      "seed":"ts-node {\"module\":\"CommonJS\"} prisma/seed.ts"
+      "seed":"ts-node  prisma/seed.ts"
   },
   "main": "index.js",
   "scripts": {

@@ -14,7 +14,8 @@ router.post('/test', (req,res,next) =>{
 
 const {addNewClient} = require('../modules/addNewClient/addNewClient')
 const {addNewNoteClient} = require('../modules/addNewNoteClient/addNewNoteClient')
-router.post('/NewClient', addNewClient,addNewNoteClient)
+const {addNewTaskClient} = require("../modules/addNewTaskClient/addNewTaskClient")
+router.post('/NewClient', addNewClient,addNewNoteClient,addNewTaskClient)
 
 
 
