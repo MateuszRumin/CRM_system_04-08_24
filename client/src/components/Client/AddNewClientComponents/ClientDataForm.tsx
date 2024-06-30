@@ -13,6 +13,7 @@ export function ClientDataForm() {
   useEffect(() => {
     setClientData(localClientData);
   }, [localClientData, setClientData]);
+  
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLocalClientData({ ...localClientData, status: e.target.value });
