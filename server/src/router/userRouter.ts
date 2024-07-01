@@ -1,13 +1,14 @@
-import express from 'express';
-const router = express.Router();
+import { Router } from 'express';
+import { createUser, getAllUsers, getUserById, updateUser, deleteUser, loginUser } from '../modules/users/usersController';
+import { authenticateToken, authorizeRole } from '../middleware/auth';
 
-const { registerUser, loginUser, getUsers, deleteUser, updateUser } = require('../modules/users/usersController');
-const { authenticateJWT } = require('../middlewares/auth.middleware');
+const router = Router();
 
-router.post('/register', registerUser);
 router.post('/login', loginUser);
-router.get('/listAllUsers', authenticateJWT, getUsers);
-router.delete('/:userId', authenticateJWT, deleteUser);
-router.put('/:userId', authenticateJWT, updateUser);
+router.post('/', authenticateToken, authorizeRole(['admin']), createUser);
+router.get('/', authenticateToken, authorizeRole(['admin', 'user']), getAllUsers);
+router.get('/:id', authenticateToken, authorizeRole(['admin', 'user']), getUserById);
+router.put('/:id', authenticateToken, authorizeRole(['admin']), updateUser);
+router.delete('/:id', authenticateToken, authorizeRole(['admin']), deleteUser);
 
-module.exports = router;
+module.exports = router
