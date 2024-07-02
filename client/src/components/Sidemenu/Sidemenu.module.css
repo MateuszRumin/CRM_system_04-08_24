@@ -11,8 +11,11 @@
 	padding: 0 16px;
 	background-color: var(--background-menu-item);
 	height: 40px;
+	width: 240px;
 	align-items: center;
 	transition: background 0.3s;
+	border-radius: 8px;
+	
 }
 .item:hover {
 	background-color: var(--color-outline-gray);
