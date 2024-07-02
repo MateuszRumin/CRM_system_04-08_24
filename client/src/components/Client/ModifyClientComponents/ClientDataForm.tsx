@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from './ClientDataForm.module.css';
 import { useData } from '../../../contexts/DataContext';
-import { FieldError } from 'react-hook-form';
 
 interface ClientDataFormProps {
   clientData: any;
@@ -11,7 +10,7 @@ interface ClientDataFormProps {
 }
 
 export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormProps) {
-  const { setUpdatedClientData, setValid } = useData();
+  const { setValid } = useData();
   const {
     register,
     handleSubmit,
@@ -227,7 +226,7 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
                     pattern: { value: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/, message: 'Nieprawidłowy format email.' },
                   })}
                 />
-                <button className={styles.removeButton} type="button" onClick={() => handleRemoveEmail(index)}>
+                <button className={styles.button} type="button" onClick={() => handleRemoveEmail(index)}>
                   Usuń
                 </button>
               </div>
@@ -250,7 +249,7 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
                     pattern: { value: /^[0-9]+$/, message: 'Numer telefonu może zawierać tylko cyfry.' },
                   })}
                 />
-                <button className={styles.removeButton} type="button" onClick={() => handleRemovePhone(index)}>
+                <button className={styles.button} type="button" onClick={() => handleRemovePhone(index)}>
                   Usuń
                 </button>
               </div>

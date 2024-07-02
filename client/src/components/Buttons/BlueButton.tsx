@@ -8,7 +8,7 @@ interface BlueButtonProps {
   buttonStyle?: string;
   redirectPath?: string;
   disabled?: boolean;
-  onClickAction?: () => void;  // Prop for custom onClick callback
+  onClickAction?: () => void;
 }
 
 const BlueButton: React.FC<BlueButtonProps> = ({
@@ -24,16 +24,16 @@ const BlueButton: React.FC<BlueButtonProps> = ({
   const handleClick = async () => {
     if (!disabled) {
       if (onClickAction) {
-        await onClickAction();  // If onClickAction is provided, execute it
+        await onClickAction();
       } else {
-        sendDataToServerAddedClient();  // If no onClickAction, perform default behavior
+        sendDataToServerAddedClient();
       }
       navigate(redirectPath);
     }
   };
 
   return (
-    <button className={buttonStyle || styles.blueButton} onClick={handleClick} disabled={disabled}>
+    <button className={`${buttonStyle || styles.blueButton} ${disabled ? styles.disabled : ''}`} onClick={handleClick} disabled={disabled}>
       {buttonText}
     </button>
   );

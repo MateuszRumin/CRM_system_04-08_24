@@ -16,9 +16,9 @@ export const EditClient: React.FC = () => {
   const location = useLocation();
   const state = location.state as LocationState;
   const { clientId, modifiedName } = state;
-  const { isValid, updateClient } = useData();
+  const { isValid, isValidTasks, isValidNotes, updateClient } = useData();
 
-  const [client, setClient] = useState({
+  const [client] = useState({
     id: clientId,
     status: 'Zrobiony',
     assignedEmployee: 'Paweł Nowak',
@@ -86,7 +86,9 @@ export const EditClient: React.FC = () => {
 
   const handleSubmit = (data: any) => {
     updateClient(clientId, data);
-    // console.log('Wysyłanie danych do serwera:', data);
+
+    // sendDataToServerUpdatedClient();
+
   };
 
   const memoizedClientDataForm = useCallback(
@@ -109,17 +111,18 @@ export const EditClient: React.FC = () => {
     if (formElement) {
       formElement.requestSubmit();
     }
+
   };
 
   return (
     <div className={styles.pageContainer}>
       <div className={styles.headerContainer}>
         <h1>Edycja klienta: {modifiedName}</h1>
-        <p>Walidacja: {isValid ? 'true' : 'false'}</p>
+        <p>Walidacja: {isValid && isValidTasks && isValidNotes ? 'true' : 'false'}</p>
         <BlueButton
           buttonText='Zapisz zmiany'
           buttonStyle={styles.blueButton}
-          disabled={!isValid}
+          disabled={!isValid || !isValidTasks || !isValidNotes}
           onClickAction={handleClick}
         />
       </div>

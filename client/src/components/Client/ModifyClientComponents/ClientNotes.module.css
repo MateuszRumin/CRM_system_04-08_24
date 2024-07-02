@@ -23,6 +23,11 @@
   font-weight: bold;
 }
 
+.button_container{
+  display: flex;
+  justify-content: flex-end; /* Przyciski będą wyrównane do prawej strony */
+}
+
 .addNoteButton:hover {
   color: #0056b3;
 }
@@ -67,6 +72,17 @@
   border-radius: 5px;
   cursor: pointer;
   align-self: flex-end;
+}
+
+.edit_delete_Button{
+  padding: 10px 20px;
+  margin-left: 5px;
+  margin-top: 5px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .saveNoteButton:hover {

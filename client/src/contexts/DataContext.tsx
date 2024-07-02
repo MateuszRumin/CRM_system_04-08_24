@@ -27,21 +27,27 @@ interface DataState {
   updatedTasks: Task[];
   deletedTasks: number[];
   isValid: boolean;
+  isValidNotes: boolean;
+  isValidTasks: boolean;
   setClientData: Dispatch<SetStateAction<any>>;
   setAddedClientData: Dispatch<SetStateAction<any>>;
   setUpdatedClientData: Dispatch<SetStateAction<any>>;
   setDeletedClientData: Dispatch<SetStateAction<any>>;
   setNotes: Dispatch<SetStateAction<Note[]>>;
+  setAddedNotes: Dispatch<SetStateAction<Note[]>>;
   addNote: (note: Note) => void;
   updateNote: (note: Note) => void;
   deleteNote: (noteId: number) => void;
   setTasks: Dispatch<SetStateAction<Task[]>>;
+  setAddedTasks: Dispatch<SetStateAction<Task[]>>;
   addTask: (task: Task) => void;
   updateTask: (task: Task) => void;
   deleteTask: (taskId: number) => void;
   sendDataToServerAddedClient: () => void;
   sendDataToServerUpdatedClient: () => void;
   setValid: (isValid: boolean) => void;
+  setValidNotes: (isValidNotes: boolean) => void;
+  setValidTasks: (isValidTasks: boolean) => void;
   updateClient: (clientId: string, data: any) => void;
 }
 
@@ -81,6 +87,8 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [deletedTasks, setDeletedTasks] = useState<number[]>([]);
 
   const [isValid, setIsValid] = useState<boolean>(false);
+  const [isValidNotes, setIsValidNotes] = useState<boolean>(false);
+  const [isValidTasks, setIsValidTasks] = useState<boolean>(false);
 
   const addNote = (note: Note) => {
     setNotes(prevNotes => [...prevNotes, note]);
@@ -128,11 +136,13 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
   const sendDataToServerAddedClient = () => {
     console.log('Wysyłanie danych do serwera z nowym klientem:', { 
-      clientData, 
-      notes, 
-      tasks, 
+      clientData,
+      addedClientData, // Dodajemy dane nowego klienta
+      addedNotes,
+      addedTasks,
     });
-    // Logika faktycznego wysyłania danych do serwera dla nowego klienta
+  
+    // Tutaj dodaj logikę faktycznego wysyłania danych do serwera
   };
 
   const sendDataToServerUpdatedClient = () => {
@@ -144,12 +154,39 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       deletedTasks,
       updatedNotes, 
       updatedTasks,
+      notes,
+      tasks,
     });
     // Logika faktycznego wysyłania danych do serwera dla zaktualizowanego klienta
+
+    console.log(updatedClientData.firstName)
+    // Logika faktycznego wysyłania danych do serwera dla zaktualizowanego klienta
+    //// tutaj będzie wykorzystanie endpointu do dodania do bazy danych 
+
+    // Po wysłaniu danych, wykonujemy czyszczenie
+    setUpdatedClientData({}); // Czyszczenie zaktualizowanych danych klienta
+    setAddedNotes([]); // Czyszczenie dodanych notatek
+    setAddedTasks([]); // Czyszczenie dodanych zadań
+    setDeletedNotes([]); // Czyszczenie usuniętych notatek
+    setDeletedTasks([]); // Czyszczenie usuniętych zadań
+    setUpdatedNotes([]); // Czyszczenie zaktualizowanych notatek
+    setUpdatedTasks([]); // Czyszczenie zaktualizowanych zadań
+    setNotes([]); // Czyszczenie notatek
+    setTasks([]); // Czyszczenie zadań
+
+
   };
 
   const setValid = (isValid: boolean) => {
     setIsValid(isValid);
+  };
+
+  const setValidNotes = (isValidNotes: boolean) => {
+    setIsValidNotes(isValidNotes);
+  };
+
+  const setValidTasks = (isValidTasks: boolean) => {
+    setIsValidTasks(isValidTasks);
   };
 
   const updateClient = (clientId: string, data: any) => {
@@ -170,22 +207,28 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       addedTasks, 
       updatedTasks, 
       deletedTasks, 
-      isValid, 
+      isValid,
+      isValidNotes, 
+      isValidTasks,
       setClientData, 
       setAddedClientData,
       setUpdatedClientData,
       setDeletedClientData,
       setNotes, 
+      setAddedNotes,
       addNote, 
       updateNote, 
       deleteNote, 
-      setTasks, 
+      setTasks,
+      setAddedTasks, 
       addTask, 
       updateTask, 
       deleteTask, 
       sendDataToServerAddedClient,
       sendDataToServerUpdatedClient,
       setValid,
+      setValidNotes,
+      setValidTasks,
       updateClient
     }}>
       {children}

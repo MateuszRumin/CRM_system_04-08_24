@@ -1,33 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './ClientNotes.module.css';
 import { useData } from '../../../contexts/DataContext';
 
 export function ClientNotes() {
-  const { notes, setNotes } = useData();
+  const { notes, addNote, isValidNotes, setValidNotes } = useData();
   const [newNote, setNewNote] = useState<string>('');
+
+  // Initialize isValidNotes as true when component mounts
+  useEffect(() => {
+    setValidNotes(true);
+  }, []);
 
   const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewNote(e.target.value);
+    if (e.target.value.trim() === '') {
+      setValidNotes(true); // Set back to true if the note field is empty
+    } else {
+      setValidNotes(false); // Set to false if there's content in the note field
+    }
   };
 
   const handleSaveNote = () => {
     if (newNote.trim() !== '') {
       const timestamp = new Date().toLocaleString();
-      setNotes([...notes, { content: newNote, timestamp }]);
+      addNote({
+        note_id: notes.length + 1, // Generate unique ID (replace with your logic)
+        note_text: newNote,
+      });
       setNewNote('');
-      simulateDataSend(newNote);
+      setValidNotes(true); // Set isValidNotes to true after successfully saving note
     }
-  };
-
-  const simulateDataSend = (note: string) => {
-    console.log('Symulacja wysłania notatki do serwera:', note);
   };
 
   return (
     <div className={styles.notesContainer}>
       <div className={styles.header}>
         <h2>Ustalenia z klientem</h2>
-        {/* <button className={styles.addNoteButton}>Dodaj nową notatkę</button> */}
       </div>
       <div className={styles.notesFieldContainer}>
         <div className={styles.richTextEditor}>
@@ -45,7 +53,7 @@ export function ClientNotes() {
       <div className={styles.notes}>
         {notes.map((note, index) => (
           <div key={index} className={styles.note}>
-            <p className={styles.noteContent}>{note.content}</p>
+            <p className={styles.noteContent}>{note.note_text}</p>
             <div className={styles.noteFooter}>
               <img src="/path/to/admin_avatar.png" alt="Admin Avatar" className={styles.avatar} />
               <div className={styles.noteAuthor}>

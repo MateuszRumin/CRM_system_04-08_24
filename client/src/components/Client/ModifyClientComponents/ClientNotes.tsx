@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useData } from '../../../contexts/DataContext';
 import styles from './ClientNotes.module.css';
 
@@ -12,28 +12,35 @@ interface ClientNotesProps {
 }
 
 export const ClientNotes: React.FC<ClientNotesProps> = ({ initialNotes }) => {
-  const { addNote, updateNote, deleteNote } = useData();
-  const [localNotes, setLocalNotes] = React.useState<Note[]>(initialNotes);
-  const [newNoteText, setNewNoteText] = React.useState<string>('');
-  const [editingNoteId, setEditingNoteId] = React.useState<number | null>(null);
-  const [editedNoteText, setEditedNoteText] = React.useState<string>('');
-  const [formErrors, setFormErrors] = React.useState<{ [key: string]: string }>({
+  const { addNote, updateNote, deleteNote, setValidNotes } = useData();
+  const [localNotes, setLocalNotes] = useState<Note[]>(initialNotes);
+  const [noteText, setNoteText] = useState<string>('');
+  const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({
     note_text: '',
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     setLocalNotes(initialNotes);
   }, [initialNotes]);
 
-  const handleNewNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNewNoteText(e.target.value);
+  const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNoteText(e.target.value);
   };
 
-  const validateNote = (): boolean => {
+  useEffect(() => {
+    if (noteText.trim() === '' && editingNoteId === null) {
+      setValidNotes(true); // Reset isValidNotes to true if noteText is empty and not editing
+    } else {
+      setValidNotes(false); // Set isValidNotes to false if there's content in noteText or editing
+    }
+  }, [noteText, editingNoteId, setValidNotes]);
+
+  const validateNote = (noteText: string): boolean => {
     let valid = true;
     const errors: { [key: string]: string } = {};
 
-    if (newNoteText.trim() === '') {
+    if (noteText.trim() === '') {
       errors['note_text'] = 'Treść notatki jest wymagana';
       valid = false;
     }
@@ -43,42 +50,45 @@ export const ClientNotes: React.FC<ClientNotesProps> = ({ initialNotes }) => {
   };
 
   const handleSaveNote = () => {
-    if (validateNote()) {
-      const newNote: Note = {
-        note_id: localNotes.length + 1, // Można rozważyć lepsze generowanie ID
-        note_text: newNoteText,
-      };
-      setLocalNotes([...localNotes, newNote]);
-      addNote(newNote);
-      setNewNoteText('');
+    if (validateNote(noteText)) {
+      if (editingNoteId !== null) {
+        const updatedNote: Note = {
+          note_id: editingNoteId,
+          note_text: noteText,
+        };
+        const updatedLocalNotes = localNotes.map((note) =>
+          note.note_id === editingNoteId ? updatedNote : note
+        );
+        setLocalNotes(updatedLocalNotes);
+        updateNote(updatedNote);
+        setNoteText('');
+        setEditingNoteId(null);
+      } else {
+        const newNote: Note = {
+          note_id: localNotes.length + 1, // Można rozważyć lepsze generowanie ID
+          note_text: noteText,
+        };
+        setLocalNotes([...localNotes, newNote]);
+        addNote(newNote);
+        setNoteText('');
+      }
     }
   };
 
   const handleEditNote = (note: Note) => {
+    setNoteText(note.note_text);
     setEditingNoteId(note.note_id);
-    setEditedNoteText(note.note_text);
-  };
-
-  const handleSaveEditedNote = (noteId: number) => {
-    if (validateNote()) {
-      const updatedLocalNotes = localNotes.map((note) =>
-        note.note_id === noteId ? { ...note, note_text: editedNoteText } : note
-      );
-      setLocalNotes(updatedLocalNotes);
-
-      const updatedNote = { note_id: noteId, note_text: editedNoteText };
-      updateNote(updatedNote);
-
-      setEditingNoteId(null);
-      setEditedNoteText('');
-    }
   };
 
   const handleDeleteNote = (noteId: number) => {
     const updatedLocalNotes = localNotes.filter((note) => note.note_id !== noteId);
     setLocalNotes(updatedLocalNotes);
-
     deleteNote(noteId);
+
+    // Reset isValidNotes to true if noteText becomes empty after deleting a note and not editing
+    if (noteText.trim() === '' && editingNoteId === null) {
+      setValidNotes(true);
+    }
   };
 
   return (
@@ -90,38 +100,31 @@ export const ClientNotes: React.FC<ClientNotesProps> = ({ initialNotes }) => {
         <div className={styles.richTextEditor}>
           <textarea
             className={styles.TextAreaField}
-            value={newNoteText}
-            onChange={handleNewNoteChange}
+            value={noteText}
+            onChange={handleNoteChange}
             placeholder="Wpisz nową notatkę..."
           ></textarea>
           {formErrors.note_text && <p className={styles.error}>{formErrors.note_text}</p>}
         </div>
-        <button className={styles.saveNoteButton} onClick={handleSaveNote}>
-          Zapisz notatkę
-        </button>
+        {editingNoteId !== null ? (
+          <button className={styles.saveNoteButton} onClick={handleSaveNote}>
+            Zapisz zmiany
+          </button>
+        ) : (
+          <button className={styles.saveNoteButton} onClick={handleSaveNote}>
+            Zapisz notatkę
+          </button>
+        )}
       </div>
       <div className={styles.notes}>
         {localNotes && localNotes.length > 0 ? (
           localNotes.map((note) => (
             <div key={note.note_id} className={styles.note}>
-              {editingNoteId === note.note_id ? (
-                <>
-                  <textarea
-                    className={styles.TextAreaField}
-                    value={editedNoteText}
-                    onChange={(e) => setEditedNoteText(e.target.value)}
-                  ></textarea>
-                  <button className={styles.saveNoteButton} onClick={() => handleSaveEditedNote(note.note_id)}>
-                    Zapisz
-                  </button>
-                </>
-              ) : (
-                <>
-                  <p className={styles.noteContent}>{note.note_text}</p>
-                  <button onClick={() => handleEditNote(note)}>Edytuj</button>
-                  <button onClick={() => handleDeleteNote(note.note_id)}>Usuń</button>
-                </>
-              )}
+              <p className={styles.noteContent}>{note.note_text}</p>
+              <div className={styles.button_container}>
+              <button className={styles.edit_delete_Button} onClick={() => handleEditNote(note)}>Edytuj</button>
+              <button className={styles.edit_delete_Button} onClick={() => handleDeleteNote(note.note_id)}>Usuń</button>
+              </div>
             </div>
           ))
         ) : (

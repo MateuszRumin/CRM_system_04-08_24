@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useData } from '../../../contexts/DataContext';
 import styles from './ClientTasks.module.css';
 
@@ -10,29 +10,87 @@ interface Task {
 }
 
 export function ClientTasks() {
-  const { tasks, setTasks } = useData();
+  const { tasks, setTasks, isValidTasks, setValidTasks } = useData();
   const [newTask, setNewTask] = useState<Task>({
     title: '',
     deadline: '',
-    status: 'nieZaczety',
+    status: 'Nie zaczęty',
     description: '',
   });
+  const [isEditing, setIsEditing] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({
+    title: '',
+    deadline: '',
+    status: '',
+    description: '',
+  });
+
+  // Synchronize isValidTasks with isEditing
+  useEffect(() => {
+    if (isEditing) {
+      setValidTasks(false);
+    } else {
+      setValidTasks(true);
+    }
+  }, [isEditing, setValidTasks]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setNewTask(prevTask => ({ ...prevTask, [name]: value }));
+    setIsEditing(true); // Set isEditing to true on any change
+  };
+
+  const validateFields = () => {
+    const { title, deadline, status, description } = newTask;
+    const errorsCopy = { ...errors };
+
+    if (title.trim() === '') {
+      errorsCopy.title = 'Proszę uzupełnić tytuł zadania.';
+    } else {
+      errorsCopy.title = '';
+    }
+
+    if (deadline.trim() === '') {
+      errorsCopy.deadline = 'Proszę ustawić termin zadania.';
+    } else {
+      errorsCopy.deadline = '';
+    }
+
+    if (status.trim() === '') {
+      errorsCopy.status = 'Proszę wybrać status zadania.';
+    } else {
+      errorsCopy.status = '';
+    }
+
+    if (description.trim() === '') {
+      errorsCopy.description = 'Proszę uzupełnić opis zadania.';
+    } else {
+      errorsCopy.description = '';
+    }
+
+    setErrors(errorsCopy);
+
+    return (
+      errorsCopy.title === '' &&
+      errorsCopy.deadline === '' &&
+      errorsCopy.status === '' &&
+      errorsCopy.description === ''
+    );
   };
 
   const handleAddTask = () => {
-    if (newTask.title.trim() !== '' && newTask.deadline.trim() !== '' && newTask.description.trim() !== '') {
+    const fieldsValid = validateFields();
+
+    if (fieldsValid) {
       setTasks([...tasks, newTask]);
       setNewTask({
         title: '',
         deadline: '',
-        status: 'nieZaczety',
+        status: 'Nie zaczęty',
         description: '',
       });
       simulateDataSend(newTask);
+      setIsEditing(false); // Set isEditing to false after adding task
     }
   };
 
@@ -47,7 +105,7 @@ export function ClientTasks() {
         <div className={styles.taskForm}>
           <div className={styles.inputRow}>
             <div className={styles.inputGroup}>
-              <label className={styles.titleFormField} >Tytuł zadania</label>
+              <label className={styles.titleFormField}>Tytuł zadania</label>
               <input
                 type="text"
                 name="title"
@@ -55,9 +113,10 @@ export function ClientTasks() {
                 onChange={handleChange}
                 className={styles.inputField}
               />
+              {errors.title && <p className={styles.error}>{errors.title}</p>}
             </div>
             <div className={styles.inputGroup}>
-              <label className={styles.titleFormField} >Termin zadania</label>
+              <label className={styles.titleFormField}>Termin zadania</label>
               <input
                 type="date"
                 name="deadline"
@@ -65,9 +124,10 @@ export function ClientTasks() {
                 onChange={handleChange}
                 className={styles.inputField}
               />
+              {errors.deadline && <p className={styles.error}>{errors.deadline}</p>}
             </div>
             <div className={styles.inputGroup}>
-              <label className={styles.titleFormField} >Status zadania</label>
+              <label className={styles.titleFormField}>Status zadania</label>
               <select
                 name="status"
                 value={newTask.status}
@@ -79,6 +139,7 @@ export function ClientTasks() {
                 <option value="Zrobiony">Zrobiony</option>
                 <option value="Nie zrobiony (porażka)">Nie zrobiony (porażka)</option>
               </select>
+              {errors.status && <p className={styles.error}>{errors.status}</p>}
             </div>
           </div>
           <div className={styles.richTextEditor}>
@@ -86,9 +147,9 @@ export function ClientTasks() {
               name="description"
               value={newTask.description}
               onChange={handleChange}
-              placeholder="Wpisz opis zadania..."
               className={styles.textAreaField}
             ></textarea>
+            {errors.description && <p className={styles.error}>{errors.description}</p>}
           </div>
           <button
             type="button"
@@ -111,4 +172,4 @@ export function ClientTasks() {
       </div>
     </div>
   );
-};
+}

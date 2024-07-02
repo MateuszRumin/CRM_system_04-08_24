@@ -12,10 +12,17 @@
   border: 1px solid #24304F;
   background: #24304F;
   color: white;
-  text-decoration: none; 
+  text-decoration: none;
 }
 
-.BlueButton:hover {
+.blueButton:hover {
   background-color: gray;
-  cursor: pointer; 
+  cursor: pointer;
+}
+
+.disabled {
+  background-color: #ccc;
+  border-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
 }

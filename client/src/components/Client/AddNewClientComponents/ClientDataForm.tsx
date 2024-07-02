@@ -1,106 +1,101 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import styles from './ClientDataForm.module.css';
 import { useData } from '../../../contexts/DataContext';
 
-export function ClientDataForm() {
-  const { clientData, setClientData } = useData();
-  const [localClientData, setLocalClientData] = useState(clientData);
+interface ClientDataFormProps {
+  onSubmit: (data: any) => void;
+  formId: string;
+}
+
+export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
+  const { setClientData, setValid } = useData();
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isValid },
+    trigger,
+  } = useForm({
+    mode: 'onChange', // Ustawiamy onBlur, aby komunikaty walidacyjne pokazywały się po opuszczeniu pola
+    // defaultValues: clientData,
+  });
 
   useEffect(() => {
-    setLocalClientData(clientData);
-  }, [clientData]);
+    setClientData((prevData: any) => ({
+      ...prevData,
+      ...watch(),
+    }));
+  }, [watch, setClientData]);
 
   useEffect(() => {
-    setClientData(localClientData);
-  }, [localClientData, setClientData]);
-  
+    setValid(isValid);
+  }, [isValid, setValid]);
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLocalClientData({ ...localClientData, status: e.target.value });
-  };
-
-  const handleEmployeeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLocalClientData({ ...localClientData, assignedEmployee: e.target.value });
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setLocalClientData({ ...localClientData, [name]: value });
-  };
-
-  const handleCompanyTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setLocalClientData({ ...localClientData, [name]: value });
-  };
-
-  const handleEmailChange = (index: number, value: string) => {
-    const updatedEmails = [...localClientData.emails];
-    updatedEmails[index] = value;
-    setLocalClientData({ ...localClientData, emails: updatedEmails });
-  };
-
-  const handlePhoneChange = (index: number, value: string) => {
-    const updatedPhones = [...localClientData.phones];
-    updatedPhones[index] = value;
-    setLocalClientData({ ...localClientData, phones: updatedPhones });
+  const handleFetchData = () => {
+    console.log('Pobieranie danych z REGON:', watch('nip'));
   };
 
   const handleAddEmail = () => {
-    setLocalClientData({ ...localClientData, emails: [...localClientData.emails, ''] });
+    const currentEmails = watch('emails') || [];
+    setValue('emails', [...currentEmails, '']);
+    trigger('emails'); // Wyzwalamy walidację po dodaniu
   };
+  
 
   const handleRemoveEmail = (index: number) => {
-    const updatedEmails = [...localClientData.emails];
-    updatedEmails.splice(index, 1);
-    setLocalClientData({ ...localClientData, emails: updatedEmails });
-  };
+  console.log('Removing email at index:', index);
+  
+  const currentEmails = watch('emails') || [];
+  currentEmails.splice(index, 1);
+  setValue('emails', currentEmails);
+  trigger('emails'); // Wyzwalamy walidację po usunięciu
+};
 
+  
   const handleAddPhone = () => {
-    setLocalClientData({ ...localClientData, phones: [...localClientData.phones, ''] });
+    const phones = watch('phones') || [];
+    setValue('phones', [...phones, '']);
+    trigger('phones'); // Wyzwalamy walidację po dodaniu
   };
 
   const handleRemovePhone = (index: number) => {
-    const updatedPhones = [...localClientData.phones];
-    updatedPhones.splice(index, 1);
-    setLocalClientData({ ...localClientData, phones: updatedPhones });
-  };
-
-  const handleFetchData = () => {
-    // Tutaj można by zaimplementować logikę pobierania danych z REGON
-    console.log('Symulacja pobrania danych z REGON:', localClientData.nip);
-    // Na potrzeby symulacji, logujemy NIP klienta
+    const phones = watch('phones') || [];
+    phones.splice(index, 1);
+    setValue('phones', phones);
+    trigger('phones'); // Wyzwalamy walidację po usunięciu
   };
 
   return (
     <div className={styles.formContainer}>
       <h2>Dane klienta</h2>
-      <form className={styles.form}>
+      <form id={formId} className={styles.form} onSubmit={handleSubmit(onSubmit)}>
         <div className={styles.row}>
           <label className={styles.label}>
             Status
             <select
               className={styles.select}
-              name="status"
-              value={clientData.status}
-              onChange={handleStatusChange}
+              {...register('status', { required: 'Status jest wymagany.' })}
             >
-              <option value="wtrakcie">W trakcie</option>
-              <option value="zrobiony">Zrobiony</option>
-              <option value="niezrobiony">Niezrobiony</option>
+              <option value="Nie zaczęty">W toku</option>
+              <option value="Zrobiony">Zrobione</option>
+              <option value="Nie zrobiony">Nie zrobione</option>
             </select>
+            {errors.status && <span className={styles.error}>{errors.status.message as string}</span>}
           </label>
           <label className={styles.label}>
             Przypisany pracownik
             <select
               className={styles.select}
-              name="assignedEmployee"
-              value={clientData.assignedEmployee}
-              onChange={handleEmployeeChange}
+              {...register('assignedEmployee', { required: 'Przypisany pracownik jest wymagany.' })}
             >
               <option value="">Wybierz pracownika</option>
-              <option value="Kamil Wojnarowski">Kamil Wojnarowski</option>
+              <option value="Paweł Nowak">Paweł Nowak</option>
               <option value="other">Inny pracownik</option>
             </select>
+            {errors.assignedEmployee && <span className={styles.error}>{errors.assignedEmployee.message as string}</span>}
           </label>
         </div>
         <div className={styles.row}>
@@ -109,165 +104,196 @@ export function ClientDataForm() {
             <input
               className={styles.input}
               type="text"
-              name="firstName"
-              value={clientData.firstName}
-              onChange={handleInputChange}
+              {...register('firstName', {
+                required: 'Imię jest wymagane.',
+                minLength: { value: 2, message: 'Imię musi mieć co najmniej 2 znaki.' },
+                pattern: {
+                  value: /^[A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ\s]+$/,
+                  message: 'Imię może zawierać tylko litery i spacje.',
+                },
+              })}
             />
+            {errors.firstName && <span className={styles.error}>{errors.firstName.message as string}</span>}
           </label>
           <label className={styles.label}>
             Nazwisko
             <input
               className={styles.input}
               type="text"
-              name="lastName"
-              value={clientData.lastName}
-              onChange={handleInputChange}
+              {...register('lastName', {
+                required: 'Nazwisko jest wymagane.',
+                minLength: { value: 2, message: 'Nazwisko musi mieć co najmniej 2 znaki.' },
+                pattern: {
+                  value: /^[A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ\s]+$/,
+                  message: 'Nazwisko może zawierać tylko litery i spacje.',
+                },
+              })}
             />
+            {errors.lastName && <span className={styles.error}>{errors.lastName.message as string}</span>}
           </label>
         </div>
         <div className={styles.row}>
           <label className={styles.radioGroup}>
             <input
               type="radio"
-              name="companyType"
-              value="firma"
-              checked={clientData.companyType === 'firma'}
-              onChange={handleCompanyTypeChange}
+              {...register('companyType')}
+              value="company"
             />
             Firma
           </label>
           <label className={styles.radioGroup}>
             <input
               type="radio"
-              name="companyType"
-              value="osobaPrywatna"
-              checked={clientData.companyType === 'osobaPrywatna'}
-              onChange={handleCompanyTypeChange}
+              {...register('companyType')}
+              value="privatePerson"
             />
             Osoba prywatna
           </label>
         </div>
-        <div className={styles.row}>
-          <label className={styles.label}>
-            NIP
-            <input
-              className={styles.input}
-              type="text"
-              name="nip"
-              value={clientData.nip}
-              onChange={handleInputChange}
-            />
-          </label>
-          <button
-            className={styles.button}
-            type="button"
-            onClick={handleFetchData}
-          >
-            Pobierz dane z REGON
-          </button>
-        </div>
-        <div className={styles.row}>
-          <label className={styles.label}>
-            REGON
-            <input
-              className={styles.input}
-              type="text"
-              name="regon"
-              value={clientData.regon}
-              onChange={handleInputChange}
-            />
-          </label>
-          <label className={styles.label}>
-            KRS
-            <input
-              className={styles.input}
-              type="text"
-              name="krs"
-              value={clientData.krs}
-              onChange={handleInputChange}
-            />
-          </label>
-        </div>
-        <div className={styles.row}>
-          <label className={styles.label}>
-            Nazwa firmy
-            <input
-              className={styles.input}
-              type="text"
-              name="companyName"
-              value={clientData.companyName}
-              onChange={handleInputChange}
-            />
-          </label>
-        </div>
-        <div className={styles.row}>
-          <label className={styles.label}>
-            Adres firmy
-            <input
-              className={styles.input}
-              type="text"
-              name="companyAddress"
-              value={clientData.companyAddress}
-              onChange={handleInputChange}
-            />
-          </label>
-        </div>
-        <div className={styles.phoneEmailSection}>
-          <div className={styles.section}>
-            <h3>Email</h3>
-            {clientData.emails.map((email: string, index: number) => (
-              <div className={styles.row} key={index}>
+        {watch('companyType') === 'company' && (
+          <>
+            <div className={styles.row}>
+              <label className={styles.label}>
+                NIP
                 <input
                   className={styles.input}
-                  type="email"
-                  value={email}
-                  onChange={(e) => handleEmailChange(index, e.target.value)}
+                  type="text"
+                  {...register('nip', {
+                    required: 'NIP jest wymagany.',
+                    minLength: { value: 10, message: 'NIP musi mieć 10 znaków.' },
+                    maxLength: { value: 10, message: 'NIP musi mieć 10 znaków.' },
+                    pattern: {
+                      value: /^[0-9]+$/,
+                      message: 'NIP może zawierać tylko cyfry.',
+                    },
+                  })}
                 />
-                <button
-                  className={styles.button}
-                  type="button"
-                  onClick={() => handleRemoveEmail(index)}
-                >
-                  Usuń
-                </button>
-              </div>
-            ))}
-            <button
-              className={styles.addEmailButton}
-              type="button"
-              onClick={handleAddEmail}
-            >
+                {errors.nip && <span className={styles.error}>{errors.nip.message as string}</span>}
+              </label>
+              <button className={styles.button} type="button" onClick={handleFetchData}>
+                Pobierz dane z REGON
+              </button>
+            </div>
+            <div className={styles.row}>
+              <label className={styles.label}>
+                REGON
+                <input
+                  className={styles.input}
+                  type="text"
+                  {...register('regon', {
+                    required: 'REGON jest wymagany.',
+                    minLength: { value: 9, message: 'REGON musi mieć 9 znaków.' },
+                    maxLength: { value: 9, message: 'REGON musi mieć 9 znaków.' },
+                    pattern: {
+                      value: /^[0-9]+$/,
+                      message: 'REGON może zawierać tylko cyfry.',
+                    },
+                  })}
+                />
+                {errors.regon && <span className={styles.error}>{errors.regon.message as string}</span>}
+              </label>
+              <label className={styles.label}>
+                KRS
+                <input
+                  className={styles.input}
+                  type="text"
+                  {...register('krs', {
+                    minLength: { value: 9, message: 'KRS musi mieć co najmniej 9 znaków.' },
+                    maxLength: { value: 14, message: 'KRS musi mieć maksymalnie 14 znaków.' },
+                    pattern: {
+                      value: /^[0-9]+$/,
+                      message: 'KRS może zawierać tylko cyfry.',
+                    },
+                  })}
+                />
+                {errors.krs && <span className={styles.error}>{errors.krs.message as string}</span>}
+              </label>
+            </div>
+            <div className={styles.row}>
+              <label className={styles.label}>
+                Nazwa firmy
+                <input
+                  className={styles.input}
+                  type="text"
+                  {...register('companyName', {
+                    minLength: { value: 3, message: 'Nazwa firmy musi mieć co najmniej 3 znaki.' },
+                  })}
+                />
+                {errors.companyName && <span className={styles.error}>{errors.companyName.message as string}</span>}
+              </label>
+            </div>
+            <div className={styles.row}>
+              <label className={styles.label}>
+                Adres firmy
+                <input
+                  className={styles.input}
+                  type="text"
+                  {...register('companyAddress', {
+                    minLength: { value: 3, message: 'Adres firmy musi mieć co najmniej 3 znaki.' },
+                  })}
+                />
+                {errors.companyAddress && <span className={styles.error}>{errors.companyAddress.message as string}</span>}
+              </label>
+            </div>
+          </>
+        )}
+        <div className={styles.row}>
+          <label className={styles.label}>
+            E-maile
+            {watch('emails', []).map((email: string, index: number) => (
+  <div key={index} className={styles.emailRow}>
+    <input
+      className={styles.input}
+      type="email"
+      {...register(`emails.${index}`, {
+        required: 'Email jest wymagany.',
+        pattern: {
+          value: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
+          message: 'Nieprawidłowy format email.',
+        },
+      })}
+    />
+    <button className={styles.button} type="button" onClick={() => handleRemoveEmail(index)}>
+      Usuń
+    </button>
+    {errors.emails && errors.emails[index] && (
+      <span className={styles.error}>{errors.emails[index].message}</span>
+    )}
+  </div>
+))}
+
+            <button className={styles.button} type="button" onClick={handleAddEmail}>
               Dodaj email
             </button>
-          </div>
-          <div className={styles.section}>
-            <h3>Telefony</h3>
-            {clientData.phones.map((phone: string, index: number) => (
-              <div className={styles.row} key={index}>
+          </label>
+        </div>
+        <div className={styles.row}>
+          <label className={styles.label}>
+            Telefony
+            {watch('phones', []).map((phone: string, index: number) => (
+              <div key={index} className={styles.phoneRow}>
                 <input
                   className={styles.input}
                   type="tel"
-                  value={phone}
-                  onChange={(e) => handlePhoneChange(index, e.target.value)}
+                  {...register(`phones.${index}`, {
+                    required: 'Numer telefonu jest wymagany.',
+                    pattern: { value: /^[0-9]+$/, message: 'Numer telefonu może zawierać tylko cyfry.' },
+                  })}
                 />
-                <button
-                  className={styles.button}
-                  type="button"
-                  onClick={() => handleRemovePhone(index)}
-                >
+                <button className={styles.button} type="button" onClick={() => handleRemovePhone(index)}>
                   Usuń
                 </button>
+                {errors.phones && errors.phones[index] && (
+                  <span className={styles.error}>{errors.phones[index].message}</span>
+                )}
               </div>
             ))}
-            <button
-              className={styles.addPhoneButton}
-              type="button"
-              onClick={handleAddPhone}
-            >
+            <button className={styles.button} type="button" onClick={handleAddPhone}>
               Dodaj telefon
             </button>
-          </div>
+          </label>
         </div>
+        <button type="submit" style={{ display: 'none' }}>Ukryty przycisk</button>
       </form>
     </div>
   );

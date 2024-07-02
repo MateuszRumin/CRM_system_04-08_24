@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useData } from '../../../contexts/DataContext';
 import styles from './ClientTasks.module.css';
 
@@ -15,7 +15,7 @@ interface ClientTasksProps {
 }
 
 export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
-  const { tasks, addTask, updateTask, deleteTask } = useData();
+  const { addTask, updateTask, deleteTask, setValidTasks } = useData();
   const [localTasks, setLocalTasks] = useState<Task[]>(initialTasks);
   const [newTask, setNewTask] = useState<Task>({
     task_id: localTasks.length + 1, // Generowanie nowego ID, lepszym podejściem byłoby generowanie na serwerze
@@ -26,6 +26,15 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
   });
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editedTask, setEditedTask] = useState<Task | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  
+  useEffect(() => {
+    if (isEditing) {
+      setValidTasks(false);
+    } else {
+      setValidTasks(true);
+    }
+  }, [isEditing, setValidTasks]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -34,6 +43,7 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
     } else {
       setNewTask(prevTask => ({ ...prevTask, [name]: value }));
     }
+    setIsEditing(true); // Set isEditing to true on any change
   };
 
   const handleAddTask = () => {
@@ -47,17 +57,18 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
         task_status: 'Nie zaczęty',
         task_description: '',
       });
+      setIsEditing(false); // Set isEditing to false after adding task
     }
   };
-  
 
   const handleEditTask = (task: Task) => {
     setEditingTaskId(task.task_id);
     setEditedTask(task);
+    setIsEditing(true); // Set isEditing to true when editing a task
   };
 
   const handleSaveEditedTask = () => {
-    if (editedTask) {
+    if (editedTask && validateForm(editedTask)) {
       const updatedLocalTasks = localTasks.map(task =>
         task.task_id === editedTask.task_id ? editedTask : task
       );
@@ -67,6 +78,7 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
 
       setEditingTaskId(null);
       setEditedTask(null);
+      setIsEditing(false); // Set isEditing to false after saving edited task
     }
   };
 
@@ -76,34 +88,31 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
     task_status: '',
     task_description: '',
   });
-  
 
-
-  const validateForm = (): boolean => {
+  const validateForm = (task: Task = newTask): boolean => {
     let valid = true;
     const errors: { [key: string]: string } = {};
   
-    if (newTask.task_title.trim() === '') {
+    if (task.task_title.trim() === '') {
       errors['task_title'] = 'Pole tytułu jest wymagane';
       valid = false;
     }
-    if (newTask.task_deadline.trim() === '') {
+    if (task.task_deadline.trim() === '') {
       errors['task_deadline'] = 'Pole terminu jest wymagane';
       valid = false;
     } else {
-      // Sprawdzamy czy data terminu jest w przyszłości
       const today = new Date();
-      const deadlineDate = new Date(newTask.task_deadline);
+      const deadlineDate = new Date(task.task_deadline);
       if (deadlineDate <= today) {
         errors['task_deadline'] = 'Termin zadania musi być w przyszłości';
         valid = false;
       }
     }
-    if (newTask.task_status === '') {
+    if (task.task_status === '') {
       errors['task_status'] = 'Wybierz status zadania';
       valid = false;
     }
-    if (newTask.task_description.trim() === '') {
+    if (task.task_description.trim() === '') {
       errors['task_description'] = 'Pole opisu jest wymagane';
       valid = false;
     }
@@ -111,8 +120,6 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
     setFormErrors(errors);
     return valid;
   };
-  
-  
 
   const handleDeleteTask = (taskId: number) => {
     const updatedLocalTasks = localTasks.filter(task => task.task_id !== taskId);
@@ -167,14 +174,14 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
             </div>
           </div>
           <div className={styles.richTextEditor}>
-          <textarea
-            name="task_description"
-            value={editingTaskId !== null && editedTask ? editedTask.task_description : newTask.task_description}
-            onChange={handleChange}
-            placeholder="Wpisz opis zadania..."
-            className={styles.textAreaField}
-          ></textarea>
-          {formErrors.task_description && <p className={styles.error}>{formErrors.task_description}</p>}
+            <textarea
+              name="task_description"
+              value={editingTaskId !== null && editedTask ? editedTask.task_description : newTask.task_description}
+              onChange={handleChange}
+              placeholder="Wpisz opis zadania..."
+              className={styles.textAreaField}
+            ></textarea>
+            {formErrors.task_description && <p className={styles.error}>{formErrors.task_description}</p>}
           </div>
           {editingTaskId !== null ? (
             <button
@@ -202,6 +209,7 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
             <p><strong>Termin:</strong> {task.task_deadline}</p>
             <p><strong>Status:</strong> {task.task_status}</p>
             <p>{task.task_description}</p>
+            <div className={styles.button_container}>
             <button className={styles.addButton}
              onClick={() => handleEditTask(task)}>
               Edytuj
@@ -210,6 +218,7 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
              onClick={() => handleDeleteTask(task.task_id)}>
               Usuń
             </button>
+            </div>
           </div>
         ))}
       </div>
