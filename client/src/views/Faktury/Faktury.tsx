@@ -3,8 +3,10 @@ import styles from './Faktury.module.css';
 import invoices from '../../data/invoices';
 import ThreeDotIcon from '../../../public/icons/3dot.svg';
 import SortIcon from '../../../public/icons/bxs_sort-alt.svg';
+import FilterSettingsModal from '../../components/Invoice/FilterSettingsModal';
 
 export const Faktury = () => {
+
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [filteredInvoices, setFilteredInvoices] = useState(invoices);
@@ -22,6 +24,16 @@ export const Faktury = () => {
   const [sortTypeForInvoiceStatus, setSortTypeForInvoiceStatus] = useState<'asc' | 'desc' | null>(null); // Dodane
 
   const itemsPerPageOptions = [10, 20, 30, 50];
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     const results = invoices.filter(invoice =>
@@ -224,10 +236,10 @@ export const Faktury = () => {
               </div>
             )}
           </div>
-          <button className={styles.filter_box}>
-            <img src="/icons/filter.svg" alt="Filter" className={styles.icon} />
-            <div className={styles.filter_text}>Filtruj</div>
-          </button>
+          <button className={styles.filter_box} onClick={openModal}>
+          <img src="/icons/filter.svg" alt="Filter" className={styles.icon} />
+          <div className={styles.filter_text}>Filtruj</div>
+        </button>
           <button className={styles.create_button}>
             <div className={styles.create_text}>Stwórz nową Fakturę</div>
           </button>
@@ -353,6 +365,7 @@ export const Faktury = () => {
           </div>
         )}
       </div>
+      {isModalOpen && <FilterSettingsModal onClose={closeModal} />}
     </div>
   );
 };
