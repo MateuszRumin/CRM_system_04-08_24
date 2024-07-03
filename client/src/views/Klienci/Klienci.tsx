@@ -9,6 +9,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 export const Klienci = () => {
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filterOptions, setFilterOptions] = useState<{ [key: string]: string }>({});
 
   const isAddClientRoute = location.pathname.includes('add-client');
   const isEditClientRoute = location.pathname.includes('edit-client');
@@ -21,11 +22,11 @@ export const Klienci = () => {
             <h1>Klienci</h1>
             <div className={styles.actions}>
               <SearchClient onSearch={setSearchTerm} />
-              <FilterClient />
+              <FilterClient onFilter={setFilterOptions} />
               <AddNewClientButton />
             </div>
           </div>
-          <ClientTable searchTerm={searchTerm} />
+          <ClientTable searchTerm={searchTerm} filterOptions={filterOptions} />
         </div>
       )}
       <Outlet />

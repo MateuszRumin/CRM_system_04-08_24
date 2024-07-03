@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import styles from './ClientTable.module.css';
 import { ClientRow } from './ClientRow';
 import Pagination from './Pagination';
+import { parseISO, format } from 'date-fns';
 
 interface Client {
-  id: number,
+  id: number;
   name: string;
   status: string;
   projects: string;
@@ -14,7 +15,9 @@ interface Client {
 
 interface ClientTableProps {
   searchTerm: string;
+  filterOptions: { [key: string]: string };
 }
+
 
 // Mock data simulating API response
 const clients = [
@@ -96,7 +99,7 @@ const clients = [
     status: 'Niepodjęty',
     projects: '3 aktywne / 10 wszystkich',
     nextPayment: 'FV #1659 - 03.09.2024 - 3400 zł netto',
-    addedOn: '15.06.2024 - Polecenie',
+    addedOn: '15.07.2024 - Polecenie',
   },
   {
     id: 11,
@@ -152,7 +155,7 @@ const clients = [
     status: 'W trakcie',
     projects: '7 aktywnych / 10 wszystkich',
     nextPayment: 'FV #1666 - 25.07.2024 - 4600 zł netto',
-    addedOn: '15.06.2024 - Organiczny',
+    addedOn: '15.06.2023 - Organiczny',
   },
   {
     id: 18,
@@ -167,7 +170,7 @@ const clients = [
     name: 'SigmaTech Adam Zieliński',
     status: 'Niepodjęty',
     projects: '2 aktywne / 5 wszystkich',
-    nextPayment: 'FV #1668 - 10.09.2024 - 2000 zł netto',
+    nextPayment: 'FV #1668 - 10.09.2023 - 2000 zł netto',
     addedOn: '20.06.2024 - Organiczny',
   },
   {
@@ -189,32 +192,95 @@ const clients = [
 ];
 
 
-export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm }) => {
+export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOptions }) => {
   const [filteredClients, setFilteredClients] = useState<Client[]>(clients);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10); // Default items per page
-  const itemsPerPageOptions: number[] = [10, 20, 30, 50]; // Options for items per page
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const itemsPerPageOptions: number[] = [10, 20, 30, 50];
+
+  // Adjust parseDate to handle DD.MM.YYYY format
+  const parseDate = (dateString: string) => {
+    const [day, month, year] = dateString.split('.').map(Number);
+    return new Date(year, month - 1, day); // Poprawny przesunięcie miesięcy
+  };
+  
+  
+  const formatDate = (date: Date) => {
+    return format(date, 'yyyy-MM-dd');
+  };
 
   useEffect(() => {
-    const results = clients.filter(client =>
+    let results = clients.filter(client =>
       client.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+  
+    if (Object.keys(filterOptions).length > 0) {
+      results = results.filter(client => {
+        return Object.entries(filterOptions).every(([key, value]) => {
+          if (key === 'projects') {
+            const [activeFilter, totalFilter] = value.split('/').map(item => item.trim());
+            const [activeProjectsClient, totalProjectsClient] = client.projects
+              .split('/')
+              .map(item => parseInt(item.trim(), 10));
+  
+            const activeMatches = activeFilter === '' || activeProjectsClient.toString() === activeFilter;
+            const totalMatches = totalFilter === '' || totalProjectsClient.toString() === totalFilter;
+  
+            return activeMatches && totalMatches;
+          } else if (key === 'nextPayment') {
+            const [invoiceNumberFilter, paymentDateFilter, paymentAmountFilter] = value.split(' - ').map(item => item.trim());
+            const [invoiceNumberClient, paymentDateClient, paymentAmountClient] = client.nextPayment.split(' - ').map(item => item.trim());
+  
+            const invoiceMatches = invoiceNumberFilter === '' || invoiceNumberClient.includes(invoiceNumberFilter);
+  
+            // Formatowanie daty filtrowania
+            const formattedPaymentDateFilter = paymentDateFilter ? parseISO(paymentDateFilter) : null;
+            const formattedPaymentDateClient = parseDate(paymentDateClient);
+  
+            // Porównanie dat
+            const dateMatches = !formattedPaymentDateFilter || (formattedPaymentDateClient && formattedPaymentDateClient.getTime() === formattedPaymentDateFilter.getTime());
+  
+            const amountMatches = paymentAmountFilter === '' || paymentAmountClient.includes(paymentAmountFilter);
+  
+            return invoiceMatches && dateMatches && amountMatches;
+          } else if (key === 'addedOn') {
+            const [addedDateFilter, addedSourceFilter] = value.split(' - ').map(item => item.trim());
+            const [addedDateClient, addedSourceClient] = client.addedOn.split(' - ').map(item => item.trim());
+  
+            const formattedAddedDateFilter = addedDateFilter ? parseDate(addedDateFilter) : null;
+            const formattedAddedDateClient = parseDate(addedDateClient);
+  
+            // Porównanie dat i źródeł
+            const dateMatches = !formattedAddedDateFilter || (formattedAddedDateClient && formattedAddedDateClient.getTime() === formattedAddedDateFilter.getTime());
+            const sourceMatches = addedSourceFilter === '' || addedSourceClient.includes(addedSourceFilter);
+  
+            return dateMatches && sourceMatches;
+          } else {
+            // Dodano warunek sprawdzający typ wartości
+            if (typeof value === 'string') {
+              return client[key as keyof Client].toString().toLowerCase().includes(value.toLowerCase());
+            } else {
+              return client[key as keyof Client] === value;
+            }
+          }
+        });
+      });
+    }
+  
     setFilteredClients(results);
-    setCurrentPage(1); // Reset to the first page when search term changes
-  }, [searchTerm]);
+    setCurrentPage(1);
+  }, [searchTerm, filterOptions]);
+  
 
-  // Get current clients based on pagination
   const indexOfLastClient: number = currentPage * itemsPerPage;
   const indexOfFirstClient: number = indexOfLastClient - itemsPerPage;
   const currentClients: Client[] = filteredClients.slice(indexOfFirstClient, indexOfLastClient);
 
-  // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  // Change items per page
   const changeItemsPerPage = (newItemsPerPage: number) => {
     setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1); // Reset to the first page when changing items per page
+    setCurrentPage(1);
   };
 
   return (
