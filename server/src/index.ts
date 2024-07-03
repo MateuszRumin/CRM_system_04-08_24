@@ -13,19 +13,13 @@ const app = express();
 app.set('logger', logger);
 app.use(express.json());
 
-
-
-
-
 //inicjalizacja klienta prisma
 const prisma = new PrismaClient();
 app.set('prisma', prisma);
 
-
 // przekierownie routningu
 const route = require('./router/mainRouter')
 app.use(route)
-
 
 //start servera
 const port = process.env.PORT || 3303;
@@ -39,5 +33,17 @@ app.listen(port, () => {
     console.log(`Failed to start server: ${error}`)
 }
 
+// Sprawdzenie połączenia z bazą danych
+async function checkDatabaseConnection() {
+    try {
+        await prisma.$connect();
+        // logger.info('Connected to database');
+        console.log('Connected to database');
+    } catch (error) {
+        // logger.error(`Database connection Error: ${error}`);
+        console.log(`Database connection error`);
+        //process.exit(1);
+    }
+}
 
-
+checkDatabaseConnection();

@@ -80,7 +80,6 @@ enum clientTypeValues {
   Firma
 }
 
-
 model Clients {
   client_id Int @id @default(autoincrement())
   status_id Int
@@ -150,8 +149,6 @@ model ClientNotes {
   Client Clients @relation(fields: [client_id],references: [client_id])
   Note Notes @relation(fields: [note_id],references: [note_id])
 }
-
-
 
 model Tasks {
   task_id Int @id @default(autoincrement())

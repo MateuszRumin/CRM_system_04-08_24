@@ -1,8 +1,8 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "prisma":{
-      "seed":"ts-node  prisma/seed.ts"
+  "prisma": {
+    "seed": "ts-node  prisma/seed.ts"
   },
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,9 @@
   "description": "",
   "devDependencies": {
     "@prisma/client": "^5.15.1",
+    "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.14.8",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
@@ -27,5 +29,9 @@
     "typescript": "^5.5.2",
     "winston": "^3.13.0",
     "winston-daily-rotate-file": "^5.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
   }
 }

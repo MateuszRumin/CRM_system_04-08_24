@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { IResponse } from '../../../../globalTypes/iResponce';
 
-
-
 exports.addNewTaskClient = async (req: Request, res: Response, next: NextFunction) => {
    
     const prisma = req.app.get('prisma')
@@ -24,8 +22,7 @@ exports.addNewTaskClient = async (req: Request, res: Response, next: NextFunctio
                     name:taskData.status_name
                 }
     
-            })
-            
+            })            
             
             let insertData = {
                 status_id:status.status_id,
@@ -58,9 +55,7 @@ exports.addNewTaskClient = async (req: Request, res: Response, next: NextFunctio
             message: 'Dodano, klięta, notatki,zadania',
             devmessage: `Fill database Succes`,
             data: null
-        };  
-
-
+        }; 
        
         res.status(200).json(response)
 
@@ -78,15 +73,4 @@ exports.addNewTaskClient = async (req: Request, res: Response, next: NextFunctio
 
         res.status(404).json(response)
     }
-    
-
-
-
-
-
-
-
-
-
-
 }

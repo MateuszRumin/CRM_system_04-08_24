@@ -1,16 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { IResponse } from '../../../../globalTypes/iResponce';
 
-
-
-
-
-
-
 exports.addNewClient = async (req: Request, res: Response, next: NextFunction) => {
     const prisma = req.app.get('prisma')
-    try  {
-        
+    try  {        
         
         const initData = req.body.client
         const status = await prisma.Statuses.findFirst({
@@ -23,8 +16,6 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
             }
 
         })
-
-        
 
         const insertData = {
             status_id: status.status_id,
@@ -42,21 +33,13 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
         initData.krs ? Object.assign(insertData, {krs:initData.krs}):void 0
         initData.company_name ? Object.assign(insertData, {company_name:initData.company_name}):void 0
         
-        
-
-        
-
         const client = await prisma.Clients.create({
             data:insertData
         })
-
         
         req.body.client_id = client.client_id
         req.body.user_id = initData.user_id
-
-        
-
-        
+       
         next()
 
     }catch (error){
@@ -72,16 +55,4 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
 
         res.status(302).json(response)
     }
-
-
-
-    
-
-
-
-
-   
-
-
-
 }
