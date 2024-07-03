@@ -1,0 +1,59 @@
+# Ignoruj pliki node_modules w obu katalogach
+client/node_modules/
+server/node_modules/
+
+# Ignoruj pliki build (output) w obu katalogach
+client/build/
+server/build/
+
+# Ignoruj pliki logów
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+server/npm-debug.log*
+server/yarn-debug.log*
+server/yarn-error.log*
+
+# Ignoruj pliki środowiskowe
+client/.env
+server/.env
+
+# Ignoruj pliki tymczasowe edytorów kodu
+*.swp
+*.swo
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Ignoruj pliki i katalogi systemowe
+.DS_Store
+Thumbs.db
+
+# Ignoruj wyniki kompilacji TypeScript (jeśli używasz TypeScript)
+client/dist/
+server/dist/
+client/tsconfig.tsbuildinfo
+server/tsconfig.tsbuildinfo
+
+# Ignoruj pliki cache'ów
+client/.next/
+server/.next/
+client/.cache/
+server/.cache/
+
+# Ignoruj pliki lockfile
+client/package-lock.json
+client/yarn.lock
+server/package-lock.json
+server/yarn.lock
+
+# Ignoruj pliki prywatnych kluczy
+client/private.key
+server/private.key
+
+# Ignoruj pliki cypress (jeśli używasz cypress do testów e2e)
+client/cypress/screenshots/
+client/cypress/videos/
+server/cypress/screenshots/
+server/cypress/videos/

@@ -142,15 +142,14 @@
   font-size: 16px;
   font-family: 'Inter', sans-serif;
   border-radius: 5px;
+  user-select: none;
 }
 
 .table th:hover {
   background-color: #f3f3f3;
   cursor: pointer;
 }
-.desc {
-  transform: scaleY(-1);
-}
+
 .table td {
   color: black;
   font-size: 15px;
@@ -194,20 +193,24 @@
 .Oplacona {
   color: #1f9254;
   background-color: #ebf9f1;
+  font-size: 13px;
 }
 
 .Nieoplacona {
   color: #a30d11;
+  font-size: 13px;
   background-color: #fbe7e8;
 }
 
 .OczekujeNaPlatnosc {
   color: #726d00;
   background-color: #feffc0;
+  font-size: 13px;
 }
 .absoluteMenu {
   position: absolute;
   z-index: 100;
+  
 }
 
 .menu {
