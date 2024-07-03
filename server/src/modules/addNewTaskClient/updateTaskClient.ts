@@ -7,62 +7,18 @@ import { IResponse } from '../../../../globalTypes/iResponce';
 const prisma = new PrismaClient();
 
 export const updateTaskStatus = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { status_id } = req.body;
     try {
-        const { task_id, status_name } = req.body;
-
-        // Pobranie nowego statusu zadania
-        const newStatus = await prisma.statuses.findFirst({
-            select: {
-                status_id: true,
-            },
-            where: {
-                status_type: 'Zadanie',
-                name: status_name,
-            },
-        });
-
-        if (!newStatus) {
-            const response: IResponse = {
-                status: 'error',
-                display: true,
-                error: { message: `Nie znaleziono statusu o nazwie ${status_name}` },
-                message: 'Błąd podczas aktualizacji statusu zadania',
-                devmessage: `Nie znaleziono statusu o nazwie ${status_name}`,
-                data: null,
-            };
-            return res.status(404).json(response);
-        }
-
-        // Aktualizacja zadania
         const updatedTask = await prisma.tasks.update({
-            where: {
-                task_id: task_id,
-            },
+            where: { task_id: parseInt(id) },
             data: {
-                status_id: newStatus.status_id,
+                status_id: status_id,
             },
         });
-
-        const response: IResponse = {
-            status: 'info',
-            display: true,
-            error: null,
-            message: 'Zaktualizowano status zadania',
-            devmessage: `Aktualizacja statusu zadania o id ${task_id} zakończona sukcesem`,
-            data: updatedTask,
-        };
-
-        res.status(200).json(response);
+        res.status(200).json(updatedTask);
     } catch (error) {
-        const response: IResponse = {
-            status: 'error',
-            display: true,
-            error: { error },
-            message: 'Błąd podczas aktualizacji statusu zadania',
-            devmessage: `${error}`,
-            data: null,
-        };
-
-        res.status(500).json(response);
+        console.error('Error updating task status:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };

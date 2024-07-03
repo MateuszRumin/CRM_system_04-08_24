@@ -80,7 +80,6 @@ enum clientTypeValues {
   Firma
 }
 
-
 model Clients {
   client_id Int @id @default(autoincrement())
   status_id Int

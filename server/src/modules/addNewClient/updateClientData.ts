@@ -6,65 +6,86 @@ import { IResponse } from '../../../../globalTypes/iResponce';
 
 const prisma = new PrismaClient();
 
-export const updateClientData = async (req: Request, res: Response, next: NextFunction) => {
+export const updateClientData = async (req: Request, res: Response) => {
+    const { client_id } = req.params;
+    const {
+        status_id,
+        user_id,
+        client_type,
+        first_name,
+        second_name,
+        regon,
+        nip,
+        krs,
+        company_name,
+        address,
+        contacts
+    } = req.body;
+
     try {
-        const { client_id, client } = req.body;
-
-        // Sprawdzenie, czy klient istnieje
-        const existingClient = await prisma.clients.findUnique({
-            where: {
-                client_id: client_id,
-            },
-        });
-
-        if (!existingClient) {
-            const response: IResponse = {
-                status: 'error',
-                display: true,
-                error: { message: `Klient o id ${client_id} nie istnieje` },
-                message: 'Błąd podczas aktualizacji danych klienta',
-                devmessage: `Klient o id ${client_id} nie istnieje`,
-                data: null,
-            };
-            return res.status(404).json(response);
+        // Sprawdzamy, czy clientId jest liczbą
+        const id = parseInt(client_id, 10);
+        if (isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid clientId parameter' });
         }
 
-        // Aktualizacja danych klienta
+        // Aktualizujemy dane klienta
         const updatedClient = await prisma.clients.update({
             where: {
-                client_id: client_id,
+                client_id: id,
             },
             data: {
-                status_id: existingClient.status_id, // Może być potrzebne do aktualizacji statusu klienta
-                user_id: existingClient.user_id, // Może być potrzebne do aktualizacji user_id
-                client_type: client.client_type,
-                first_name: client.first_name,
-                second_name: client.second_name,
-                address: client.address,
-                registration_date: client.registration_date,
-                regon: client.regon,
-                nip: client.nip,
-                krs: client.krs,
-                company_name: client.company_name,
+                status_id,
+                user_id,
+                client_type,
+                first_name,
+                second_name,
+                regon,
+                nip,
+                krs,
+                company_name,
+                address,
             },
         });
 
-        req.body.client_id = updatedClient.client_id;
-        req.body.user_id = updatedClient.user_id; // Może być potrzebne, jeśli chcesz przekazać dalej do kolejnych middleware lub routera
+        // Usuwamy istniejące dane kontaktowe, jeśli są
+        await prisma.clientContacts.deleteMany({
+            where: {
+                client_id: id,
+            },
+        });
 
-        next(); // Przekazanie dalej do następnego middleware lub routera
+        // Dodajemy nowe dane kontaktowe
+        if (contacts && Array.isArray(contacts)) {
+            await Promise.all(
+                contacts.map(contact =>
+                    prisma.clientContacts.create({
+                        data: {
+                            client_id: id,
+                            first_name: contact.first_name,
+                            second_name: contact.second_name,
+                            email: contact.email || 'Brak',
+                            tel_number: contact.tel_number || 'Brak',
+                        },
+                    })
+                )
+            );
+        }
 
+        // Pobieramy zaktualizowane dane klienta razem z nowymi kontaktami
+        const updatedClientWithContacts = await prisma.clients.findUnique({
+            where: {
+                client_id: id,
+            },
+            include: {
+                ClientContact: true,
+            },
+        });
+
+        res.status(200).json(updatedClientWithContacts);
     } catch (error) {
-        const response: IResponse = {
-            status: 'error',
-            display: true,
-            error: { error },
-            message: 'Błąd podczas aktualizacji danych klienta',
-            devmessage: `${error}`,
-            data: null,
-        };
-
-        res.status(500).json(response);
+        console.error('Error updating client with contacts:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 

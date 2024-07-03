@@ -7,39 +7,28 @@ import { IResponse } from '../../../../globalTypes/iResponce';
 const prisma = new PrismaClient();
 
 export const addClientContact = async (req: Request, res: Response) => {
-    try {
-        const { client_id, first_name, second_name, email, tel_number } = req.body;
+    const { client_id, first_name, second_name, email, tel_number } = req.body;
 
+    try {
+        // Sprawdzamy, czy client_id jest liczbą
+        if (!client_id || !first_name || !second_name) {
+            return res.status(400).json({ error: 'client_id, first_name, and second_name are required' });
+        }
+
+        // Tworzymy nowe dane kontaktowe
         const newClientContact = await prisma.clientContacts.create({
             data: {
                 client_id,
                 first_name,
                 second_name,
                 email: email || 'Brak',
-                tel_number: tel_number || 'Brak', 
+                tel_number: tel_number || 'Brak',
             },
         });
 
-        const response: IResponse = {
-            status: 'success',
-            display: true,
-            error: null,
-            message: 'Dane kontaktowe klienta zostały dodane pomyślnie',
-            devmessage: 'Successfully added client contact data to the database',
-            data: newClientContact,
-        };
-
-        res.status(201).json(response);
+        res.status(201).json(newClientContact);
     } catch (error) {
-        const response: IResponse = {
-            status: 'error',
-            display: true,
-            error: { error },
-            message: 'Błąd podczas dodawania danych kontaktowych klienta',
-            devmessage: `${error}`,
-            data: null,
-        };
-
-        res.status(500).json(response);
+        console.error('Error creating client contact:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };

@@ -6,58 +6,54 @@ import { IResponse } from '../../../../globalTypes/iResponce';
 
 const prisma = new PrismaClient();
 
-export const updateClientStatus = async (req: Request, res: Response, next: NextFunction) => {
+export const updateClientStatus = async (req: Request, res: Response) => {
+    const { client_id } = req.params;
+    const { status_id } = req.body;
+
     try {
-        const { client_id, status_name } = req.body;
-
-        // Pobranie nowego statusu klienta
-        const newStatus = await prisma.statuses.findFirst({
-            select: {
-                status_id: true,
-            },
-            where: {
-                name: status_name,
-                status_type: 'Klient',
-            },
-        });
-
-        if (!newStatus) {
-            const response: IResponse = {
-                status: 'error',
-                display: true,
-                error: { message: `Nie znaleziono statusu o nazwie ${status_name}` },
-                message: 'Błąd podczas aktualizacji statusu klienta',
-                devmessage: `Nie znaleziono statusu o nazwie ${status_name}`,
-                data: null,
-            };
-            return res.status(404).json(response);
+        const id = parseInt(client_id, 10);
+        if (isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid clientId parameter' });
         }
 
-        // Aktualizacja klienta
-        const updatedClient = await prisma.clients.update({
+        const statusId = parseInt(status_id, 10);
+        if (isNaN(statusId)) {
+            return res.status(400).json({ error: 'Invalid status_id parameter' });
+        }
+
+        const status = await prisma.statuses.findUnique({
             where: {
-                client_id: client_id,
-            },
-            data: {
-                status_id: newStatus.status_id,
+                status_id: statusId,
             },
         });
 
-        req.body.client_id = updatedClient.client_id;
-        req.body.user_id = updatedClient.user_id; // Może być potrzebne, jeśli chcesz przekazać dalej do kolejnych middleware lub routera
+        if (!status) {
+            return res.status(404).json({ error: 'Status not found' });
+        }
 
-        next(); // Przekazanie dalej do następnego middleware lub routera
+        // Aktualizujemy status klienta
+        const updatedClient = await prisma.clients.update({
+            where: {
+                client_id: id,
+            },
+            data: {
+                status_id: statusId,
+            },
+        });
 
+        // Pobieramy zaktualizowane dane klienta z nowym statusem
+        const clientWithStatus = await prisma.clients.findUnique({
+            where: {
+                client_id: id,
+            },
+            include: {
+                Status: true,
+            },
+        });
+
+        res.status(200).json(clientWithStatus);
     } catch (error) {
-        const response: IResponse = {
-            status: 'error',
-            display: true,
-            error: { error },
-            message: 'Błąd podczas aktualizacji statusu klienta',
-            devmessage: `${error}`,
-            data: null,
-        };
-
-        res.status(500).json(response);
+        console.error('Error updating client status:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };

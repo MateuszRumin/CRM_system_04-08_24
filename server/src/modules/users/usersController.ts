@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
 // Funkcja pomocnicza do tworzenia JWT
@@ -18,16 +19,14 @@ export const getAllUsers = async (req: Request, res: Response) => {
                 UserData: true,
                 UserRole: {
                     include: {
-                        Role: true,
-                    },
-                },
-                Client: true,
-                Task: true,
-                Note: true,
-            },
+                        Role: true
+                    }
+                }
+            }
         });
         res.status(200).json(users);
     } catch (error) {
+        console.error("Error fetching users:", error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -54,6 +53,7 @@ export const getUserById = async (req: Request, res: Response) => {
         }
         res.status(200).json(user);
     } catch (error) {
+        console.error('Error fetching user by ID:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -84,10 +84,11 @@ export const createUser = async (req: Request, res: Response) => {
         });
 
         const userRole = newUser.UserRole[0].Role.name;
-        const token = createToken(newUser.user_id, userRole);
+        // const token = createToken(newUser.user_id, userRole);
 
-        res.status(201).json({ newUser, token });
+        res.status(201).json({ newUser });
     } catch (error) {
+        console.error('Error creating user:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -96,22 +97,27 @@ export const updateUser = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { username, email, password, userData, userRoles } = req.body;
     try {
-        const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
+        const dataToUpdate: any = {
+            username,
+            email,
+            UserData: {
+                update: userData,
+            },
+            UserRole: {
+                deleteMany: { user_id: parseInt(id) }, // Usuń istniejące role użytkownika
+                create: userRoles.map((role: { role_id: number }) => ({ role_id: role.role_id })), // Dodaj nowe role
+            },
+        };
+
+        if (password) {
+            dataToUpdate.password = await bcrypt.hash(password, 10);
+        }
+
         const updatedUser = await prisma.users.update({
             where: { user_id: parseInt(id) },
-            data: {
-                username,
-                email,
-                password: hashedPassword,
-                UserData: {
-                    update: userData,
-                },
-                UserRole: {
-                    deleteMany: { user_id: parseInt(id) }, // Usuń istniejące role użytkownika
-                    create: userRoles.map((role: { role_id: number }) => ({ role_id: role.role_id })), // Dodaj nowe role
-                },
-            },
+            data: dataToUpdate,
             include: {
+                UserData: true,
                 UserRole: {
                     include: {
                         Role: true,
@@ -122,6 +128,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
         res.status(200).json(updatedUser);
     } catch (error) {
+        console.error('Error updating user:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -129,20 +136,58 @@ export const updateUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-        await prisma.users.delete({
-            where: { user_id: parseInt(id) },
+        const userId = parseInt(id);
+
+        // Sprawdzenie, czy użytkownik istnieje
+        const userExists = await prisma.users.findUnique({
+            where: { user_id: userId }
         });
-        res.status(204).send();
+
+        if (!userExists) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Usuń wszystkie powiązane dane z innych modeli
+        await prisma.$transaction([
+            prisma.userDatas.deleteMany({
+                where: { user_id: userId }
+            }),
+            prisma.userRoles.deleteMany({
+                where: { user_id: userId }
+            }),
+            prisma.clients.deleteMany({
+                where: { user_id: userId }
+            }),
+            prisma.tasks.deleteMany({
+                where: { user_id: userId }
+            }),
+            prisma.notes.deleteMany({
+                where: { user_id: userId }
+            }),
+            // Usuń użytkownika
+            prisma.users.delete({
+                where: { user_id: userId }
+            })
+        ]);
+
+        res.status(200).json({ message: 'User and related data deleted successfully' });
     } catch (error) {
+        console.error('Error deleting user:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 
 export const loginUser = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
+
     try {
-        const user = await prisma.users.findUnique({
-            where: { email },
+        // Sprawdzamy czy username jest dostarczony,
+        const user = await prisma.users.findFirst({
+            where: {
+                OR: [
+                    { username },
+                ]
+            },
             include: {
                 UserRole: {
                     include: {
@@ -156,17 +201,23 @@ export const loginUser = async (req: Request, res: Response) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
+        // Sprawdzamy poprawność hasła
         const isValidPassword = await bcrypt.compare(password, user.password);
 
         if (!isValidPassword) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
+        // Pobieramy rolę użytkownika
         const userRole = user.UserRole[0].Role.name;
+        // Tworzymy token
         const token = createToken(user.user_id, userRole);
 
+        // Zwracamy token
         res.status(200).json({ token });
+
     } catch (error) {
+        console.error('Error during login:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };

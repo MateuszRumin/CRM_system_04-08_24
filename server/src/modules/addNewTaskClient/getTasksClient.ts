@@ -1,60 +1,43 @@
 import { Request, Response, NextFunction } from 'express';
 import { IResponse } from '../../../../globalTypes/iResponce';
+import { PrismaClient, ClientTasks, Tasks } from '@prisma/client';
 
-exports.getTasksClient = async (req: Request, res: Response, next: NextFunction) => {
-    const prisma = req.app.get('prisma');
+const prisma = new PrismaClient();
+
+export const getTasksClient = async (req: Request, res: Response) => {
+    const { client_id } = req.params;
 
     try {
-        const { client_id } = req.params;
+        // Sprawdzamy, czy clientId jest liczbą
+        const id = parseInt(client_id, 10);
+        if (isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid clientId parameter' });
+        }
 
-        // Znajdź wszystkie zadania powiązane z danym klientem
-        const clientTasks = await prisma.ClientTasks.findMany({
+        // Wyszukaj zadania przypisane do klienta przez tabelę ClientTasks
+        const clientTasks = await prisma.clientTasks.findMany({
             where: {
-                client_id: Number(client_id),
+                client_id: id, // Używamy `id` bezpośrednio
             },
             include: {
                 Task: {
                     include: {
-                        Statuses: true,
-                        Users: true,
+                        Status: true, // Dołącz status zadania
                     },
                 },
             },
         });
 
-        // Jeśli nie znaleziono żadnych zadań dla danego klienta
         if (clientTasks.length === 0) {
-            const response: IResponse = {
-                status: 'info',
-                display: true,
-                error: null,
-                message: 'Nie znaleziono żadnych zadań dla tego klienta',
-                devmessage: 'No tasks found for this client',
-                data: null,
-            };
-            return res.status(404).json(response);
+            return res.status(404).json({ error: 'No tasks found for this client' });
         }
 
-        const response: IResponse = {
-            status: 'success',
-            display: true,
-            error: null,
-            message: 'Znaleziono zadania dla klienta',
-            devmessage: 'Successfully retrieved tasks for the client',
-            data: clientTasks,
-        };
+        // Wyciągamy dane z zadań
+        const taskDetails = clientTasks.map((clientTask) => clientTask.Task);
 
-        res.status(200).json(response);
+        res.status(200).json(taskDetails);
     } catch (error) {
-        const response: IResponse = {
-            status: 'error',
-            display: true,
-            error: { error },
-            message: 'Błąd podczas pobierania zadań dla klienta',
-            devmessage: `${error}`,
-            data: null,
-        };
-
-        res.status(500).json(response);
+        console.error('Error fetching tasks for client:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };

@@ -4,8 +4,8 @@ const router = express.Router();
 const clientRouter = require('./clientRouter');
 router.use('/client', clientRouter);
 
-const usersRouter = require('./userRouter');
-router.use('/users', usersRouter);
+const userRouter = require('./userRouter');
+router.use('/users', userRouter);
 
 router.get('/test', (req,res,next) =>{
     res.status(200).json({error : "Witamy w crm"});
