@@ -1,0 +1,127 @@
+.notesContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #E0E0E0;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.addNoteButton {
+  background-color: transparent;
+  border: none;
+  color: #007BFF;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.button_container{
+  display: flex;
+  justify-content: flex-end; /* Przyciski będą wyrównane do prawej strony */
+}
+
+.addNoteButton:hover {
+  color: #0056b3;
+}
+
+.notesFieldContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 20px 10px;
+  align-items: flex-start;
+  border-radius: 5px;
+  background: #F3F3F3;
+  
+}
+
+.richTextEditor {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  min-height: 100px;
+}
+
+.TextAreaField {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  min-height: 100px;
+}
+
+.saveNoteButton {
+  padding: 10px 20px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.edit_delete_Button{
+  padding: 10px 20px;
+  margin-left: 5px;
+  margin-top: 5px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.saveNoteButton:hover {
+  background-color: #0056b3;
+}
+
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.note {
+  padding: 10px;
+  border: 1px solid #E0E0E0;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  width: 100%;
+}
+
+.noteContent {
+  margin-bottom: 10px;
+}
+
+.noteFooter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.noteAuthor {
+  font-size: 12px;
+  color: #666;
+}
+

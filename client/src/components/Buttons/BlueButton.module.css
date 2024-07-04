@@ -1,0 +1,28 @@
+.blueButtonContainer {
+  display: inline-block;
+}
+
+.blueButton {
+  display: flex;
+  height: 40px;
+  padding: 16px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid #24304F;
+  background: #24304F;
+  color: white;
+  text-decoration: none;
+}
+
+.blueButton:hover {
+  background-color: gray;
+  cursor: pointer;
+}
+
+.disabled {
+  background-color: #ccc;
+  border-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
