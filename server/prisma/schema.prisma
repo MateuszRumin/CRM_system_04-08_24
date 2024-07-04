@@ -99,6 +99,7 @@ model Clients {
   ClientNote ClientNotes[]
   ClientTask ClientTasks[]
   ClientContact ClientContacts[]
+  Invoice Invoices[]
 }
 
 model ClientContacts {
@@ -127,6 +128,7 @@ model Statuses {
 
   Client Clients[]
   Task Tasks[]
+  Invoice Invoices[]
 }
 
 model Notes {
@@ -173,3 +175,94 @@ model ClientTasks {
   Task Tasks @relation(fields: [task_id],references: [task_id])
 }
 
+model Invoices {
+  invoice_id     Int           @id @default(autoincrement())
+  invoice_number String        @unique
+  issue_date     DateTime
+  due_date       DateTime
+  client_id      Int
+  invoice_type_id Int
+  project_id     Int
+  status_id      Int
+  quantity       Int
+  unit_price    Float
+  amount        Float
+  vat_amount    Int
+  note          String
+  
+  Client     Clients      @relation(fields: [client_id], references: [client_id])
+  InvoiceType InvoiceTypes @relation(fields: [invoice_type_id], references: [invoice_type_id])
+  Project    Projects    @relation(fields: [project_id], references: [project_id])
+  Status     Statuses     @relation(fields: [status_id], references: [status_id])
+}
+
+enum invoiceTypeValues {
+  VAT
+  Zaliczkowa
+  Koncowa
+  Proforma
+  Okresowa
+}
+
+model InvoiceTypes {
+  invoice_type_id Int     @id @default(autoincrement())
+  invoice_type            invoiceTypeValues
+  
+  Invoice Invoices[]
+}
+
+model InvoiceSettings {
+  invoice_setting_id Int     @id @default(autoincrement())
+  numbering_format   String
+  current_number     String
+  default_currency   String
+  template           String
+  payment_term       Int
+  vat_enabled        Boolean
+  advance_enabled    Boolean
+  final_enabled      Boolean
+  proforma_enabled   Boolean
+  periodic_enabled   Boolean
+  periodic_auto_generate Boolean
+  periodic_frequency String
+  reminder_enabled   Boolean
+  reminder_frequency Int
+  reminder_content   String?
+  reminder_channel_email Boolean
+  reminder_channel_sms Boolean
+  reminder_channel_push Boolean
+
+  company_id Int
+  Company Companies @relation(fields: [company_id], references: [company_id])
+}
+
+model InvoicePaymentSettings {
+  payment_setting_id Int     @id @default(autoincrement())
+  advancement_rate   Int
+  tax_rate           Int
+  tax_type           String @default("brak")
+  default_vat_amount Int
+
+  company_id Int
+  Company Companies @relation(fields: [company_id], references: [company_id])
+}
+
+model Projects {
+  project_id   Int       @id @default(autoincrement())
+  project_name String
+  description  String?
+
+  Invoice Invoices[]
+}
+
+model Companies {
+  company_id Int @id @default(autoincrement())
+  name String
+  address String
+  regon String @default("brak") 
+  nip String @default("brak") 
+  krs String @default("brak")
+
+  InvoicePaymentSetting InvoicePaymentSettings[]
+  InvoiceSetting InvoiceSettings[]
+}
