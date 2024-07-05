@@ -17,7 +17,8 @@ import { Layout } from './components/Layout/Layout.tsx'
 import { AddNewClient } from './views/Klienci/Dodaj_nowego_klienta/AddNewClient.tsx'
 import { EditClient } from './views/Klienci/Edytuj_klienta/EditClient.tsx'
 import { Logowanie } from './views/Logowanie/Logowanie.tsx'
-
+import { AddNewEmployee } from './views/Pracownicy/Dodaj_nowego_pracownika/AddNewEmployee.tsx'
+import { EditEmployee } from './views/Pracownicy/Edytuj_pracownika/EditEmployee.tsx'
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,16 @@ const router = createBrowserRouter([
       {
         path: '/pracownicy',
         element: <Pracownicy />,
+        children: [
+          {
+            path: 'add-employee',
+            element: <AddNewEmployee />,
+          },
+          {
+            path: 'edit-employee/:id',
+            element: <EditEmployee />,
+          },
+        ],
       },
       {
         path: '/uprawnienia',

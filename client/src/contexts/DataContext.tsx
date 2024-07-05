@@ -13,6 +13,17 @@ interface Task {
   task_description: string;
 }
 
+
+interface Employee {
+  firstName: string;
+  lastName: string;
+  position: string;
+  email: string;
+  phone: string;
+  address: string;
+  startDate: string;
+}
+
 interface DataState {
   clientData: any;
   addedClientData: any;
@@ -29,6 +40,7 @@ interface DataState {
   isValid: boolean;
   isValidNotes: boolean;
   isValidTasks: boolean;
+  employeeData: any;
   setClientData: Dispatch<SetStateAction<any>>;
   setAddedClientData: Dispatch<SetStateAction<any>>;
   setUpdatedClientData: Dispatch<SetStateAction<any>>;
@@ -49,6 +61,10 @@ interface DataState {
   setValidNotes: (isValidNotes: boolean) => void;
   setValidTasks: (isValidTasks: boolean) => void;
   updateClient: (clientId: string, data: any) => void;
+  getEmployeeData: (employeeId: string) => Promise<any>;
+  updateEmployeeData: (employeeId: string, updatedData: any) => Promise<void>;
+  setEmployeeData: Dispatch<SetStateAction<any>>;
+  
 }
 
 interface DataProviderProps {
@@ -71,6 +87,16 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     companyAddress: '',
     emails: [''],
     phones: [''],
+  });
+
+  const [employeeData, setEmployeeData] = useState<Employee>({
+    firstName: '',
+    lastName: '',
+    position: '',
+    email: '',
+    phone: '',
+    address: '',
+    startDate: '',
   });
 
   const [addedClientData, setAddedClientData] = useState<any>({});
@@ -193,6 +219,28 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     setUpdatedClientData(data);
   };
 
+
+  const getEmployeeData = async (employeeId: string) => {
+    // Fetch employee data from the server or database
+    const response = await fetch(`/api/employees/${employeeId}`);
+    const data = await response.json();
+    return data;
+  };
+  
+  const updateEmployeeData = async (employeeId: string, updatedData: any) => {
+    // Update employee data on the server or database
+    await fetch(`/api/employees/${employeeId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedData),
+    });
+  };
+
+
+  
+
   return (
     <DataContext.Provider value={{ 
       clientData, 
@@ -210,6 +258,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       isValid,
       isValidNotes, 
       isValidTasks,
+      employeeData,
       setClientData, 
       setAddedClientData,
       setUpdatedClientData,
@@ -229,7 +278,10 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       setValid,
       setValidNotes,
       setValidTasks,
-      updateClient
+      updateClient,
+      setEmployeeData,
+      getEmployeeData,
+      updateEmployeeData,
     }}>
       {children}
     </DataContext.Provider>
