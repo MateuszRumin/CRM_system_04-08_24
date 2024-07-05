@@ -7,6 +7,9 @@ router.use('/client', clientRouter);
 const userRouter = require('./userRouter');
 router.use('/users', userRouter);
 
+const invoiceRouter = require('./invoiceRouter');
+router.use('/invoices', invoiceRouter);
+
 router.get('/test', (req,res,next) =>{
     res.status(200).json({error : "Witamy w crm"});
 })
