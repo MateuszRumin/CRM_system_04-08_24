@@ -1,18 +1,22 @@
 import express, { response } from 'express';
+import { } from '../modules/invoices/selectAllinvoices';
 
 const router = express.Router()
+
+const { getAllInvoices } = require('../modules/invoices/selectAllinvoices');
+const { getAllSettings } = require('../modules/invoices/getInvoiceSettings');
+const { updateAllSettings } = require('../modules/invoices/changeInvoiceSettings');
+const { updateInvoiceStatus } = require('../modules/invoices/updateInvoiceStatus');
+
 
 router.post('/test', (req,res,next) =>{
     res.status(200).json({error : "Witamy w fakturach"});
 })
 
-
-
-
-
-
-
-
+router.get('/', getAllInvoices);
+router.put('/status', updateInvoiceStatus);
+router.get('/settings', getAllSettings);
+router.post('/settings/update', updateAllSettings);
 
 
 router.use('/', (req,res,next) =>{
