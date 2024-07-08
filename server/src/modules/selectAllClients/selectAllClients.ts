@@ -13,10 +13,12 @@ exports.selectAllClients = async (req: Request, res: Response, next: NextFunctio
             select:{
                 client_id:true,
                 registration_date:true,
+                first_name:true,
+                second_name:true,
                 Status:{
                     select:{
                         status_id:true,
-                        name:true
+                        name:true,
                     }
                 }
             }

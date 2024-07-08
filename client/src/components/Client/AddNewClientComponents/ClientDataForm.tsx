@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from './ClientDataForm.module.css';
 import { useData } from '../../../contexts/DataContext';
@@ -10,6 +10,7 @@ interface ClientDataFormProps {
 
 export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
   const { setClientData, setValid } = useData();
+  const [showPrivateAddress, setShowPrivateAddress] = useState(false);
 
   const {
     register,
@@ -19,8 +20,7 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
     formState: { errors, isValid },
     trigger,
   } = useForm({
-    mode: 'onChange', // Ustawiamy onBlur, aby komunikaty walidacyjne pokazywały się po opuszczeniu pola
-    // defaultValues: clientData,
+    mode: 'onChange',
   });
 
   useEffect(() => {
@@ -41,31 +41,33 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
   const handleAddEmail = () => {
     const currentEmails = watch('emails') || [];
     setValue('emails', [...currentEmails, '']);
-    trigger('emails'); // Wyzwalamy walidację po dodaniu
+    trigger('emails');
   };
-  
 
   const handleRemoveEmail = (index: number) => {
-  console.log('Removing email at index:', index);
-  
-  const currentEmails = watch('emails') || [];
-  currentEmails.splice(index, 1);
-  setValue('emails', currentEmails);
-  trigger('emails'); // Wyzwalamy walidację po usunięciu
-};
+    const currentEmails = watch('emails') || [];
+    currentEmails.splice(index, 1);
+    setValue('emails', currentEmails);
+    trigger('emails');
+  };
 
-  
   const handleAddPhone = () => {
     const phones = watch('phones') || [];
     setValue('phones', [...phones, '']);
-    trigger('phones'); // Wyzwalamy walidację po dodaniu
+    trigger('phones');
   };
 
   const handleRemovePhone = (index: number) => {
     const phones = watch('phones') || [];
     phones.splice(index, 1);
     setValue('phones', phones);
-    trigger('phones'); // Wyzwalamy walidację po usunięciu
+    trigger('phones');
+  };
+
+  const handleCompanyTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setShowPrivateAddress(event.target.value === 'Prywatny');
+    // Ustawiamy wartość pola companyType ręcznie
+    setValue('companyType', event.target.value);
   };
 
   return (
@@ -137,7 +139,9 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
             <input
               type="radio"
               {...register('companyType')}
-              value="company"
+              value="Firma"
+              checked={watch('companyType') === 'Firma'}
+              onChange={handleCompanyTypeChange}
             />
             Firma
           </label>
@@ -145,12 +149,17 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
             <input
               type="radio"
               {...register('companyType')}
-              value="privatePerson"
+              value="Prywatny"
+              checked={watch('companyType') === 'Prywatny'}
+              onChange={handleCompanyTypeChange}
             />
             Osoba prywatna
           </label>
         </div>
-        {watch('companyType') === 'company' && (
+        {errors.companyType && typeof errors.companyType.message === 'string' && (
+          <span className={styles.error}>{errors.companyType.message}</span>
+        )}
+        {watch('companyType') === 'Firma' && (
           <>
             <div className={styles.row}>
               <label className={styles.label}>
@@ -159,7 +168,6 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
                   className={styles.input}
                   type="text"
                   {...register('nip', {
-                    required: 'NIP jest wymagany.',
                     minLength: { value: 10, message: 'NIP musi mieć 10 znaków.' },
                     maxLength: { value: 10, message: 'NIP musi mieć 10 znaków.' },
                     pattern: {
@@ -181,7 +189,6 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
                   className={styles.input}
                   type="text"
                   {...register('regon', {
-                    required: 'REGON jest wymagany.',
                     minLength: { value: 9, message: 'REGON musi mieć 9 znaków.' },
                     maxLength: { value: 9, message: 'REGON musi mieć 9 znaków.' },
                     pattern: {
@@ -237,31 +244,45 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
             </div>
           </>
         )}
+        {watch('companyType') === 'Prywatny' && (
+          <div className={styles.row}>
+            <label className={styles.label}>
+              Adres osoby prywatnej
+              <input
+                className={styles.input}
+                type="text"
+                {...register('privateAddress', {
+                  minLength: { value: 3, message: 'Adres osoby prywatnej musi mieć co najmniej 3 znaki.' },
+                })}
+              />
+              {errors.privateAddress && <span className={styles.error}>{errors.privateAddress.message as string}</span>}
+            </label>
+          </div>
+        )}
         <div className={styles.row}>
           <label className={styles.label}>
             E-maile
             {watch('emails', []).map((email: string, index: number) => (
-  <div key={index} className={styles.emailRow}>
-    <input
-      className={styles.input}
-      type="email"
-      {...register(`emails.${index}`, {
-        required: 'Email jest wymagany.',
-        pattern: {
-          value: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
-          message: 'Nieprawidłowy format email.',
-        },
-      })}
-    />
-    <button className={styles.button} type="button" onClick={() => handleRemoveEmail(index)}>
-      Usuń
-    </button>
-    {errors.emails && errors.emails[index] && (
-      <span className={styles.error}>{errors.emails[index].message}</span>
-    )}
-  </div>
-))}
-
+              <div key={index} className={styles.emailRow}>
+                <input
+                  className={styles.input}
+                  type="email"
+                  {...register(`emails.${index}`, {
+                    required: 'Email jest wymagany.',
+                    pattern: {
+                      value: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
+                      message: 'Nieprawidłowy format email.',
+                    },
+                  })}
+                />
+                <button className={styles.button} type="button" onClick={() => handleRemoveEmail(index)}>
+                  Usuń
+                </button>
+                {errors.emails && errors.emails[index] && (
+                  <span className={styles.error}>{errors.emails[index].message}</span>
+                )}
+              </div>
+            ))}
             <button className={styles.button} type="button" onClick={handleAddEmail}>
               Dodaj email
             </button>
