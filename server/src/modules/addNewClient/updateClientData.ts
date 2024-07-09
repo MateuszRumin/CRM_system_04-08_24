@@ -62,8 +62,8 @@ export const updateClientData = async (req: Request, res: Response) => {
                     prisma.clientContacts.create({
                         data: {
                             client_id: id,
-                            first_name: contact.first_name,
-                            second_name: contact.second_name,
+                            //first_name: contact.first_name,
+                            //second_name: contact.second_name,
                             email: contact.email || 'Brak',
                             tel_number: contact.tel_number || 'Brak',
                         },
