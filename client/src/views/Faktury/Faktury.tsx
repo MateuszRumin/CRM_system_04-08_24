@@ -381,7 +381,6 @@ export const Faktury = () => {
       </div>
           {/* Modal */}
           {isModalOpen && <FilterSettingsModal onClose={closeModal} />}
-
         </div>
       )}
     </div>
