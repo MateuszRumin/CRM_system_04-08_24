@@ -19,6 +19,7 @@ import { EditClient } from './views/Klienci/Edytuj_klienta/EditClient.tsx'
 import { Logowanie } from './views/Logowanie/Logowanie.tsx'
 import { AddNewEmployee } from './views/Pracownicy/Dodaj_nowego_pracownika/AddNewEmployee.tsx'
 import { EditEmployee } from './views/Pracownicy/Edytuj_pracownika/EditEmployee.tsx'
+import { EmployeeDetails } from './views/Pracownicy/EmployeeDetails.tsx'
 
 const router = createBrowserRouter([
   {
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
           {
             path: 'edit-employee/:id',
             element: <EditEmployee />,
+          },
+          {
+            path: 'details-employee/:id',
+            element: <EmployeeDetails />,
           },
         ],
       },

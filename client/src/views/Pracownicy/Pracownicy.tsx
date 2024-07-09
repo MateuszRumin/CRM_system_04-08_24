@@ -13,10 +13,13 @@ export const Pracownicy = () => {
 
   const isAddEmployeeRoute = location.pathname.includes('add-employee');
   const isEditEmployeeRoute = location.pathname.includes('edit-employee');
+  const isDetailsEmployeeRoute = location.pathname.includes('details-employee');
+
+  const shouldShowEmployeeList = !isAddEmployeeRoute && !isEditEmployeeRoute && !isDetailsEmployeeRoute;
 
   return (
     <div>
-      {!isAddEmployeeRoute && !isEditEmployeeRoute && (
+      {shouldShowEmployeeList && (
         <div className={styles.container}>
           <div className={styles.header}>
             <h1>Pracownicy</h1>

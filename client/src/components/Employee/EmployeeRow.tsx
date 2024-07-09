@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './EmployeeRow.module.css';
 import ThreeDotsSettings from '../../assets/ClientPage/three_dots_settings.svg';
@@ -19,16 +19,30 @@ export const EmployeeRow: React.FC<{ employee: Employee }> = ({ employee }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(`.${styles.settingsContainer}`)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleOutsideClick);
+
+    return () => {
+      document.removeEventListener('click', handleOutsideClick);
+    };
+  }, [setIsMenuOpen]);
+
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+    setIsMenuOpen(prev => !prev);
   };
 
   const handleEdit = () => {
-
     const modifiedName = employee.name
-      .normalize('NFD') // Normalize to decomposed
-      .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-      .replace(/\s+/g, '-'); // Replace spaces with "-"
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-');
 
     navigate(`/pracownicy/edit-employee/${modifiedName}`, { state: { employee } });
   };
@@ -42,6 +56,17 @@ export const EmployeeRow: React.FC<{ employee: Employee }> = ({ employee }) => {
     setIsModalOpen(false);
   };
 
+  const handleDetails = () => {
+    const employeeId = employee.id;
+    const modifiedName = employee.name
+      .normalize('NFD') // Normalize to decomposed
+      .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+      .replace(/\s+/g, '-'); // Replace spaces with "-"
+
+    navigate(`/pracownicy/details-employee/${modifiedName}`, { state: { employee } });
+    console.log(modifiedName, employeeId);
+  };
+
   return (
     <>
       <tr className={`${styles.row} ${styles.employeeRow}`}>
@@ -53,6 +78,7 @@ export const EmployeeRow: React.FC<{ employee: Employee }> = ({ employee }) => {
         <td>{employee.position}</td>
         <td>{employee.role}</td>
         <td className={styles.settingsContainer}>
+          <button className={styles.detailsButton} onClick={handleDetails}>Szczegóły</button>
           <img
             src={ThreeDotsSettings}
             alt="Settings"

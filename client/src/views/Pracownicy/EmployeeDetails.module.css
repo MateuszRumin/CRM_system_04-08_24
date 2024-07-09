@@ -1,0 +1,91 @@
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.calendarButton img {
+  width: 103px;
+  height: 77px;
+}
+
+.detailsContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.details {
+  display: flex;
+  width: 513px;
+  height: 270px;
+  padding: 20px 10px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  border-radius: 5px;
+  background: #F3F3F3;
+}
+
+.imageContainer {
+  flex: 1;
+  text-align: center;
+}
+
+.employeeImage {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.modifyButton,
+.deleteButton {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.modifyButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.deleteButton {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.projectsContainer {
+  flex: 1;
+}
+
+.projectButton,
+.addButton {
+  display: block;
+  margin: 10px 0;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.addButton {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.dateInfo {
+  margin-top: 20px;
+}
