@@ -39,12 +39,12 @@ exports.addNewTaskClient = async (req: Request, res: Response, next: NextFunctio
                 data:insertData
             })
 
-            let clientTask = await prisma.ClientTasks.create({
-                data:{
-                    client_id:client_id,
-                    task_id:task.task_id
+            await prisma.ClientTasks.create({
+                data: {
+                    client_id: client_id,
+                    task_id: task.task_id
                 }
-            })
+            });
 
         }
 
@@ -55,9 +55,9 @@ exports.addNewTaskClient = async (req: Request, res: Response, next: NextFunctio
             message: 'Dodano, klięta, notatki,zadania',
             devmessage: `Fill database Succes`,
             data: null
-        }; 
-       
-        res.status(200).json(response)
+        };
+
+        next();
 
     }catch (error){
 
@@ -65,7 +65,7 @@ exports.addNewTaskClient = async (req: Request, res: Response, next: NextFunctio
             status: 'error',
             display: true,
             error: {error},
-            message: 'Błąd dodawania nowego klięta',
+            message: 'Błąd dodawania taskow nowego klięta',
             devmessage: `${error}`,
             data: null
         };   

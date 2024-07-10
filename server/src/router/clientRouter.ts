@@ -23,7 +23,12 @@ router.post('/test', (req,res,next) =>{
 })
 
 // Trasy związane z klientami i notatkami
-router.post('/new', addNewClient, addNewNoteClient, addNewTaskClient, addClientContact);
+
+// Dodanei klienta wraz z innymi danymi
+router.post('/new', addNewClient, addNewNoteClient, addNewTaskClient, addClientMailTel, (req, res) => {
+    res.status(201).json({ message: 'Client, notes, tasks, and contacts added successfully' });
+});
+
 router.get('/:client_id/notes', getClientNotes);
 router.put('/:client_id/notes/:note_id', updateClientNote);
 router.delete('/:client_id/notes/:note_id', deleteClientNote);
@@ -42,7 +47,7 @@ router.delete('/:client_id/tasks/:task_id', deleteClientTask);
 
 router.use('/', (req,res,next) =>{
     const logger = req.app.get('logger')
-    logger.error(`Próba połączenia z nieobsługiwaną scierzką klient`);
+    logger.error(`Próba połączenia z nieobsługiwaną sciezką klient`);
     res.status(404).json({error : "Nie obsługiwana ścieżka"});
 })
 
