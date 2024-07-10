@@ -175,65 +175,102 @@ model ClientTasks {
   Task Tasks @relation(fields: [task_id],references: [task_id])
 }
 
+
 model Invoices {
-  invoice_id     Int           @id @default(autoincrement())
-  invoice_number String        @unique
+  invoice_id Int  @id @default(autoincrement())
+  invoice_number String        @unique 
+  status_id Int
+  invoice_type_id Int
+  client_id Int
   issue_date     DateTime
   due_date       DateTime
-  client_id      Int
-  invoice_type_id Int
-  project_id     Int
-  status_id      Int
-  quantity       Int
-  unit_price    Float
-  amount        Float
-  vat_amount    Int
-  note          String
-  
-  Client     Clients      @relation(fields: [client_id], references: [client_id])
-  InvoiceType InvoiceTypes @relation(fields: [invoice_type_id], references: [invoice_type_id])
-  Project    Projects    @relation(fields: [project_id], references: [project_id])
+  prize_netto Float
+  prize_brutto Float
+  tax_ammount Float
+  comments String
+
   Status     Statuses     @relation(fields: [status_id], references: [status_id])
+  InvoiceType InvoiceTypes @relation(fields: [invoice_type_id], references: [invoice_type_id])
+  Client     Clients      @relation(fields: [client_id], references: [client_id])
+  IncoiceProduct InvoiceProducts[]
 }
 
-enum invoiceTypeValues {
-  VAT
-  Zaliczkowa
-  Koncowa
-  Proforma
-  Okresowa
+model InvoiceProducts {
+  invoice_product_id Int @id @default(autoincrement())
+  invoice_id Int
+  project_id Int 
+  product_name String
+  unit_price Float
+  product_count Int
+  prize Float
+  tax Float
+
+  Invoice Invoices @relation(fields:[invoice_id], references: [invoice_id])
+  
 }
+
 
 model InvoiceTypes {
   invoice_type_id Int     @id @default(autoincrement())
-  invoice_type            invoiceTypeValues
-  
+  invoice_type            String
+  numbering_format  numberingFormats  @default(FV_rok_miesiac_numer)    
+  // tutaj powinny być ustawienie czy mają być powiadomienia
   Invoice Invoices[]
 }
 
-model InvoiceSettings {
-  invoice_setting_id Int     @id @default(autoincrement())
-  numbering_format   String
-  current_number     String
-  default_currency   String
-  template           String
-  payment_term       Int
-  vat_enabled        Boolean
-  advance_enabled    Boolean
-  final_enabled      Boolean
-  proforma_enabled   Boolean
-  periodic_enabled   Boolean
-  periodic_auto_generate Boolean
-  periodic_frequency String
-  reminder_enabled   Boolean
-  reminder_frequency Int
-  reminder_content   String?
-  reminder_channel_email Boolean
-  reminder_channel_sms Boolean
-  reminder_channel_push Boolean
+enum numberingFormats {
+  FV_rok_miesiac_numer @map("FV/{rok}/{miesiąc}/{numer}")
+  FZ_rok_miesiac_numer @map("FZ/{rok}/{miesiąc}/{numer}")
+  FK_rok_miesiac_numer @map("FK/{rok}/{miesiąc}/{numer}")
+  PF_rok_miesiac_numer @map("PF/{rok}/{miesiąc}/{numer}")
+  FO_rok_miesiac_numer @map("FO/{rok}/{miesiąc}/{numer}")
+}
 
-  company_id Int
-  Company Companies @relation(fields: [company_id], references: [company_id])
+
+model CompanySettings {
+  company_id Int @id @default(1)
+  name String
+  address String
+  regon String @default("brak") 
+  nip String @default("brak") 
+  krs String @default("brak")
+
+  InvoicePaymentSetting InvoicePaymentSettings[]
+  InvoiceSetting InvoiceSettings[]
+}
+
+
+enum currencyTypeValues {
+  USD
+  EUR
+  PLN
+}
+
+
+model InvoiceSettings {
+  invoice_setting_id        Int      @id @default(1)
+  current_number_year       Int
+  current_number_month      Int
+  current_number_sequence   Int 
+  default_currency          currencyTypeValues
+  template                  String
+  payment_term              Int
+  vat_enabled               Boolean
+  advance_enabled           Boolean
+  final_enabled             Boolean
+  proforma_enabled          Boolean
+  periodic_enabled          Boolean
+  periodic_auto_generate    Boolean
+  periodic_frequency        String
+  reminder_enabled          Boolean
+  reminder_frequency        Int
+  reminder_content          String
+  reminder_channel_email    Boolean
+  reminder_channel_sms      Boolean
+  reminder_channel_push     Boolean
+
+  company_id                Int
+  CompanySet                   CompanySettings @relation(fields: [company_id], references: [company_id])
 }
 
 model InvoicePaymentSettings {
@@ -244,25 +281,7 @@ model InvoicePaymentSettings {
   default_vat_amount Int
 
   company_id Int
-  Company Companies @relation(fields: [company_id], references: [company_id])
+  CompanySet CompanySettings @relation(fields: [company_id], references: [company_id])
 }
 
-model Projects {
-  project_id   Int       @id @default(autoincrement())
-  project_name String
-  description  String?
 
-  Invoice Invoices[]
-}
-
-model Companies {
-  company_id Int @id @default(autoincrement())
-  name String
-  address String
-  regon String @default("brak") 
-  nip String @default("brak") 
-  krs String @default("brak")
-
-  InvoicePaymentSetting InvoicePaymentSettings[]
-  InvoiceSetting InvoiceSettings[]
-}
