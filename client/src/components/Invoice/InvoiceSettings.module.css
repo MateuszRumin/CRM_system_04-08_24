@@ -1,0 +1,88 @@
+.body {
+    width: 100%; 
+    height: 100%; 
+    flex-direction: column; 
+    justify-content: flex-start; 
+    align-items: flex-start; 
+    gap: 10px; 
+    display: inline-flex;
+    font-family: Inter, sans-serif;
+    
+}
+.header_container {
+    align-self: stretch; 
+    padding-top: 15px; 
+    padding-bottom: 15px; 
+    border-bottom: 1px #E0E0E0 solid; 
+    justify-content: space-between; 
+    align-items: center; 
+    display: inline-flex;
+    font-family: Inter, sans-serif;
+  }
+  
+  /* Styl dla tytułu "Nowa Faktura" */
+  .title {
+    text-align: center;
+    color: #24304F;
+    font-size: 25px;
+    font-family: Inter, sans-serif;
+    font-weight: 700;
+    line-height: 35px;
+    word-wrap: break-word;
+  }
+  
+  /* Kontener dla przycisku "Zapisz" */
+  .button_container {
+    justify-content: flex-end;
+    align-items: center;
+    gap: 5px;
+    display: flex;
+    border: none;
+  }
+  
+  /* Styl dla przycisku "Zapisz" */
+  .save_button {
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    display: flex;
+    border: none;
+  }
+  
+  .save_button_inner {
+    width: 84px;
+    padding: 16px;
+    background: #24304F;
+    border-radius: 8px;
+    border: 1px #24304F solid;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+  }
+  .save_button_anuluj {
+    width: 84px;
+    padding: 16px;
+    background: #E0E0E0;
+    border-radius: 8px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+  }
+  
+  .save_button_text {
+    text-align: center;
+    color: #FBFBFB;
+    font-size: 16px;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+    
+  }
+  .anuluj_button_text {
+    text-align: center;
+    color: #24304F;
+    font-size: 16px;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+  }
