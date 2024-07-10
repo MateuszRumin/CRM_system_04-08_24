@@ -1,8 +1,5 @@
-// src/controllers/updateClientData.ts
-
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { IResponse } from '../../../../globalTypes/iResponce';
 
 const prisma = new PrismaClient();
 
@@ -20,7 +17,7 @@ export const updateClientData = async (req: Request, res: Response) => {
         company_name,
         address,
         contacts
-    } = req.body;
+    } = req.body.client; // Zmieniłem sposób pobierania danych klienta
 
     try {
         // Sprawdzamy, czy clientId jest liczbą
@@ -62,8 +59,6 @@ export const updateClientData = async (req: Request, res: Response) => {
                     prisma.clientContacts.create({
                         data: {
                             client_id: id,
-                            //first_name: contact.first_name,
-                            //second_name: contact.second_name,
                             email: contact.email || 'Brak',
                             tel_number: contact.tel_number || 'Brak',
                         },
@@ -88,4 +83,3 @@ export const updateClientData = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-

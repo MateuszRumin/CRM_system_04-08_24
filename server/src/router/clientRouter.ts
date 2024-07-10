@@ -39,7 +39,7 @@ router.patch('/:client_id/tasks/:task_id', updateTaskStatus);
 router.put('/:client_id/tasks/:task_id', updateClientTask);
 router.get('/:client_id/tasks', getTasksClient);
 router.delete('/:client_id/tasks/:task_id', deleteClientTask);
-
+router.put('/:client_id/notes/:note_id', updateClientNote);
 router.use('/', (req,res,next) =>{
     const logger = req.app.get('logger')
     logger.error(`Próba połączenia z nieobsługiwaną scierzką klient`);

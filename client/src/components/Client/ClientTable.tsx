@@ -33,9 +33,9 @@ export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOpti
         id: client.client_id,
         name: client.first_name ? `${client.first_name} ${client.second_name}` : client.company_name,
         status: client.Status.name,
-        projects: 'jeszcze brak z backendu', // Puste, dopóki backend nie dostarcza tych informacji
-        nextPayment: 'jeszcze brak z backendu', // Puste, dopóki backend nie dostarcza tych informacji
-        addedOn: format(parseISO(client.registration_date), 'dd.MM.yyyy'), // Formatowanie daty
+        projects: 'jeszcze brak z backendu',
+        nextPayment: 'jeszcze brak z backendu',
+        addedOn: format(parseISO(client.registration_date), 'dd.MM.yyyy'),
       }));
       setClients(clientData);
       setFilteredClients(clientData);
@@ -48,7 +48,6 @@ export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOpti
     fetchData();
   }, []);
 
-  // Adjust parseDate to handle DD.MM.YYYY format
   const parseDate = (dateString: string) => {
     const [day, month, year] = dateString.split('.').map(Number);
     return new Date(year, month - 1, day);
@@ -127,6 +126,11 @@ export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOpti
     setCurrentPage(1);
   };
 
+  const handleDeleteClient = (clientId: number) => {
+    setClients(prevClients => prevClients.filter(client => client.id !== clientId));
+    setFilteredClients(prevClients => prevClients.filter(client => client.id !== clientId));
+  };
+
   return (
     <div className={styles.tableContainer}>
       <table className={styles.table}>
@@ -141,8 +145,8 @@ export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOpti
           </tr>
         </thead>
         <tbody>
-          {currentClients.map((client, index) => (
-            <ClientRow key={index} client={client} />
+          {currentClients.map((client) => (
+            <ClientRow key={client.id} client={client} onDelete={handleDeleteClient} />
           ))}
         </tbody>
       </table>
