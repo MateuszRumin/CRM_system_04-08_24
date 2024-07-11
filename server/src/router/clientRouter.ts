@@ -31,7 +31,6 @@ router.post('/new', addNewClient, addNewNoteClient, addNewTaskClient, addClientM
 router.get('/:client_id/notes', getClientNotes);
 router.put('/notes/:note_id', updateClientNote);
 router.delete('/:client_id/notes/:note_id', deleteClientNote);
-router.get('/:client_id/notes', getClientNotes);
 router.post('/:client_id/notes', addNewNoteClientbyId);
 
 // Klienci i kontakty

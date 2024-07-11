@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { IResponse } from '../../../../globalTypes/iResponce';
 
 const prisma = new PrismaClient();
 

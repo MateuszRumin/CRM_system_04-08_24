@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction, useEffect } from 'react';
+import axios from 'axios';
 
 interface Note {
   note_id: number;
@@ -29,6 +30,8 @@ interface DataState {
   isValid: boolean;
   isValidNotes: boolean;
   isValidTasks: boolean;
+  clientId: string;
+  setClientId: Dispatch<SetStateAction<string>>;
   setClientData: Dispatch<SetStateAction<any>>;
   setAddedClientData: Dispatch<SetStateAction<any>>;
   setUpdatedClientData: Dispatch<SetStateAction<any>>;
@@ -90,6 +93,8 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [isValidNotes, setIsValidNotes] = useState<boolean>(false);
   const [isValidTasks, setIsValidTasks] = useState<boolean>(false);
 
+  const [clientId, setClientId] = useState<string>('');
+
   const addNote = (note: Note) => {
     setNotes(prevNotes => [...prevNotes, note]);
     setAddedNotes(prevAddedNotes => [...prevAddedNotes, note]);
@@ -145,7 +150,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     // Tutaj dodaj logikę faktycznego wysyłania danych do serwera
   };
 
-  const sendDataToServerUpdatedClient = () => {
+  const sendDataToServerUpdatedClient = async () => {
     console.log('Wysyłanie danych do serwera ze zmodyfikowanym klientem:', {
       updatedClientData, 
       addedNotes,
@@ -156,10 +161,126 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       updatedTasks,
       notes,
       tasks,
+      clientId
     });
-    // Logika faktycznego wysyłania danych do serwera dla zaktualizowanego klienta
+    // Logika  wysyłania danych do serwera dla zaktualizowanego klienta
 
-    console.log(updatedClientData.firstName)
+
+    // Usuwanie notatek
+      if (deletedNotes.length > 0) {
+        try {
+            // Iteracja przez wszystkie ID notatek do usunięcia
+            for (const noteId of deletedNotes) {
+                const url = `http://localhost:3000/client/${clientId}/notes/${noteId}`;
+
+                // Wysłanie zapytania DELETE dla każdej notatki
+                await axios.delete(url);
+            }
+
+            console.log('Notatki zostały usunięte:', deletedNotes);
+        } catch (error) {
+            console.error('Wystąpił błąd podczas usuwania notatek:', error);
+        }
+      } else {
+        console.log('Nie ma notatek do usunięcia.');
+      }
+
+      console.log(deletedNotes);
+
+      console.log(updatedClientData.firstName);
+
+    // Usuwanie tasków
+      if (deletedTasks.length > 0) {
+        try {
+            // Iteracja przez wszystkie ID tasków do usunięcia
+            for (const taskId of deletedTasks) {
+                const url = `http://localhost:3000/client/${clientId}/tasks/${taskId}`;
+
+                // Wysłanie zapytania DELETE dla każdego taska
+                await axios.delete(url);
+            }
+
+            console.log('Zadania zostały usunięte:', deletedTasks);
+        } catch (error) {
+            console.error('Wystąpił błąd podczas usuwania zadań:', error);
+        }
+      } else {
+        console.log('Nie ma zadań do usunięcia.');
+      }
+
+      console.log(deletedTasks);
+
+      console.log(updatedClientData.firstName);
+
+
+      // update danych klienta
+
+      try {
+        // Logika aktualizacji danych klienta
+        console.log("to jest typ:", updatedClientData.companyType);
+        const updatedClientUrl = `http://localhost:3000/client/${clientId}/update`;
+        const response = await axios.put(updatedClientUrl, {
+            client: {
+                status_id: 1,
+                user_id: 1,
+                client_type: updatedClientData.companyType,
+                first_name: updatedClientData.firstName,
+                second_name: updatedClientData.lastName,
+                regon: updatedClientData.regon,
+                nip: updatedClientData.nip,
+                krs: updatedClientData.krs,
+                company_name: updatedClientData.companyName,
+                address: updatedClientData.companyAddress,
+            }
+        });
+
+        console.log('Odpowiedź z serwera:', response.data); // Loguj odpowiedź z serwera
+
+        console.log('Dane klienta zostały zaktualizowane. Oto dane wysłane do aktualizacji:', updatedClientData);
+
+    } catch (error) {
+        console.error('Wystąpił błąd podczas wysyłania danych do serwera:', error);
+    }
+
+
+
+    try {
+      // Aktualizacja tasków
+      if (updatedTasks.length > 0) {
+          for (const task of updatedTasks) {
+              const { task_id, task_title, task_description, task_deadline, task_status } = task;
+              const url = `http://localhost:3000/client/${clientId}/tasks/${task_id}`;
+
+              // Sformatowanie daty do ISO-8601
+              const isoDeadline = new Date(task_deadline).toISOString();
+
+              // Konwersja task_status na int
+              const statusId = parseInt(task_status);
+
+              // Wysyłanie zaktualizowanych danych taska do serwera
+              const response = await axios.put(url, {
+                  task_id: updatedTasks,
+                  status_id: statusId,
+                  user_id: 1,  // Przykładowy user_id do przypisania do taska
+                  task_name: task_title,
+                  task_text: task_description,
+                  deadline: isoDeadline  // Użycie sformatowanej daty ISO-8601
+              });
+
+              console.log(`Zaktualizowano zadanie o ID ${task_id}. Odpowiedź z serwera:`, response.data);
+          }
+
+          console.log('Zadania zostały zaktualizowane:', updatedTasks);
+      } else {
+          console.log('Nie ma zadań do zaktualizowania.');
+      }
+
+
+  } catch (error) {
+      console.error('Wystąpił błąd podczas aktualizacji zadań:', error);
+  }
+
+
     // Logika faktycznego wysyłania danych do serwera dla zaktualizowanego klienta
     //// tutaj będzie wykorzystanie endpointu do dodania do bazy danych 
 
@@ -210,6 +331,8 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       isValid,
       isValidNotes, 
       isValidTasks,
+      clientId,
+      setClientId,
       setClientData, 
       setAddedClientData,
       setUpdatedClientData,

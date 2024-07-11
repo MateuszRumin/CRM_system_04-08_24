@@ -18,7 +18,7 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
   const { addTask, updateTask, deleteTask, setValidTasks } = useData();
   const [localTasks, setLocalTasks] = useState<Task[]>(initialTasks);
   const [newTask, setNewTask] = useState<Task>({
-    task_id: localTasks.length + 1, // Generowanie nowego ID, lepszym podejściem byłoby generowanie na serwerze
+    task_id: 0, // Początkowe ID, może wymagać dostosowania w zależności od danych
     task_title: '',
     task_deadline: '',
     task_status: 'Nie zaczęty',
@@ -27,12 +27,16 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editedTask, setEditedTask] = useState<Task | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  
+
+  useEffect(() => {
+    setLocalTasks(initialTasks);
+  }, [initialTasks]);
+
   useEffect(() => {
     if (isEditing) {
-      setValidTasks(false);
+      setValidTasks(false); // Ustaw isEditing na false, gdy edytowanie jest w toku
     } else {
-      setValidTasks(true);
+      setValidTasks(true); // Ustaw isEditing na true, gdy edytowanie nie jest w toku
     }
   }, [isEditing, setValidTasks]);
 
@@ -43,28 +47,32 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
     } else {
       setNewTask(prevTask => ({ ...prevTask, [name]: value }));
     }
-    setIsEditing(true); // Set isEditing to true on any change
+    setIsEditing(true); // Ustaw isEditing na true w przypadku każdej zmiany
   };
 
   const handleAddTask = () => {
     if (validateForm()) {
-      setLocalTasks([...localTasks, newTask]);
-      addTask(newTask);
-      setNewTask({
+      const newTaskWithId = {
+        ...newTask,
         task_id: localTasks.length + 1,
+      };
+      setLocalTasks([...localTasks, newTaskWithId]);
+      addTask(newTaskWithId);
+      setNewTask({
+        task_id: localTasks.length + 2,
         task_title: '',
         task_deadline: '',
         task_status: 'Nie zaczęty',
         task_description: '',
       });
-      setIsEditing(false); // Set isEditing to false after adding task
+      setIsEditing(false); // Ustaw isEditing na false po dodaniu zadania
     }
   };
 
   const handleEditTask = (task: Task) => {
     setEditingTaskId(task.task_id);
     setEditedTask(task);
-    setIsEditing(true); // Set isEditing to true when editing a task
+    setIsEditing(true); // Ustaw isEditing na true podczas edycji zadania
   };
 
   const handleSaveEditedTask = () => {
@@ -78,8 +86,15 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
 
       setEditingTaskId(null);
       setEditedTask(null);
-      setIsEditing(false); // Set isEditing to false after saving edited task
+      setIsEditing(false); // Ustaw isEditing na false po zapisaniu edytowanego zadania
     }
+  };
+
+  const handleDeleteTask = (taskId: number) => {
+    const updatedLocalTasks = localTasks.filter(task => task.task_id !== taskId);
+    setLocalTasks(updatedLocalTasks);
+
+    deleteTask(taskId);
   };
 
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({
@@ -92,7 +107,7 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
   const validateForm = (task: Task = newTask): boolean => {
     let valid = true;
     const errors: { [key: string]: string } = {};
-  
+
     if (task.task_title.trim() === '') {
       errors['task_title'] = 'Pole tytułu jest wymagane';
       valid = false;
@@ -116,16 +131,9 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
       errors['task_description'] = 'Pole opisu jest wymagane';
       valid = false;
     }
-  
+
     setFormErrors(errors);
     return valid;
-  };
-
-  const handleDeleteTask = (taskId: number) => {
-    const updatedLocalTasks = localTasks.filter(task => task.task_id !== taskId);
-    setLocalTasks(updatedLocalTasks);
-
-    deleteTask(taskId);
   };
 
   return (
@@ -165,10 +173,10 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
                 className={styles.inputField}
               >
                 <option value="">Wybierz status</option>
-                <option value="Nie zaczęty">Nie zaczęty</option>
-                <option value="W trakcie">W trakcie</option>
-                <option value="Zrobiony">Zrobiony</option>
-                <option value="Nie zrobiony (porażka)">Nie zrobiony (porażka)</option>
+                <option value="5">Nie zaczęty</option>
+                <option value="6">W trakcie</option>
+                <option value="7">Zrobiony</option>
+                <option value="8">Porażka</option>
               </select>
               {formErrors.task_status && <p className={styles.error}>{formErrors.task_status}</p>}
             </div>

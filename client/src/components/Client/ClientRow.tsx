@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ClientRow.module.css';
 import ThreeDotsSettings from '../../assets/ClientPage/three_dots_settings.svg';
+import axios from 'axios';
 
 interface Client {
-  id: number; // Add this if you have an ID field
+  id: number;
   name: string;
   status: string;
   projects: string;
@@ -12,7 +13,12 @@ interface Client {
   addedOn: string;
 }
 
-export const ClientRow: React.FC<{ client: Client }> = ({ client }) => {
+interface ClientRowProps {
+  client: Client;
+  onDelete: (clientId: number) => void;
+}
+
+export const ClientRow: React.FC<ClientRowProps> = ({ client, onDelete }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -39,23 +45,32 @@ export const ClientRow: React.FC<{ client: Client }> = ({ client }) => {
   const handleEdit = () => {
     const clientId = client.id;
     const modifiedName = client.name
-      .normalize('NFD') // Normalize to decomposed
-      .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-      .replace(/\s+/g, '-'); // Replace spaces with "-"
-  
-    // Przekażemy zarówno ID jak i zmodyfikowaną nazwę w nawigacji
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-');
+
     navigate(`/klienci/edit-client/${modifiedName}`, { state: { clientId, modifiedName } });
-    console.log(modifiedName, clientId);
   };
 
   const handleDelete = () => {
     setIsModalOpen(true);
   };
 
-  const confirmDelete = () => {
-    // Logika usunięcia użytkownika
-    console.log('Usuń klienta o id równym :', client.id);
-    setIsModalOpen(false);
+  const confirmDelete = async () => {
+    try {
+      const clientId = client.id;
+
+      const response = await axios.delete(`http://localhost:3000/client/${clientId}/delete`);
+
+      if (response.status === 200) {
+        console.log('Klient został usunięty pomyślnie');
+        onDelete(clientId); // Wywołanie funkcji przekazanej w propach
+      }
+
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Wystąpił błąd podczas usuwania klienta:', error);
+    }
   };
 
   return (

@@ -122,15 +122,15 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
         </div>
         <div className={styles.row}>
           <label className={styles.radioGroup}>
-            <input type="radio" {...register('companyType')} value="company" />
+            <input type="radio" {...register('companyType')} value="Firma" />
             Firma
           </label>
           <label className={styles.radioGroup}>
-            <input type="radio" {...register('companyType')} value="privatePerson" />
+            <input type="radio" {...register('companyType')} value="Prywatny" />
             Osoba prywatna
           </label>
         </div>
-        {watch('companyType') === 'company' && (
+        {watch('companyType') === 'Firma' && (
           <>
             <div className={styles.row}>
               <label className={styles.label}>
