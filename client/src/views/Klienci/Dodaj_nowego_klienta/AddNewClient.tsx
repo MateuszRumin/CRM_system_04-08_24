@@ -39,13 +39,12 @@ export function AddNewClient() {
           task_name: task.title,
           deadline: new Date(task.deadline).toISOString(), // Konwersja na format ISO-8601
         })),
-        contacts: {
-          phone_numbers: ['123123123'], // to jest do zmiany (zmienić na backendzie)
-          emails: ['szymon@onet.pl']  // to jest do zmiany (zmienić na backendzie)
-        }
+        emails: data.emails,  
+        phones: data.phones  
       };
 
       console.log('Request Data:', requestData);
+      console.log("to są maile i telefony",data.phones, data.emails)
 
       const response = await axios.post(endpointUrl, requestData);
       console.log('Response:', response.data);

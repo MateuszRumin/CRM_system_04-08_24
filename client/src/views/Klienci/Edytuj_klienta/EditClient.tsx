@@ -57,8 +57,8 @@ export const EditClient: React.FC = () => {
           krs: data.krs,
           companyName: data.company_name,
           companyAddress: data.address,
-          emails: [], // maile jeszcze do poprawy
-          phones: [], // numery jeszcze do poprawy
+          emails: ["test@vp.pl","marian@onet.pl"], // chwilową sa przykładowe bo jeszcze z API nie są zwracane
+          phones: ["123123123","444555888"],  // chwilową sa przykładowe bo jeszcze z API nie są zwracane
         });
 
         const fetchedNotes = data.ClientNote.map((clientNote: any) => ({
