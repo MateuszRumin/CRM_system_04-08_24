@@ -1,5 +1,3 @@
-// src/controllers/updateClientData.ts
-
 import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { IResponse } from '../../../../globalTypes/iResponce';
@@ -19,11 +17,11 @@ export const updateClientData = async (req: Request, res: Response) => {
         krs,
         company_name,
         address,
-        contacts
+        emails,
+        phones
     } = req.body;
 
     try {
-        // Sprawdzamy, czy clientId jest liczbą
         const id = parseInt(client_id, 10);
         if (isNaN(id)) {
             return res.status(400).json({ error: 'Invalid clientId parameter' });
@@ -48,37 +46,42 @@ export const updateClientData = async (req: Request, res: Response) => {
             },
         });
 
-        // Usuwamy istniejące dane kontaktowe, jeśli są
-        await prisma.clientContacts.deleteMany({
-            where: {
-                client_id: id,
-            },
+        // Usunięcie istniejących e-maili i numerów telefonów
+        await prisma.clientEmails.deleteMany({
+            where: { client_id: id },
+        });
+        await prisma.clientPhones.deleteMany({
+            where: { client_id: id },
         });
 
-        // Dodajemy nowe dane kontaktowe
-        if (contacts && Array.isArray(contacts)) {
-            await Promise.all(
-                contacts.map(contact =>
-                    prisma.clientContacts.create({
-                        data: {
-                            client_id: id,
-                            //first_name: contact.first_name,
-                            //second_name: contact.second_name,
-                            email: contact.email || 'Brak',
-                            tel_number: contact.tel_number || 'Brak',
-                        },
-                    })
-                )
-            );
+        if (emails && emails.length > 0) {
+            for (const email of emails) {
+                await prisma.clientEmails.create({
+                    data: {
+                        client_id: id,
+                        email: email,
+                    },
+                });
+            }
         }
 
-        // Pobieramy zaktualizowane dane klienta razem z nowymi kontaktami
+        if (phones && phones.length > 0) {
+            for (const phone of phones) {
+                await prisma.clientPhones.create({
+                    data: {
+                        client_id: id,
+                        tel_number: phone,
+                    },
+                });
+            }
+        }
+
+        // Pobranie zaktualizowanych danych klienta razem z e-mailami i numerami telefonów
         const updatedClientWithContacts = await prisma.clients.findUnique({
-            where: {
-                client_id: id,
-            },
+            where: { client_id: id },
             include: {
-                ClientContact: true,
+                ClientEmail: true,
+                ClientPhone: true,
             },
         });
 
@@ -88,4 +91,3 @@ export const updateClientData = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-

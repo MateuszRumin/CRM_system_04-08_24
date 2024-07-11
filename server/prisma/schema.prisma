@@ -14,7 +14,6 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
-
 model Users {
   user_id Int @id @default(autoincrement())
   username String @unique
@@ -120,15 +119,6 @@ model ClientPhones {
   Client      Clients @relation(fields: [client_id], references: [client_id])
 
   @@unique([tel_number])
-}
-
-model ClientContacts {
-  client_contacts_id Int @id @default(autoincrement())
-  client_id Int
-  email String @default("Brak")
-  tel_number String @default("Brak")
-
-  Client Clients @relation(fields: [client_id], references: [client_id])
 }
 
 enum statusTypeValues {

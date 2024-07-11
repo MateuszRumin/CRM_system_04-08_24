@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
 // Funkcja pomocnicza do tworzenia JWT
 const createToken = (userId: number, role: string) => {
-    return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: '10h' });
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -105,7 +105,7 @@ export const updateUser = async (req: Request, res: Response) => {
             },
             UserRole: {
                 deleteMany: { user_id: parseInt(id) }, // Usuń istniejące role użytkownika
-                create: userRoles.map((role: { role_id: number }) => ({ role_id: role.role_id })), // Dodaj nowe role
+                create: userRoles.map((role: { role_id: number }) => ({ role_id: role.role_id })),
             },
         };
 
