@@ -18,72 +18,77 @@ import { AddNewClient } from './views/Klienci/Dodaj_nowego_klienta/AddNewClient.
 import { EditClient } from './views/Klienci/Edytuj_klienta/EditClient.tsx'
 import { Logowanie } from './views/Logowanie/Logowanie.tsx'
 
-
 const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Layout />,
-    children: [
-      {
-        path: '/',
-        element: <StronaGlowna />,
-      },
-      {
-        path: '/kreator',
-        element: <Kreator />,
-      },
-      {
-        path: '/faktury',
-        element: <Faktury />,
-      },
-      {
-        path: '/umowy',
-        element: <Umowy />,
-      },
-      {
-        path: '/projekty',
-        element: <Projekty />,
-        children: [
-          {
-            path: 'test/',
-            element: <Projekty />,
-          },
-        ],
-      },
-      {
-        path: '/pracownicy',
-        element: <Pracownicy />,
-      },
-      {
-        path: '/uprawnienia',
-        element: <Uprawnienia />,
-      },
-      {
-        path: '/klienci',
-        element: <Klienci />,
-        children: [
-          {
-            path: 'add-client',
-            element: <AddNewClient />,
-          },
-          {
-            path: 'edit-client/:id', // Include a parameter for client ID
-            element: <EditClient />,
-          },
-        ],
-      },
-    ],
-  },
+	{
+		path: '/',
+		element: <Layout />,
+		children: [
+			{
+				path: '/',
+				element: <StronaGlowna />,
+			},
+			{
+				path: 'kreator',
+				element: <Kreator />,
+			},
+			{
+				path: 'faktury',
+				element: <Faktury />,
+			},
+			{
+				path: 'umowy',
+				element: <Umowy />,
+			},
+			{
+				path: 'projekty',
+				element: <Projekty />,
+				children: [
+					{
+						path: 'test/',
+						element: <Projekty />,
+					},
+				],
+			},
+			{
+				path: '/pracownicy',
+				element: <Pracownicy />,
+				children: [
+					{
+						path: 'register',
+						element: <Logowanie />,
+					},
+				],
+			},
+			{
+				path: '/uprawnienia',
+				element: <Uprawnienia />,
+			},
+			{
+				path: '/klienci',
+				element: <Klienci />,
+				children: [
+					{
+						path: 'add-client',
+						element: <AddNewClient />,
+					},
+					{
+						path: 'edit-client/:id', // Include a parameter for client ID
+						element: <EditClient />,
+					},
+				],
+			},
+		],
+	},
 	{
 		path: '/login',
 		element: <Logowanie />,
 	},
-]);
+])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <DataProvider>
-      <RouterProvider router={router}></RouterProvider>
-    </DataProvider>
-  </React.StrictMode>
-);
+	<React.StrictMode>
+		<DataProvider>
+			<RouterProvider router={router}></RouterProvider>
+		</DataProvider>
+	</React.StrictMode>
+)
