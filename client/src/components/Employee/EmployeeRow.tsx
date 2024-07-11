@@ -63,7 +63,7 @@ export const EmployeeRow: React.FC<{ employee: Employee }> = ({ employee }) => {
       .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
       .replace(/\s+/g, '-'); // Replace spaces with "-"
 
-    navigate(`/pracownicy/details-employee/${modifiedName}`, { state: { employee } });
+      navigate(`/pracownicy/details-employee/${modifiedName}`, { state: { employee } });
     console.log(modifiedName, employeeId);
   };
 

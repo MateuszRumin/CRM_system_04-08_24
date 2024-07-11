@@ -1,0 +1,7 @@
+.row {
+  text-align: left;
+}
+
+.row td select {
+  width: 100%;
+}

@@ -20,6 +20,8 @@ import { Logowanie } from './views/Logowanie/Logowanie.tsx'
 import { AddNewEmployee } from './views/Pracownicy/Dodaj_nowego_pracownika/AddNewEmployee.tsx'
 import { EditEmployee } from './views/Pracownicy/Edytuj_pracownika/EditEmployee.tsx'
 import { EmployeeDetails } from './views/Pracownicy/EmployeeDetails.tsx'
+import { AssignProjectToEmployee } from './views/Pracownicy/Przypisz_projekt_do_pracownika/AssignProjectToEmployee.tsx'
+import { RemoveEmployee } from './views/Pracownicy/Usun_pracownika/RemoveEmployee.tsx'
 
 const router = createBrowserRouter([
   {
@@ -67,6 +69,16 @@ const router = createBrowserRouter([
           {
             path: 'details-employee/:id',
             element: <EmployeeDetails />,
+            children: [
+              {
+                path: 'assign-project-to-employee',
+                element: <AssignProjectToEmployee />,
+              },
+              {
+                path: 'remove-employee',
+                element: <RemoveEmployee  />,
+              },
+            ],
           },
         ],
       },
