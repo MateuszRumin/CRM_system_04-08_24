@@ -1,7 +1,7 @@
 // main.js (lub App.js, w zależności od Twojej struktury plików)
 import './styles/theme.css'
 import './styles/globals.css'
-import React from 'react'
+
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Kreator } from './views/Kreator/Kreator.tsx'
@@ -15,6 +15,10 @@ import { StronaGlowna } from './views/StronaGlowna/StronaGlowna.tsx'
 import { Layout } from './components/Layout/Layout.tsx'
 import { Logowanie } from './views/Logowanie/Logowanie.tsx'
 import ProtectedRoute from './components/auth/ProctectedRoute.tsx'
+
+
+
+
 
 const router = createBrowserRouter([
 	{
@@ -68,7 +72,7 @@ const router = createBrowserRouter([
 ])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-	<React.StrictMode>
+
 		<RouterProvider router={router} />
-	</React.StrictMode>
+
 )

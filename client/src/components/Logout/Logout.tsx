@@ -7,7 +7,10 @@ export const Logout = () => {
 				path="login"
 				src={logOut}
 				alt="ikona wylogowania"
-				onClick={() => localStorage.removeItem('token')}
+				onClick={() => {
+					localStorage.removeItem('token')
+					localStorage.removeItem('USER')
+				}}
 			/>
 		</>
 	)

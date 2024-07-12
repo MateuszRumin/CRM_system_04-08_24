@@ -33,10 +33,11 @@ export const Login: React.FC = () => {
 			const result = await response.json()
 
 			const token = result.token
+
 			// console.log(token)
 			localStorage.setItem('token', token) // Save the token in localStorage
 
-			alert('Login successful!')
+			// alert('Login successful!')
 			reset()
 			navigate('/') // Redirect to the homepage
 		} catch (error: any) {
