@@ -23,7 +23,7 @@ export const updateClientData = async (req: Request, res: Response) => {
     try {
         const id = parseInt(client_id, 10);
         if (isNaN(id)) {
-            return res.status(400).json({ error: 'Invalid clientId parameter' });
+            return res.status(400).json({ error: 'Invalid client_id parameter' });
         }
 
         // Aktualizujemy dane klienta
@@ -46,36 +46,41 @@ export const updateClientData = async (req: Request, res: Response) => {
         });
 
         // Usunięcie istniejących e-maili i numerów telefonów
-        await prisma.clientEmails.deleteMany({
-            where: { client_id: id },
-        });
-        await prisma.clientPhones.deleteMany({
-            where: { client_id: id },
-        });
+        await prisma.clientEmails.deleteMany({ where: { client_id: id } });
+        await prisma.clientPhones.deleteMany({ where: { client_id: id } });
 
+        let emailErrors = [];
         if (emails && emails.length > 0) {
             for (const email of emails) {
-                await prisma.clientEmails.create({
-                    data: {
-                        client_id: id,
-                        email: email,
-                    },
-                });
+                try {
+                    await prisma.clientEmails.create({
+                        data: {
+                            client_id: id,
+                            email: email,
+                        },
+                    });
+                } catch (e) {
+                    emailErrors.push(email);
+                }
             }
         }
 
+        let phoneErrors = [];
         if (phones && phones.length > 0) {
             for (const phone of phones) {
-                await prisma.clientPhones.create({
-                    data: {
-                        client_id: id,
-                        tel_number: phone,
-                    },
-                });
+                try {
+                    await prisma.clientPhones.create({
+                        data: {
+                            client_id: id,
+                            tel_number: phone,
+                        },
+                    });
+                } catch (e) {
+                    phoneErrors.push(phone);
+                }
             }
         }
 
-        // Pobranie zaktualizowanych danych klienta razem z e-mailami i numerami telefonów
         const updatedClientWithContacts = await prisma.clients.findUnique({
             where: { client_id: id },
             include: {
@@ -84,7 +89,19 @@ export const updateClientData = async (req: Request, res: Response) => {
             },
         });
 
-        res.status(200).json(updatedClientWithContacts);
+        if (emailErrors.length === 0 && phoneErrors.length === 0) {
+            res.status(200).json({
+                message: 'Client data updated successfully',
+                data: updatedClientWithContacts
+            });
+        } else {
+            res.status(200).json({
+                message: 'Client data updated successfully with some errors',
+                data: updatedClientWithContacts,
+                emailErrors: emailErrors.length > 0 ? emailErrors : undefined,
+                phoneErrors: phoneErrors.length > 0 ? phoneErrors : undefined,
+            });
+        }
     } catch (error) {
         console.error('Error updating client with contacts:', error);
         res.status(500).json({ error: 'Internal Server Error' });

@@ -8,10 +8,10 @@ export const deleteClientTask = async (req: Request, res: Response) => {
 
     try {
         const taskId = parseInt(task_id, 10);
-        const clientId = parseInt(client_id, 10);
+        //const clientId = parseInt(client_id, 10);
 
-        if (isNaN(taskId) || isNaN(clientId)) {
-            return res.status(400).json({ error: 'Invalid task_id or client_id parameter' });
+        if (isNaN(taskId)) {
+            return res.status(400).json({ error: 'Invalid task_id' });
         }
 
         const existingTask = await prisma.tasks.findUnique({
@@ -25,7 +25,7 @@ export const deleteClientTask = async (req: Request, res: Response) => {
         await prisma.clientTasks.deleteMany({
             where: {
                 task_id: taskId,
-                client_id: clientId
+                //client_id: clientId
             }
         });
 

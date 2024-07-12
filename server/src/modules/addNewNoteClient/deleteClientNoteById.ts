@@ -8,11 +8,7 @@ export const deleteClientNote = async (req: Request, res: Response) => {
 
     try {
         const noteId = parseInt(note_id, 10);
-        const clientId = parseInt(client_id, 10);
-
-        if (isNaN(noteId) || isNaN(clientId)) {
-            return res.status(400).json({ error: 'Invalid note_id or client_id parameter' });
-        }
+        //const clientId = parseInt(client_id, 10);
 
         const existingNote = await prisma.notes.findUnique({
             where: { note_id: noteId }
@@ -26,7 +22,7 @@ export const deleteClientNote = async (req: Request, res: Response) => {
         await prisma.clientNotes.deleteMany({
             where: {
                 note_id: noteId,
-                client_id: clientId
+                //client_id: clientId
             }
         });
 

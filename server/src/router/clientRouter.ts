@@ -11,7 +11,7 @@ const {addNewTaskClient, addNewTaskClientbyId} = require("../modules/addNewTaskC
 const {updateTaskStatus, updateClientTask} = require('../modules/addNewTaskClient/updateTaskClient')
 const {getTasksClient} = require('../modules/addNewTaskClient/getTasksClient')
 const {deleteClientTask} = require('../modules/addNewTaskClient/deleteTaskClient')
-const {selectAllClients} = require ('../modules/selectAllClients/selectAllClients');
+const {selectAllClients} = require ('../modules/selectAllClients/selectAllClients')
 const {deleteClient} = require('../modules/addNewClient/deleteClientById')
 const {getClientById} = require('../modules/addNewClient//getClientById')
 const {getClientNotes} = require('../modules/addNewNoteClient/getClientNotesById')
@@ -30,7 +30,7 @@ router.post('/new', addNewClient, addNewNoteClient, addNewTaskClient, addClientM
 // Notatki
 router.get('/:client_id/notes', getClientNotes);
 router.put('/notes/:note_id', updateClientNote);
-router.delete('/:client_id/notes/:note_id', deleteClientNote);
+router.delete('/notes/:note_id', deleteClientNote);
 router.post('/:client_id/notes', addNewNoteClientbyId);
 
 // Klienci i kontakty
@@ -45,7 +45,7 @@ router.get('/', selectAllClients);
 router.patch('/tasks/:task_id', updateTaskStatus);
 router.put('/tasks/:task_id', updateClientTask);
 router.get('/:client_id/tasks', getTasksClient);
-router.delete('/:client_id/tasks/:task_id', deleteClientTask);
+router.delete('/tasks/:task_id', deleteClientTask);
 router.post('/:client_id/tasks/', addNewTaskClientbyId);
 
 router.use('/', (req,res,next) =>{
