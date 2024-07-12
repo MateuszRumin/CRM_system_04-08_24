@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom' // Import useNavigate
 export const Login: React.FC = () => {
 	const [isRegister, setIsRegister] = useState<boolean>(false)
+	const [submitErrors, setSubmitErrors] = useState<string>('')
+
 	const navigate = useNavigate() // Initialize useNavigate
 	const {
 		register,
@@ -14,33 +16,33 @@ export const Login: React.FC = () => {
 	} = useForm({ mode: 'onBlur' })
 
 	const onSubmit = async (data: Object): Promise<void> => {
-		console.log(data)
+		// console.log(data)
+		setSubmitErrors('')
 		try {
 			const response = await fetch('http://localhost:3000/users/login', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					
 				},
 				body: JSON.stringify(data),
 			})
 
 			if (!response.ok) {
-				throw new Error('Login failed')
+				throw new Error('1')
 			}
 			const result = await response.json()
-			
+
 			const token = result.token
-			console.log(token);
+			// console.log(token)
 			localStorage.setItem('token', token) // Save the token in localStorage
 
 			alert('Login successful!')
 			reset()
 			navigate('/') // Redirect to the homepage
-		} catch (error) {
-			alert('Login failed: ' + error)
+		} catch (error: any) {
+			if (error.message == '1') setSubmitErrors(() => 'Nieprawidłowy login lub hasło')
+			else setSubmitErrors('Wystąpił błąd połączenia')
 		}
-
 	}
 
 	return (
@@ -62,6 +64,7 @@ export const Login: React.FC = () => {
 					<label htmlFor="password">Hasło</label>
 					<input type="password" id="password" {...register('password', { required: 'Podaj hasło' })} />
 					{errors.password && <span className={styles.error}>{`${errors.password.message}`}</span>}
+					{submitErrors && <span className={styles.error}>{submitErrors}</span>}
 
 					<section className={styles.buttonForm}>
 						<button type="submit">{isRegister ? 'Zarejestruj' : 'Zaloguj'}</button>
