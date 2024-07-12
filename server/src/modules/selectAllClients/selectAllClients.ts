@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { IResponse } from '../../../../globalTypes/iResponce';
 
-
-
 exports.selectAllClients = async (req: Request, res: Response, next: NextFunction) => {
    
     const prisma = req.app.get('prisma')
@@ -23,13 +21,6 @@ exports.selectAllClients = async (req: Request, res: Response, next: NextFunctio
                 }
             }
         })
-
-
-        
-
-
-
-        
 
         const response: IResponse = {
             status: 'info',

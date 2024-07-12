@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export const updateClientNote = async (req: Request, res: Response) => {
-    const { note_id } = req.params;
+    const { note_id, client_id } = req.params;
     const { note_name, note_text, data_link } = req.body;
 
     try {

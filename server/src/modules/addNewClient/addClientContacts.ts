@@ -64,7 +64,7 @@ export const addClientMailTel = async (req: Request, res: Response, next: NextFu
 
 export const addClientContact = async (req: Request, res: Response) => {
     const { client_id } = req.params;
-    const { emails, phones} = req.body;
+    const { emails, phones } = req.body;
 
     try {
         const clientId = parseInt(client_id, 10);
@@ -80,27 +80,23 @@ export const addClientContact = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Client not found' });
         }
 
-        // Dodawanie e-maili, jeśli są przekazane
         if (emails && Array.isArray(emails)) {
             for (const email of emails) {
-                await prisma.clientContacts.create({
+                await prisma.clientEmails.create({
                     data: {
                         client_id: clientId,
-                        email: email,
-                        //tel_number: 'Brak'
+                        email: email
                     }
                 });
             }
         }
 
-        // Dodawanie numerów telefonów, jeśli są przekazane
         if (phones && Array.isArray(phones)) {
             for (const phone of phones) {
-                await prisma.clientContacts.create({
+                await prisma.clientPhones.create({
                     data: {
                         client_id: clientId,
-                        tel_number: phone,
-                        //email: 'Brak'
+                        tel_number: phone
                     }
                 });
             }

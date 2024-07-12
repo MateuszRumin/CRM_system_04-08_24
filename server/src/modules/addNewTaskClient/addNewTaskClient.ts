@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { IResponse } from '../../../../globalTypes/iResponce';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 exports.addNewTaskClient = async (req: Request, res: Response, next: NextFunction) => {
    
@@ -74,3 +77,56 @@ exports.addNewTaskClient = async (req: Request, res: Response, next: NextFunctio
         res.status(404).json(response)
     }
 }
+
+export const addNewTaskClientbyId = async (req: Request, res: Response, next: NextFunction) => {
+    const { client_id } = req.params;
+    const { user_id, tasks } = req.body;
+
+    try {
+        const clientId = parseInt(client_id, 10);
+        if (isNaN(clientId)) {
+            return res.status(400).json({ error: 'Invalid client_id parameter' });
+        }
+
+        const existingClient = await prisma.clients.findUnique({
+            where: { client_id: clientId }
+        });
+
+        if (!existingClient) {
+            return res.status(404).json({ error: 'Client not found' });
+        }
+
+        for (const taskData of tasks) {
+            const statusId = parseInt(taskData.status_id, 10);
+            if (isNaN(statusId)) {
+                return res.status(400).json({ error: 'Invalid status_id parameter' });
+            }
+
+            let insertData: any = {
+                status_id: statusId,
+                task_text: taskData.task_text,
+                user_id: user_id
+            };
+
+            if (taskData.task_name) insertData.task_name = taskData.task_name;
+            if (taskData.deadline) insertData.deadline = taskData.deadline;
+            if (taskData.created_at) insertData.created_at = taskData.created_at;
+
+            const task = await prisma.tasks.create({
+                data: insertData
+            });
+
+            await prisma.clientTasks.create({
+                data: {
+                    client_id: clientId,
+                    task_id: task.task_id
+                }
+            });
+        }
+
+        res.status(201).json({ message: 'Tasks added successfully' });
+    } catch (error) {
+        console.error('Error adding tasks:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};

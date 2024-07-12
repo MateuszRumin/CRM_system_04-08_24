@@ -29,7 +29,7 @@ export const getClientById = async (req: Request, res: Response) => {
                         Task: true
                     }
                 },
-                ClientContact: true,
+                //ClientContact: true,
                 Invoice: {
                     include: {
                         InvoiceType: true,
@@ -37,8 +37,8 @@ export const getClientById = async (req: Request, res: Response) => {
                         Status: true
                     }
                 },
-                // ClientEmails: true,
-                // ClientPhones: true
+                ClientEmail: true,
+                ClientPhone: true
             }
         });
 
