@@ -18,6 +18,7 @@
     align-items: center; 
     display: inline-flex;
     font-family: Inter, sans-serif;
+    
   }
   
   /* Styl dla tytułu "Nowa Faktura" */
@@ -86,3 +87,184 @@
     font-weight: 500;
     word-wrap: break-word;
   }
+
+  .grid_container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dwie kolumny na szerokich ekranach */
+    grid-template-rows: auto auto auto; /* Trzy wiersze */
+    gap: 10px; /* Odstęp między elementami */
+    width: 100%; /* Szerokość 100% */
+  }
+  
+  .grid_item {
+
+    text-align: center;
+  }
+  
+  .large {
+    grid-column: span 2; /* Rozciągnięcie na dwie kolumny */
+  }
+  
+  @media (max-width: 900px) {
+    .grid_container {
+      grid-template-columns: 1fr; /* Jedna kolumna dla wersji responsywnej */
+    }
+  }
+
+  .ogolne_container {
+    width: 100%; 
+    height: 100%; 
+    padding: 20px; 
+    background-color: #FBFBFB;
+    border-radius: 5px; 
+    border: 1px #E0E0E0 solid; 
+    flex-direction: column; 
+    justify-content: flex-start; 
+    align-items: flex-start; 
+    gap: 30px; 
+    display: inline-flex
+  }
+
+.header_ogolne {
+    width: 100%; 
+    height: auto;
+    padding-top: 5px; 
+    padding-bottom: 5px; 
+    border-bottom: 1px #E0E0E0 solid; 
+    justify-content: space-between;
+    align-items: flex-start; 
+    gap: 10px; 
+    display: inline-flex
+}
+
+.text_ogolne {
+    text-align: center; 
+    color: #24304F; 
+    font-size: 18px; 
+    font-family: Inter, sans-serif;
+    font-weight: 700; 
+    line-height: 25.20px; 
+    word-wrap: break-word ;
+}
+.ogolne_row {
+  width: 100%; 
+  height: auto; 
+  justify-content: flex-start; 
+  align-items: flex-start; 
+  gap: 30px; 
+  display: inline-flex;
+  
+}
+.ogolne_column {
+  width: 100%; 
+  height: 100%; 
+  justify-content: flex-start; 
+  align-items: flex-start; 
+  display: inline-flex;
+  flex: 1 1 0; 
+  flex-direction: column;
+  gap: 8px; 
+  display: inline-flex
+}
+.ogolne_column2 {
+  width: 100%; 
+  height: 100%; 
+  justify-content: flex-start; 
+  align-items: flex-start; 
+  display: inline-flex;
+  flex: 1 1 0; 
+  flex-direction: column;
+  gap: 10px; 
+  display: inline-flex;
+  padding-top: 25px;
+}
+.header_column {
+  width: 100%; 
+  height: 100%; 
+  flex-direction: column; 
+  justify-content: flex-start; 
+  align-items: flex-start; 
+  gap: 8px; display: inline-flex;
+  width: 100%; 
+  color: black; 
+  font-size: 16px; 
+  font-family: Inter, sans-serif; 
+  font-weight: 500; 
+  line-height: 24px; 
+  word-wrap: break-word
+}
+.input {
+  align-self: stretch; 
+  height: 40px;
+  width: 100%; 
+  padding-left: 16px; 
+  padding-right: 16px; 
+  padding-top: 8px; 
+  padding-bottom: 8px; 
+  background: white; 
+  border-radius: 8px; 
+  border: 1px #E0E0E0 solid; 
+  justify-content: flex-start; 
+  align-items: center; 
+  gap: 16px; 
+  display: inline-flex;
+}
+.pobierz_z_regon {
+  color: rgba(0, 0, 0, 0.58);
+  font-size: 16px;
+  font-family: Inter, sans-serif;
+  font-weight: 500;
+  text-decoration: underline;
+  line-height: 24px;
+  word-wrap: break-word;
+  cursor: pointer;
+}
+.pobierz_z_regon:hover {
+  color:black;
+  background-color: #efefef76;
+}
+
+
+.grid_container2 {
+  grid-template-rows: auto auto auto auto auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dwie kolumny */
+  gap: 25px; /* Odstęp między elementami */
+  width: auto; /* Szerokość 100% */ /* Odstęp między elementami */
+  align-items: center;
+}
+
+
+.grid_container_two {
+  display: grid;
+  grid-template-columns: auto auto; /* Dwie kolumny dostosowujące się do zawartości */
+  grid-template-rows: auto auto; /* Dwa wiersze */
+  gap: 10px; /* Odstęp między elementami */
+  align-items: center;
+  height: 100%;
+}
+
+.header_input {
+  margin-right: 20px;
+}
+
+.kanal_komunikacji {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.kanal_komunikacji_child {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 8px 0; /* Dodatkowe odstępy wewnętrzne, można dostosować */
+  
+}
+
+.kanal_komunikacji_child > div {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}

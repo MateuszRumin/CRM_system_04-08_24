@@ -1,28 +1,23 @@
-import { NavLink } from 'react-router-dom'
-import styles from './ButtonTopBar.module.css'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import style from './ButtonTopBar.module.css'; // Importowanie stylizacji CSS
+
 interface ButtonTopBarProps {
-	src: string
-	alt: string
-	path: string
-	onClick: () => void
+  src: string;
+  alt: string;
+  path: string;
 }
 
-export const ButtonTopBar = ({ src, alt, path = '', onClick }: ButtonTopBarProps) => {
-	if (path !== '') {
-		return (
-			<NavLink to={path}>
-				<button onClick={onClick} className={styles.buttontopbar}>
-					<img src={src} alt={alt} />
-				</button>
-			</NavLink>
-		)
-	}
+export const ButtonTopBar: React.FC<ButtonTopBarProps> = ({ src, alt, path }) => {
+  const navigate = useNavigate();
 
-	return (
-		<>
-			<button onClick={onClick} className={styles.buttontopbar}>
-				<img src={src} alt={alt} />
-			</button>
-		</>
-	)
-}
+  const handleClick = () => {
+    navigate(path);
+  };
+
+  return (
+    <button className={style.buttontopbar} onClick={handleClick}>
+      <img src={src} alt={alt} />
+    </button>
+  );
+};

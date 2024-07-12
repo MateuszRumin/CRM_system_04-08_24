@@ -1,27 +1,20 @@
-import React, { useState, Suspense } from 'react';
+import React, { useState} from 'react';
 import styles from './NewInvoiceForm.module.css';
 import CheckboxIcon from '../../../public/icons/checkbox.svg';
 import MinusIcon from '../../../public/icons/Minus_Square.svg';
 import AddIcon from '../../../public/icons/Add_Plus_Square.svg';
-import { InvoiceSettings } from '../Invoice/InvoiceSettings'; // Import InvoiceSettings
 
 interface NewInvoiceFormProps {
   onClose: () => void;
 }
 
 const NewInvoiceForm: React.FC<NewInvoiceFormProps> = ({ onClose }) => {
-  const [number, setNumber] = useState(''); // State for invoice number
-  const [client, setClient] = useState(''); // State for client
+  const [number] = useState(''); // State for invoice number
   const [type, setType] = useState(''); // State for invoice type (VAT, Zaliczka, Końcowa)
   const [issueDate, setIssueDate] = useState(''); // State for issue date
-  const [dueDate, setDueDate] = useState(''); // State for due date
-  const [amount, setAmount] = useState(''); // State for amount
-  const [paymentStatus, setPaymentStatus] = useState(''); // State for payment status
 
   const [selectedOption, setSelectedOption] = useState<'firma' | 'osobaPrywatna'>('firma');
   const [serviceSections, setServiceSections] = useState<string[]>(['section1']); // Initial state with one section
-
-  const [isSettingsVisible, setIsSettingsVisible] = useState(false); // State for visibility of InvoiceSettings
 
   const toggleOption = (option: 'firma' | 'osobaPrywatna') => {
     setSelectedOption(option);
@@ -44,34 +37,15 @@ const NewInvoiceForm: React.FC<NewInvoiceFormProps> = ({ onClose }) => {
     onClose();
   };
 
-  const handleSettingsClick = () => {
-    setIsSettingsVisible(!isSettingsVisible);
-  };
+
 
   return (
     <div className={styles.body}>
-      
-
-      <Suspense fallback={<div>Loading...</div>}>
-        {isSettingsVisible && (
-          <InvoiceSettings
-            initialSetting1="Default Value 1"
-            initialSetting2={0}
-            onSave={(settings) => console.log('Settings saved:', settings)}
-            isEditable={true}
-          />
-        )}
-      </Suspense>
-
-      {!isSettingsVisible && (
-        <>
         <div className={styles.header_container}>
         <div className={styles.title}>Nowa Faktura</div>
         <div className={styles.button_container}>
           <div className={styles.save_button}>
-            <button className={styles.save_button_anuluj} onClick={handleSettingsClick}>
-              <div className={styles.anuluj_button_text}>Ustawienia</div>
-            </button>
+            
             <button className={styles.save_button_anuluj} onClick={onClose}>
               <div className={styles.anuluj_button_text}>Anuluj</div>
             </button>
@@ -275,9 +249,7 @@ const NewInvoiceForm: React.FC<NewInvoiceFormProps> = ({ onClose }) => {
                 <textarea className={styles.input_text_area}></textarea>
               </div>
             </div>
-          </div>
-        </>
-      )}
+          </div>      
     </div>
   );
 };
