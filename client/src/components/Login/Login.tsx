@@ -20,6 +20,7 @@ export const Login: React.FC = () => {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
+					
 				},
 				body: JSON.stringify(data),
 			})
@@ -40,15 +41,6 @@ export const Login: React.FC = () => {
 			alert('Login failed: ' + error)
 		}
 
-		// fetch('http://localhost:3000/users/login', {
-		// 	method: 'POST',
-		// 	headers: { 'Content-Type': 'application/json' },
-		// 	body: JSON.stringify(data),
-		// })
-		// 	.then(res => res.json())
-		// 	.then(res => {
-		// 		console.log(res)
-		// 	})
 	}
 
 	return (
