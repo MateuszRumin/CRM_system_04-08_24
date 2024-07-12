@@ -98,7 +98,7 @@ model Clients {
   ClientNote ClientNotes[]
   ClientTask ClientTasks[]
   Invoice Invoices[]
-  ClientContact ClientContacts[]
+  // ClientContact ClientContacts[]
   ClientEmail ClientEmails[]
   ClientPhone ClientPhones[]
 }

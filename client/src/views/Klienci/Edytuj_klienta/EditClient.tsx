@@ -14,6 +14,18 @@ interface LocationState {
   modifiedName: string;
 }
 
+interface ClientEmail {
+  email_id: number;
+  client_id: number;
+  email: string;
+}
+
+interface ClientPhone {
+  phone_id: number;
+  client_id: number;
+  tel_number: string;
+}
+
 export const EditClient: React.FC = () => {
   const location = useLocation();
   const state = location.state as LocationState;
@@ -57,8 +69,8 @@ export const EditClient: React.FC = () => {
           krs: data.krs,
           companyName: data.company_name,
           companyAddress: data.address,
-          emails: [], // maile jeszcze do poprawy
-          phones: [], // numery jeszcze do poprawy
+          emails: data.ClientEmail.map((email: ClientEmail) => email.email), // mapowanie emaili z typem
+          phones: data.ClientPhone.map((phone: ClientPhone) => phone.tel_number),  // mapowanie telefonów z typem
         });
 
         const fetchedNotes = data.ClientNote.map((clientNote: any) => ({
