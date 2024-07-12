@@ -21,7 +21,7 @@ export function AddNewClient() {
       const requestData = {
         client: {
           user_id: 1 || '',
-          status_id: 1 || '',
+          status_id: parseInt(data.status) || '',
           client_type: data.companyType || '',
           first_name: data.firstName || '',
           second_name: data.lastName || '',

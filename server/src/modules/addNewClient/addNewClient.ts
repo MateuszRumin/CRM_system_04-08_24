@@ -6,18 +6,21 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
     try {
         const initData = req.body.client;
 
-        // Pobierz status klienta
+        console.log('Received client data:', initData);
+
+        // Pobierz status klienta na podstawie status_id
         const status = await prisma.Statuses.findFirst({
             select: {
                 status_id: true
             },
             where: {
-                name: initData.status_name,
+                status_id: initData.status_id,
                 status_type: "Klient",
             }
         });
 
         if (!status) {
+            console.log('Status not found');
             return res.status(404).json({ error: 'Status not found' });
         }
 
@@ -36,17 +39,20 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
             company_name: initData.company_name || 'brak'
         };
 
+        console.log('Insert data:', insertData);
+
         // Stwórz nowego klienta
         const client = await prisma.Clients.create({
             data: insertData
         });
 
-        // const clientId = client.client_id;
+        console.log('Client created:', client);
 
         // Przekaż client_id dalej
         req.body.client_id = client.client_id;
         req.body.user_id = client.user_id;
-        next();
+
+        return next();
 
         // res.status(201).json({ message: 'Client added successfully', client });
     } catch (error) {
@@ -56,7 +62,7 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
             status: 'error',
             display: true,
             error: { error },
-            message: 'Błąd dodawania nowego klięta',
+            message: 'Błąd dodawania nowego klienta',
             devmessage: `${error}`,
             data: null
         };

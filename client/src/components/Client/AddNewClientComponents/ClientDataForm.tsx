@@ -81,9 +81,10 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
               className={styles.select}
               {...register('status', { required: 'Status jest wymagany.' })}
             >
-              <option value="Nie zaczęty">W toku</option>
-              <option value="Zrobiony">Zrobione</option>
-              <option value="Nie zrobiony">Nie zrobione</option>
+              <option value="1" >Niepodjęty</option>
+              <option value="2">W trakcie</option>
+              <option value="3">Zdobyty</option>
+              <option value="4">Stracony</option>
             </select>
             {errors.status && <span className={styles.error}>{errors.status.message as string}</span>}
           </label>
@@ -94,7 +95,7 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
               {...register('assignedEmployee', { required: 'Przypisany pracownik jest wymagany.' })}
             >
               <option value="">Wybierz pracownika</option>
-              <option value="Paweł Nowak">Paweł Nowak</option>
+              <option value="test">Brak API zaznacz cokolwiek</option>
               <option value="other">Inny pracownik</option>
             </select>
             {errors.assignedEmployee && <span className={styles.error}>{errors.assignedEmployee.message as string}</span>}

@@ -187,7 +187,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     if (deletedNotes.length > 0) {
         try {
             for (const noteId of deletedNotes) {
-                const url = `http://localhost:3000/client/${clientId}/notes/${noteId}`;
+                const url = `http://localhost:3000/client/notes/${noteId}`;
                 await axios.delete(url);
             }
             console.log('Notatki zostały usunięte:', deletedNotes);
@@ -202,7 +202,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     if (deletedTasks.length > 0) {
         try {
             for (const taskId of deletedTasks) {
-                const url = `http://localhost:3000/client/${clientId}/tasks/${taskId}`;
+                const url = `http://localhost:3000/client/tasks/${taskId}`;
                 await axios.delete(url);
             }
             console.log('Zadania zostały usunięte:', deletedTasks);
@@ -218,7 +218,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         const updatedClientUrl = `http://localhost:3000/client/${clientId}/update`;
         const response = await axios.put(updatedClientUrl, {
             client_id: clientId,
-            status_id: 1,
+            status_id: parseInt(updatedClientData.status),
             user_id: 1,
             client_type: updatedClientData.companyType,
             registration_date: updatedClientData.registrationDate || new Date().toISOString(), // Dodaj datę rejestracji

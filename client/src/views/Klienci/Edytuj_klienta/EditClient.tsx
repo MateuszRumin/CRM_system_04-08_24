@@ -59,7 +59,7 @@ export const EditClient: React.FC = () => {
         const data = response.data;
         setClient({
           id: data.client_id,
-          status: data.Status.name,
+          status: data.status_id,
           assignedEmployee: data.User.username,
           firstName: data.first_name,
           lastName: data.second_name,

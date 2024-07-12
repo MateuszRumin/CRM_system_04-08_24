@@ -136,6 +136,21 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
     return valid;
   };
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case '5':
+        return 'Nie zaczęty';
+      case '6':
+        return 'W trakcie';
+      case '7':
+        return 'Zrobiony';
+      case '8':
+        return 'Porażka';
+      default:
+        return status;
+    }
+  };
+
   return (
     <div className={styles.tasksContainer}>
       <h2>Zadania</h2>
@@ -215,7 +230,7 @@ export function ClientTasks({ tasks: initialTasks }: ClientTasksProps) {
           <div key={task.task_id} className={styles.task}>
             <h3>{task.task_title}</h3>
             <p><strong>Termin:</strong> {task.task_deadline}</p>
-            <p><strong>Status:</strong> {task.task_status}</p>
+            <p><strong>Status:</strong> {getStatusText(task.task_status.toString())}</p>
             <p>{task.task_description}</p>
             <div className={styles.button_container}>
             <button className={styles.addButton}

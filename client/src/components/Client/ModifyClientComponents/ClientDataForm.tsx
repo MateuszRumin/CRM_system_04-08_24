@@ -1,12 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from './ClientDataForm.module.css';
 import { useData } from '../../../contexts/DataContext';
 
 interface ClientDataFormProps {
   clientData: any;
-  onSubmit: (data: any) => void; // Dodaj prop onSubmit
-  formId: string; // Dodaj prop formId
+  onSubmit: (data: any) => void;
+  formId: string;
 }
 
 export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormProps) {
@@ -17,10 +17,12 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
     setValue,
     watch,
     formState: { errors, isValid: formIsValid },
-    trigger, // Dodajemy funkcję trigger
+    trigger,
   } = useForm({
     mode: 'onChange',
   });
+
+  const [showPrivateAddress, setShowPrivateAddress] = useState(false);
 
   useEffect(() => {
     Object.keys(clientData).forEach((key) => {
@@ -39,27 +41,33 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
   const handleAddEmail = () => {
     const emails = watch('emails') || [];
     setValue('emails', [...emails, '']);
-    trigger('emails'); // Wyzwalamy walidację po dodaniu
+    trigger('emails');
   };
 
   const handleRemoveEmail = (index: number) => {
     const emails = watch('emails') || [];
     emails.splice(index, 1);
     setValue('emails', emails);
-    trigger('emails'); // Wyzwalamy walidację po usunięciu
+    trigger('emails');
   };
 
   const handleAddPhone = () => {
     const phones = watch('phones') || [];
     setValue('phones', [...phones, '']);
-    trigger('phones'); // Wyzwalamy walidację po dodaniu
+    trigger('phones');
   };
 
   const handleRemovePhone = (index: number) => {
     const phones = watch('phones') || [];
     phones.splice(index, 1);
     setValue('phones', phones);
-    trigger('phones'); // Wyzwalamy walidację po usunięciu
+    trigger('phones');
+  };
+
+  const handleCompanyTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedType = event.target.value;
+    setShowPrivateAddress(selectedType === 'Prywatny');
+    setValue('companyType', selectedType);
   };
 
   return (
@@ -70,9 +78,10 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
           <label className={styles.label}>
             Status
             <select className={styles.select} {...register('status', { required: 'Status jest wymagany.' })}>
-              <option value="Nie zaczęty">W toku</option>
-              <option value="Zrobiony">Zrobione</option>
-              <option value="Nie zrobiony">Nie zrobione</option>
+              <option value="1">Niepodjęty</option>
+              <option value="2">W trakcie</option>
+              <option value="3">Zdobyty</option>
+              <option value="4">Stracony</option>
             </select>
             {errors.status && <span className={styles.error}>{errors.status.message as string}</span>}
           </label>
@@ -80,7 +89,7 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
             Przypisany pracownik
             <select className={styles.select} {...register('assignedEmployee', { required: 'Przypisany pracownik jest wymagany.' })}>
               <option value="">Wybierz pracownika</option>
-              <option value="Paweł Nowak">Paweł Nowak</option>
+              <option value="test">Brak API zaznacz cokolwiek</option>
               <option value="other">Inny pracownik</option>
             </select>
             {errors.assignedEmployee && <span className={styles.error}>{errors.assignedEmployee.message as string}</span>}
@@ -122,14 +131,41 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
         </div>
         <div className={styles.row}>
           <label className={styles.radioGroup}>
-            <input type="radio" {...register('companyType')} value="Firma" />
+            <input
+              type="radio"
+              {...register('companyType')}
+              value="Firma"
+              onChange={handleCompanyTypeChange}
+              checked={watch('companyType') === 'Firma'}
+            />
             Firma
           </label>
           <label className={styles.radioGroup}>
-            <input type="radio" {...register('companyType')} value="Prywatny" />
+            <input
+              type="radio"
+              {...register('companyType')}
+              value="Prywatny"
+              onChange={handleCompanyTypeChange}
+              checked={watch('companyType') === 'Prywatny'}
+            />
             Osoba prywatna
           </label>
         </div>
+        {showPrivateAddress && (
+          <div className={styles.row}>
+            <label className={styles.label}>
+              Adres osoby prywatnej
+              <input
+                className={styles.input}
+                type="text"
+                {...register('companyAddress', {
+                  minLength: { value: 3, message: 'Adres osoby prywatnej musi mieć co najmniej 3 znaki.' },
+                })}
+              />
+              {errors.privateAddress && <span className={styles.error}>{errors.privateAddress.message as string}</span>}
+            </label>
+          </div>
+        )}
         {watch('companyType') === 'Firma' && (
           <>
             <div className={styles.row}>
@@ -259,7 +295,7 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
             </button>
           </label>
         </div>
-        <button type="submit" style={{ display: 'none' }}>Ukryty przycisk</button> {/* Ukryty przycisk submit */}
+        <button type="submit" style={{ display: 'none' }}>Ukryty przycisk</button>
       </form>
     </div>
   );
