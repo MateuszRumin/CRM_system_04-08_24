@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import styles from './EditClient.module.css';
 import { ClientDataForm } from '../../../components/Client/ModifyClientComponents/ClientDataForm';
@@ -6,89 +6,98 @@ import { ClientNotes } from '../../../components/Client/ModifyClientComponents/C
 import { ClientTasks } from '../../../components/Client/ModifyClientComponents/ClientTasks';
 import { useData } from '../../../contexts/DataContext';
 import BlueButton from '../../../components/Buttons/BlueButton';
+import axios from 'axios';
+import { format } from 'date-fns';
 
 interface LocationState {
   clientId: string;
   modifiedName: string;
 }
 
+interface ClientEmail {
+  email_id: number;
+  client_id: number;
+  email: string;
+}
+
+interface ClientPhone {
+  phone_id: number;
+  client_id: number;
+  tel_number: string;
+}
+
 export const EditClient: React.FC = () => {
   const location = useLocation();
   const state = location.state as LocationState;
-  const { clientId, modifiedName } = state;
-  const { isValid, isValidTasks, isValidNotes, updateClient } = useData();
+  const { modifiedName } = state;
+  const { clientId, setClientId, isValid, isValidTasks, isValidNotes, deletedNotes, updateClient, sendDataToServerUpdatedClient } = useData();
 
-  const [client] = useState({
-    id: clientId,
-    status: 'Zrobiony',
-    assignedEmployee: 'Paweł Nowak',
-    firstName: 'Ka',
-    lastName: 'Nowak',
-    companyType: 'company',
-    nip: '55324324322222',
-    regon: '222211122',
-    krs: '123321123231',
-    companyName: 'Weblance Kamil Wojnaraowski',
-    companyAddress: 'Olszanka 19',
-    emails: ['pawel201@vp.pl', 'test@vp.pl'],
-    phones: ['152435345', '543213124'],
+  const [client, setClient] = useState<any>({
+    id: '',
+    status: '',
+    assignedEmployee: '',
+    firstName: '',
+    lastName: '',
+    companyType: '',
+    nip: '',
+    regon: '',
+    krs: '',
+    companyName: '',
+    companyAddress: '',
+    emails: [],
+    phones: [],
   });
 
-  const notes = useMemo(() => [
-    {
-      note_id: 18,
-      note_text: "przykładowa notatka numer 1",
-    },
-    {
-      note_id: 21,
-      note_text: 'Jakaś tam notatka numer 2',
-    },
-    {
-      note_id: 22,
-      note_text: "przykładowa notatka numer 1",
-    },
-    {
-      note_id: 33,
-      note_text: 'Jakaś tam notatka numer 2',
-    },
-  ], []);
+  const [notes, setNotes] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<any[]>([]);
 
-  const tasks = useMemo(() => [
-    {
-      task_id: 1,
-      task_title: 'testowe zadanie',
-      task_deadline: '2024-06-29',
-      task_status: 'Zrobiony',
-      task_description: 'jakieś tam przykładowe opisy dotyczące zadania',
-    },
-    {
-      task_id: 2,
-      task_title: 'testowe zadanie 2',
-      task_deadline: '2024-06-29',
-      task_status: 'Zrobiony',
-      task_description: 'jakieś tam przykładowe opisy dotyczące zadania 2',
-    },
-    {
-      task_id: 20,
-      task_title: 'testowe zadanie 200',
-      task_deadline: '2024-06-29',
-      task_status: 'Zrobiony',
-      task_description: 'jakieś tam przykładowe opisy dotyczące zadania',
-    },
-    {
-      task_id: 23,
-      task_title: 'testowe zadanie 230',
-      task_deadline: '2024-06-29',
-      task_status: 'Zrobiony',
-      task_description: 'jakieś tam przykładowe opisy dotyczące zadania 2',
-    },
-  ], []);
+  useEffect(() => {
+    setClientId(state.clientId);
 
-  const handleSubmit = (data: any) => {
+    axios.get(`http://localhost:3000/client/${state.clientId}/get`)
+      .then(response => {
+        const data = response.data;
+        setClient({
+          id: data.client_id,
+          status: data.status_id,
+          assignedEmployee: data.User.username,
+          firstName: data.first_name,
+          lastName: data.second_name,
+          companyType: data.client_type,
+          nip: data.nip,
+          regon: data.regon,
+          krs: data.krs,
+          companyName: data.company_name,
+          companyAddress: data.address,
+          emails: data.ClientEmail.map((email: ClientEmail) => email.email), // mapowanie emaili z typem
+          phones: data.ClientPhone.map((phone: ClientPhone) => phone.tel_number),  // mapowanie telefonów z typem
+        });
+
+        const fetchedNotes = data.ClientNote.map((clientNote: any) => ({
+          note_id: clientNote.Note.note_id,
+          note_text: clientNote.Note.note_text,
+        }));
+        setNotes(fetchedNotes);
+
+        const fetchedTasks = data.ClientTask.map((clientTask: any) => ({
+          task_id: clientTask.Task.task_id,
+          task_title: clientTask.Task.task_name,
+          task_deadline: format(new Date(clientTask.Task.deadline), 'yyyy-MM-dd'),
+          task_status: clientTask.Task.status_id,
+          task_description: clientTask.Task.task_text,
+        }));
+        setTasks(fetchedTasks);
+      })
+      .catch(error => {
+        console.error('Error fetching client data:', error);
+      });
+  }, [state.clientId, setClientId]);
+
+  const handleSubmit = async (data: any) => {
+    console.log('Dane wejściowe w handleSubmit:', data);
+  
     updateClient(clientId, data);
-
-    // sendDataToServerUpdatedClient();
-
+  
   };
 
   const memoizedClientDataForm = useCallback(
@@ -96,12 +105,12 @@ export const EditClient: React.FC = () => {
     [client]
   );
 
-  const memoizedClientNotes = useCallback(
+  const memoizedClientNotes = useMemo(
     () => <ClientNotes initialNotes={notes} />,
     [notes]
   );
 
-  const memoizedClientTasks = useCallback(
+  const memoizedClientTasks = useMemo(
     () => <ClientTasks tasks={tasks} />,
     [tasks]
   );
@@ -111,7 +120,6 @@ export const EditClient: React.FC = () => {
     if (formElement) {
       formElement.requestSubmit();
     }
-
   };
 
   return (
@@ -129,9 +137,9 @@ export const EditClient: React.FC = () => {
       <div className={styles.formContainer}>
         <div className={styles.row}>
           {memoizedClientDataForm()}
-          {memoizedClientNotes()}
+          {memoizedClientNotes}
         </div>
-        {memoizedClientTasks()}
+        {memoizedClientTasks}
       </div>
     </div>
   );

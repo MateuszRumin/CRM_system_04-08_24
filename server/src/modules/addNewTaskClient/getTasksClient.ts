@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { IResponse } from '../../../../globalTypes/iResponce';
-import { PrismaClient, ClientTasks, Tasks } from '@prisma/client';
+import { PrismaClient} from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -8,21 +8,19 @@ export const getTasksClient = async (req: Request, res: Response) => {
     const { client_id } = req.params;
 
     try {
-        // Sprawdzamy, czy clientId jest liczbą
         const id = parseInt(client_id, 10);
         if (isNaN(id)) {
             return res.status(400).json({ error: 'Invalid clientId parameter' });
         }
 
-        // Wyszukaj zadania przypisane do klienta przez tabelę ClientTasks
         const clientTasks = await prisma.clientTasks.findMany({
             where: {
-                client_id: id, // Używamy `id` bezpośrednio
+                client_id: id, 
             },
             include: {
                 Task: {
                     include: {
-                        Status: true, // Dołącz status zadania
+                        Status: true, 
                     },
                 },
             },
@@ -32,7 +30,6 @@ export const getTasksClient = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'No tasks found for this client' });
         }
 
-        // Wyciągamy dane z zadań
         const taskDetails = clientTasks.map((clientTask) => clientTask.Task);
 
         res.status(200).json(taskDetails);
