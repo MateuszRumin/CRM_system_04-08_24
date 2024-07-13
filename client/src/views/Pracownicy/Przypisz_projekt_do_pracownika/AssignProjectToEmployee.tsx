@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { EmployeeTable } from '../../../components/Employee/AssignProjectToEmployeeComponents/EmployeeTable';
 import Pagination from '../../../components/Employee/Pagination';
 import styles from './AssignProjectToEmployee.module.css';
+import BlueButton from '../../../components/Buttons/BlueButton';
 
 const dummyData = [
   { projectName: 'Projekt A', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
@@ -40,7 +41,10 @@ export function AssignProjectToEmployee() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.headerContainer}>
       <h2>Przypisz projekt do pracownika {employee ? `${employee.name}, ${employee.id}` : ''}</h2>
+      <BlueButton buttonText='Przypisz'></BlueButton>
+      </div>
       <EmployeeTable data={currentItems} />
       <Pagination
         itemsPerPageOptions={[10, 20, 30, 50]}

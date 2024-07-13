@@ -7,6 +7,7 @@ import format from 'date-fns/format';
 import styles from './EmployeeDetails.module.css';
 import CalendarIcon from '../../assets/EmployeePage/calendar_drawer.svg';
 import ExaxmpleProfilePicture from '../../assets/EmployeePage/example_profile_picture.svg';
+import jsPDF from 'jspdf';
 
 export function EmployeeDetails() {
   const location = useLocation();
@@ -46,7 +47,21 @@ export function EmployeeDetails() {
 
     navigate(`/pracownicy/edit-employee/${modifiedName}`, { state: { employee } });
   };
-  
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    const text = `
+      Imię: ${employee.name.split(' ')[0]}
+      Nazwisko: ${employee.name.split(' ')[1]}
+      Umowa: ${employee.contract}
+      Data: ${selectedDate ? format(selectedDate, 'dd.MM.yyyy') : 'Nie wybrano daty'}
+      Miesiąc: ${selectedDate ? format(selectedDate, 'MMMM') : 'Nie wybrano miesiąca'}
+      Liczba przepracowanych godzin w miesiącu: 250
+      Liczba przepracowanych godzin w danym dniu: 24
+    `;
+    doc.text(text, 10, 10);
+    doc.save('employee_details.pdf');
+  };
 
   return (
     <div className={styles.container}>
@@ -68,15 +83,20 @@ export function EmployeeDetails() {
             <div className={styles.imageContainer}>
               <h2>Zdjęcie pracownika</h2>
               <img src={ExaxmpleProfilePicture} alt={`Zdjęcie ${employee.name}`} className={styles.employeeImage} />
-              {/* <button onClick={() => navigate(`/pracownicy/edit-employee/${employee.id}`)} className={styles.modifyButton} >Modyfikuj pracownika</button> */}
-              <button onClick={handleModify} className={styles.modifyButton} >Modyfikuj pracownika</button>
-              <button className={styles.deleteButton} onClick={handleRemoveEmployee}>Usuń pracownika</button>
+              <button onClick={handleModify} className={styles.modifyButton}>
+                Modyfikuj pracownika
+              </button>
+              <button className={styles.deleteButton} onClick={handleRemoveEmployee}>
+                Usuń pracownika
+              </button>
             </div>
             <div className={styles.projectsContainer}>
               <h2>Projekty</h2>
               <button className={styles.projectButton}>Projekt 1</button>
               <button className={styles.projectButton}>Projekt 2</button>
-              <button className={styles.addButton} onClick={handleAssignProjectToEmployee}>Dodaj</button>
+              <button className={styles.addButton} onClick={handleAssignProjectToEmployee}>
+                Dodaj
+              </button>
             </div>
           </div>
         </>
@@ -98,7 +118,7 @@ export function EmployeeDetails() {
               Miesiąc: {selectedDate ? format(selectedDate, 'MMMM') : 'Nie wybrano miesiąca'}
             </Typography>
             <Typography variant="body1">Liczba przepracowanych godzin: 250</Typography>
-            <Button variant="contained" color="primary">
+            <Button variant="contained" color="primary" onClick={generatePDF}>
               Generuj PDF
             </Button>
           </Box>

@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { EmployeeTable } from '../../../components/Employee/RemoveEmployeeComponents/EmployeeTable';
 import Pagination from '../../../components/Employee/Pagination';
 import styles from './RemoveEmployee.module.css';
+import BlueButton from '../../../components/Buttons/BlueButton';
 
 const dummyData = [
   { projectName: 'Projekt A', clientName: 'Adam Nowak', status: 'Wykonane', deadline: '12.12.2024' },
@@ -33,7 +34,11 @@ export function RemoveEmployee() {
 
   return (
     <div className={styles.container}>
-      <h2>Usuń pracownika {employee ? `${employee.name}, ${employee.id}` : ''}</h2>
+      <div className={styles.headerContainer}>
+        <h2>Usuń pracownika {employee ? `${employee.name}, ${employee.id}` : ''}</h2>
+        {/* <BlueButton buttonText='Usuń z pracy'></BlueButton> */}
+        <BlueButton buttonText='Usuń z projektu'></BlueButton>
+      </div>
       <EmployeeTable data={currentItems} />
       <Pagination
         itemsPerPageOptions={[5, 10, 15]}

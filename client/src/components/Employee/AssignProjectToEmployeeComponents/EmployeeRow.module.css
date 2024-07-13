@@ -1,7 +1,4 @@
 .row {
-  text-align: left;
+  transition: background-color 0.3s;
 }
 
-.row td select {
-  width: 100%;
-}
