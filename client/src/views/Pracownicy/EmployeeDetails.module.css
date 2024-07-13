@@ -28,9 +28,8 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-
   border-radius: 5px;
-  background: #F3F3F3;
+  background: #f3f3f3;
 }
 
 .imageContainer {
@@ -70,16 +69,37 @@
   flex: 1;
 }
 
-.projectButton,
-.addButton {
-  display: block;
-  margin: 10px 0;
+.projectRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.projectName {
+  flex: 1;
+}
+
+.showButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 10px 20px;
-  font-size: 16px;
+  border: 1px solid #24304f;
+  border-radius: 8px;
+  background: #24304f;
+  color: white;
   cursor: pointer;
 }
 
+.showButton:hover {
+  background-color: gray;
+}
+
 .addButton {
+  display: block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
   background-color: #28a745;
   color: white;
   border: none;

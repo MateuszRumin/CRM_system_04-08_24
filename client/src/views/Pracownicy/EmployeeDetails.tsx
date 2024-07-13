@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { Drawer, Button, Typography, Box, IconButton } from '@mui/material';
 import { LocalizationProvider, DateCalendar } from '@mui/x-date-pickers';
@@ -9,12 +9,69 @@ import CalendarIcon from '../../assets/EmployeePage/calendar_drawer.svg';
 import ExaxmpleProfilePicture from '../../assets/EmployeePage/example_profile_picture.svg';
 import jsPDF from 'jspdf';
 
+interface Project {
+  id: string;
+  projectName: string;
+}
+
 export function EmployeeDetails() {
   const location = useLocation();
   const navigate = useNavigate();
   const employee = location.state?.employee;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [projects, setProjects] = useState<Project[]>([
+    { id: '1', projectName: 'Projekt A' },
+    { id: '2', projectName: 'Projekt B' },
+    { id: '3', projectName: 'Projekt C' },
+    { id: '4', projectName: 'Projekt D' },
+    { id: '5', projectName: 'Projekt E' },
+    { id: '6', projectName: 'Projekt F' },
+    { id: '7', projectName: 'Projekt G' },
+    { id: '8', projectName: 'Projekt H' },
+    { id: '9', projectName: 'Projekt I' },
+    { id: '10', projectName: 'Projekt J' },
+  ]); // Symulowane dane projektów
+
+  // Przykładowe dane do generacji PDF-a w zależności od wybranego dnia
+  const pdfDataByDate = [
+    {
+      date: new Date(2024, 7, 15), // 15 sierpnia 2024
+      text: `
+        Imię: ${employee?.name.split(' ')[0]}
+        Nazwisko: ${employee?.name.split(' ')[1]}
+        Umowa: ${employee?.contract}
+        Data: 15.08.2024
+        Miesiąc: Sierpień
+        Liczba przepracowanych godzin w miesiącu: 250
+        Liczba przepracowanych godzin w danym dniu: 24
+      `,
+    },
+    {
+      date: new Date(2024, 7, 20), // 20 sierpnia 2024
+      text: `
+        Imię: ${employee?.name.split(' ')[0]}
+        Nazwisko: ${employee?.name.split(' ')[1]}
+        Umowa: ${employee?.contract}
+        Data: 20.08.2024
+        Miesiąc: Sierpień
+        Liczba przepracowanych godzin w miesiącu: 260
+        Liczba przepracowanych godzin w danym dniu: 26
+      `,
+    },
+    {
+      date: new Date(2024, 8, 5), // 5 września 2024
+      text: `
+        Imię: ${employee?.name.split(' ')[0]}
+        Nazwisko: ${employee?.name.split(' ')[1]}
+        Umowa: ${employee?.contract}
+        Data: 05.09.2024
+        Miesiąc: Wrzesień
+        Liczba przepracowanych godzin w miesiącu: 270
+        Liczba przepracowanych godzin w danym dniu: 28
+      `,
+    },
+  ];
 
   if (!employee) {
     return <div>Nie znaleziono szczegółów pracownika</div>;
@@ -36,6 +93,10 @@ export function EmployeeDetails() {
     navigate(`remove-employee`, { state: { employee } });
   };
 
+  const handleDisplayProject = () => {
+    console.log("tutaj będzie przejście do odpowiedniego projektu (jego id) za pomocą danych z API.");
+  };
+
   const isAssignProjectRoute = location.pathname.includes('assign-project-to-employee');
   const isRemoveEmployeeRoute = location.pathname.includes('remove-employee');
 
@@ -49,18 +110,22 @@ export function EmployeeDetails() {
   };
 
   const generatePDF = () => {
-    const doc = new jsPDF();
-    const text = `
-      Imię: ${employee.name.split(' ')[0]}
-      Nazwisko: ${employee.name.split(' ')[1]}
-      Umowa: ${employee.contract}
-      Data: ${selectedDate ? format(selectedDate, 'dd.MM.yyyy') : 'Nie wybrano daty'}
-      Miesiąc: ${selectedDate ? format(selectedDate, 'MMMM') : 'Nie wybrano miesiąca'}
-      Liczba przepracowanych godzin w miesiącu: 250
-      Liczba przepracowanych godzin w danym dniu: 24
-    `;
-    doc.text(text, 10, 10);
-    doc.save('employee_details.pdf');
+    if (!selectedDate) {
+      return; // Brak wybranego dnia, nie generujemy PDF-a
+    }
+
+    const selectedDateString = format(selectedDate, 'dd.MM.yyyy');
+
+    // Szukanie danych do generacji PDF-a na podstawie wybranego dnia
+    const pdfData = pdfDataByDate.find((data) => format(data.date, 'dd.MM.yyyy') === selectedDateString);
+
+    if (pdfData) {
+      const doc = new jsPDF();
+      doc.text(pdfData.text, 10, 10);
+      doc.save('employee_details.pdf');
+    } else {
+      console.warn('Nie znaleziono danych do generacji PDF-a dla wybranego dnia.');
+    }
   };
 
   return (
@@ -92,8 +157,12 @@ export function EmployeeDetails() {
             </div>
             <div className={styles.projectsContainer}>
               <h2>Projekty</h2>
-              <button className={styles.projectButton}>Projekt 1</button>
-              <button className={styles.projectButton}>Projekt 2</button>
+              {projects.map((project) => (
+                <div key={project.id} className={styles.projectRow}>
+                  <span className={styles.projectName}>{project.projectName}</span>
+                  <button onClick={handleDisplayProject} className={styles.showButton}>Wyświetl</button>
+                </div>
+              ))}
               <button className={styles.addButton} onClick={handleAssignProjectToEmployee}>
                 Dodaj
               </button>
