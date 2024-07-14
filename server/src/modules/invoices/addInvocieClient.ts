@@ -39,6 +39,7 @@ exports.addInvocieClient = async (req: Request, res: Response, next: NextFunctio
                 data:insertData
             })
 
+            console.log('Client created:', client);
             req.body.client.client_id = client.client_id
 
             next()
@@ -48,12 +49,12 @@ exports.addInvocieClient = async (req: Request, res: Response, next: NextFunctio
             next()
         }
     
-
+        
 
 
 
     }catch (error){
-
+        console.error('Błąd dodania nowego klienta',error)
         const response: IResponse = {
             status: 'error',
             display: true,
