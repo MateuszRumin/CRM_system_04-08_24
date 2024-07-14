@@ -3,6 +3,7 @@ import { IResponse } from '../../../../globalTypes/iResponce';
 
 exports.addNewClient = async (req: Request, res: Response, next: NextFunction) => {
     const prisma = req.app.get('prisma')
+    
     try  {        
         
         const initData = req.body.client
