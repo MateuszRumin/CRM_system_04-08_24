@@ -101,6 +101,7 @@ model Clients {
   // ClientContact ClientContacts[]
   ClientEmail ClientEmails[]
   ClientPhone ClientPhones[]
+  Project Projects[]
 }
 
 model ClientEmails {
@@ -192,15 +193,16 @@ model Invoices {
   client_id Int
   issue_date     DateTime
   due_date       DateTime
-  prize_netto Float
-  prize_brutto Float
-  tax_ammount Float
-  comments String
+  net_amount Float
+  brutto_amount Float
+  vat_amount Float
+  note String
 
   Status     Statuses     @relation(fields: [status_id], references: [status_id])
   InvoiceType InvoiceTypes @relation(fields: [invoice_type_id], references: [invoice_type_id])
   Client     Clients      @relation(fields: [client_id], references: [client_id])
   IncoiceProduct InvoiceProducts[]
+  
 }
 
 model InvoiceProducts {
@@ -235,7 +237,7 @@ enum numberingFormats {
 }
 
 
-model CompanySettings {
+model Companies {
   company_id Int @id @default(1)
   name String 
   address String
@@ -278,7 +280,7 @@ model InvoiceSettings {
   reminder_channel_push     Boolean
 
   company_id                Int
-  CompanySet                   CompanySettings @relation(fields: [company_id], references: [company_id])
+  Company                   Companies @relation(fields: [company_id], references: [company_id])
 }
 
 model InvoicePaymentSettings {
@@ -289,7 +291,15 @@ model InvoicePaymentSettings {
   default_vat_amount Int
 
   company_id Int
-  CompanySet CompanySettings @relation(fields: [company_id], references: [company_id])
+  Company Companies @relation(fields: [company_id], references: [company_id])
 }
 
+
+model Projects {
+  project_id Int @id @default(autoincrement())
+  name String
+  client_id Int
+
+  Client Clients @relation(fields: [client_id],references: [client_id])
+}
 

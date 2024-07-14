@@ -3,7 +3,7 @@ import { IResponse } from '../../../../globalTypes/iResponce';
 
 
 
-exports.addInvocieClientCheck = async (req: Request, res: Response, next: NextFunction) => {
+exports.addInvocieClient = async (req: Request, res: Response, next: NextFunction) => {
     const prisma = req.app.get('prisma')
 
     try {
@@ -24,19 +24,17 @@ exports.addInvocieClientCheck = async (req: Request, res: Response, next: NextFu
             const insertData = {
                 status_id: status.status_id,
                 user_id: initData.user_id,
-                client_type: initData.client_type,  
+                client_type: initData.client_type,
                 first_name: initData.first_name,
                 second_name: initData.second_name,
                 address: initData.address,
-                
-            }
-    
-            initData.registration_date ? Object.assign(insertData, {registration_date:initData.registration_date}):void 0
-            initData.regon  ? Object.assign(insertData, {regon:initData.regon}):void 0
-            initData.nip ? Object.assign(insertData, {nip:initData.nip}):void 0
-            initData.krs ? Object.assign(insertData, {krs:initData.krs}):void 0
-            initData.company_name ? Object.assign(insertData, {company_name:initData.company_name}):void 0
-            
+                registration_date: initData.registration_date || new Date(),
+                regon: initData.regon || 'brak',
+                nip: initData.nip || 'brak',
+                krs: initData.krs || 'brak',
+                company_name: initData.company_name || 'brak'
+            };
+
             const client = await prisma.Clients.create({
                 data:insertData
             })
