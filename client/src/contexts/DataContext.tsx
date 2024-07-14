@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction, useEffect } from 'react';
+import axios from 'axios';
 
 interface Note {
   note_id: number;
@@ -29,6 +30,8 @@ interface DataState {
   isValid: boolean;
   isValidNotes: boolean;
   isValidTasks: boolean;
+  clientId: string;
+  setClientId: Dispatch<SetStateAction<string>>;
   setClientData: Dispatch<SetStateAction<any>>;
   setAddedClientData: Dispatch<SetStateAction<any>>;
   setUpdatedClientData: Dispatch<SetStateAction<any>>;
@@ -90,6 +93,8 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [isValidNotes, setIsValidNotes] = useState<boolean>(false);
   const [isValidTasks, setIsValidTasks] = useState<boolean>(false);
 
+  const [clientId, setClientId] = useState<string>('');
+
   const addNote = (note: Note) => {
     setNotes(prevNotes => [...prevNotes, note]);
     setAddedNotes(prevAddedNotes => [...prevAddedNotes, note]);
@@ -145,37 +150,188 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     // Tutaj dodaj logikę faktycznego wysyłania danych do serwera
   };
 
-  const sendDataToServerUpdatedClient = () => {
+  const sendDataToServerUpdatedClient = async () => {
     console.log('Wysyłanie danych do serwera ze zmodyfikowanym klientem:', {
-      updatedClientData, 
-      addedNotes,
-      addedTasks,
-      deletedNotes,
-      deletedTasks,
-      updatedNotes, 
-      updatedTasks,
-      notes,
-      tasks,
+        updatedClientData,
+        addedNotes,
+        addedTasks,
+        deletedNotes,
+        deletedTasks,
+        updatedNotes,
+        updatedTasks,
+        notes,
+        tasks,
+        clientId
     });
-    // Logika faktycznego wysyłania danych do serwera dla zaktualizowanego klienta
+    // Logika wysyłania danych do serwera dla zaktualizowanego klienta
 
-    console.log(updatedClientData.firstName)
-    // Logika faktycznego wysyłania danych do serwera dla zaktualizowanego klienta
-    //// tutaj będzie wykorzystanie endpointu do dodania do bazy danych 
+    // Dodawanie nowych notatek
+    try {
+        if (addedNotes.length > 0) {
+            const dataToAdd = {
+                user_id: 1,
+                notes: addedNotes.map(note => ({
+                    note_text: note.note_text
+                }))
+            };
+            const response = await axios.post(`http://localhost:3000/client/${clientId}/notes`, dataToAdd);
+            console.log('Dodano nowe notatki:', response.data);
+        } else {
+            console.log('Nie ma notatek do dodania.');
+        }
+    } catch (error) {
+        console.error('Błąd podczas dodawania notatek:', error);
+    }
+
+    // Usuwanie notatek
+    if (deletedNotes.length > 0) {
+        try {
+            for (const noteId of deletedNotes) {
+                const url = `http://localhost:3000/client/notes/${noteId}`;
+                await axios.delete(url);
+            }
+            console.log('Notatki zostały usunięte:', deletedNotes);
+        } catch (error) {
+            console.error('Wystąpił błąd podczas usuwania notatek:', error);
+        }
+    } else {
+        console.log('Nie ma notatek do usunięcia.');
+    }
+
+    // Usuwanie tasków
+    if (deletedTasks.length > 0) {
+        try {
+            for (const taskId of deletedTasks) {
+                const url = `http://localhost:3000/client/tasks/${taskId}`;
+                await axios.delete(url);
+            }
+            console.log('Zadania zostały usunięte:', deletedTasks);
+        } catch (error) {
+            console.error('Wystąpił błąd podczas usuwania zadań:', error);
+        }
+    } else {
+        console.log('Nie ma zadań do usunięcia.');
+    }
+
+    // Aktualizacja danych klienta
+    try {
+        const updatedClientUrl = `http://localhost:3000/client/${clientId}/update`;
+        const response = await axios.put(updatedClientUrl, {
+            client_id: clientId,
+            status_id: parseInt(updatedClientData.status),
+            user_id: 1,
+            client_type: updatedClientData.companyType,
+            registration_date: updatedClientData.registrationDate || new Date().toISOString(), // Dodaj datę rejestracji
+            first_name: updatedClientData.firstName,
+            second_name: updatedClientData.lastName,
+            regon: updatedClientData.regon,
+            nip: updatedClientData.nip,
+            krs: updatedClientData.krs,
+            company_name: updatedClientData.companyName,
+            address: updatedClientData.companyAddress,
+            ClientEmail: updatedClientData.emails || [], // Dodaj e-maile
+            ClientPhone: updatedClientData.phones || []  // Dodaj numery telefonów
+        });
+
+        console.log('Odpowiedź z serwera:', response.data);
+        console.log('Dane klienta zostały zaktualizowane. Oto dane wysłane do aktualizacji:', updatedClientData);
+    } catch (error) {
+        console.error('Wystąpił błąd podczas wysyłania danych do serwera:', error);
+    }
+
+    // Aktualizacja tasków
+    try {
+        if (updatedTasks.length > 0) {
+            for (const task of updatedTasks) {
+                const { task_id, task_title, task_description, task_deadline, task_status } = task;
+                const url = `http://localhost:3000/client/tasks/${task_id}`;
+                const isoDeadline = new Date(task_deadline).toISOString();
+                const statusId = parseInt(task_status);
+
+                const response = await axios.put(url, {
+                    task_id: updatedTasks,
+                    status_id: statusId,
+                    user_id: 1,
+                    task_name: task_title,
+                    task_text: task_description,
+                    deadline: isoDeadline
+                });
+
+                console.log(`Zaktualizowano zadanie o ID ${task_id}. Odpowiedź z serwera:`, response.data);
+            }
+            console.log('Zadania zostały zaktualizowane:', updatedTasks);
+        } else {
+            console.log('Nie ma zadań do zaktualizowania.');
+        }
+
+        // Aktualizacja notatek
+        if (updatedNotes.length > 0) {
+            for (const note of updatedNotes) {
+                const { note_id, note_text } = note;
+                const url = `http://localhost:3000/client/notes/${note_id}`;
+                const response = await axios.put(url, {
+                    note_text: note_text
+                });
+
+                console.log(`Zaktualizowano notatkę o ID ${note_id}. Odpowiedź z serwera:`, response.data);
+            }
+            console.log('Notatki zostały zaktualizowane:', updatedNotes);
+        } else {
+            console.log('Nie ma notatek do zaktualizowania.');
+        }
+    } catch (error) {
+        console.error('Wystąpił błąd podczas aktualizacji zadań:', error);
+    }
+
+    // Dodawanie nowych tasków
+    try {
+        if (addedTasks.length > 0) {
+            const dataToAdd = {
+                user_id: 1,
+                client_id: clientId,
+                tasks: addedTasks.map(task => ({
+                    task_name: task.task_title,
+                    task_text: task.task_description,
+                    status_id: task.task_status,
+                    deadline: new Date(task.task_deadline).toISOString()
+                }))
+            };
+            const response = await axios.post(`http://localhost:3000/client/${clientId}/tasks`, dataToAdd);
+            console.log('Dodano nowe zadania:', response.data);
+        } else {
+            console.log('Nie ma zadań do dodania.');
+        }
+    } catch (error) {
+        console.error('Błąd podczas dodawania zadań:', error);
+    }
+
+    // Dodawanie kontaktów
+    try {
+        const dataToAdd = {
+            client_id: clientId,
+            emails: updatedClientData.emails,
+            phones: updatedClientData.phones
+        };
+        const response = await axios.post(`http://localhost:3000/client/${clientId}/contact`, dataToAdd);
+        console.log('Dodano nowe kontakty:', response.data);
+    } catch (error) {
+        console.error('Błąd podczas dodawania kontaktów:', error);
+    }
 
     // Po wysłaniu danych, wykonujemy czyszczenie
-    setUpdatedClientData({}); // Czyszczenie zaktualizowanych danych klienta
-    setAddedNotes([]); // Czyszczenie dodanych notatek
-    setAddedTasks([]); // Czyszczenie dodanych zadań
-    setDeletedNotes([]); // Czyszczenie usuniętych notatek
-    setDeletedTasks([]); // Czyszczenie usuniętych zadań
-    setUpdatedNotes([]); // Czyszczenie zaktualizowanych notatek
-    setUpdatedTasks([]); // Czyszczenie zaktualizowanych zadań
-    setNotes([]); // Czyszczenie notatek
-    setTasks([]); // Czyszczenie zadań
+    setUpdatedClientData({});
+    setAddedNotes([]);
+    setAddedTasks([]);
+    setDeletedNotes([]);
+    setDeletedTasks([]);
+    setUpdatedNotes([]);
+    setUpdatedTasks([]);
+    setNotes([]);
+    setTasks([]);
+};
 
 
-  };
+
 
   const setValid = (isValid: boolean) => {
     setIsValid(isValid);
@@ -210,6 +366,8 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       isValid,
       isValidNotes, 
       isValidTasks,
+      clientId,
+      setClientId,
       setClientData, 
       setAddedClientData,
       setUpdatedClientData,

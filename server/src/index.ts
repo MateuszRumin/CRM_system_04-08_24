@@ -2,16 +2,22 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import logger from './modules/logger/logger'
+const cors = require('cors')
+// import cors from 'cors';
 
 // Konfiguracja dotenv
 dotenv.config();
 
 // Inicjalizacja aplikacji express
 const app = express();
+app.use(cors())
 
 //import loggera
 app.set('logger', logger);
 app.use(express.json());
+
+// Obsługa CORS
+app.use(cors());
 
 //inicjalizacja klienta prisma
 const prisma = new PrismaClient();

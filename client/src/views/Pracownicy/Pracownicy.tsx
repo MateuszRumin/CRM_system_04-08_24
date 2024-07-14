@@ -1,3 +1,10 @@
+import { Outlet } from 'react-router-dom'
+
 export const Pracownicy = () => {
-	return <>Pracownicy</>
+	return (
+		<>
+			Pracownicy
+			<Outlet />
+		</>
+	)
 }
