@@ -11,9 +11,9 @@ export const getAllInvoices = async (req: Request, res: Response, next: NextFunc
         invoice_number: true,
         issue_date: true,
         due_date: true,
-        net_amount: true,
-        vat_amount: true,
-        note: true,
+        prize_netto: true,
+        tax_ammount: true,
+        //note: true,
         Client: {
           select: {
             first_name: true,
@@ -40,9 +40,9 @@ export const getAllInvoices = async (req: Request, res: Response, next: NextFunc
       invoice_type: invoice.InvoiceType.invoice_type,
       issue_date: invoice.issue_date,
       due_date: invoice.due_date,
-      amount: invoice.net_amount + invoice.vat_amount,
+      prize_brutto: invoice.tax_ammount + invoice.tax_ammount,
       status: invoice.Status.name,
-      note: invoice.note
+      //note: invoice.note
     }));
 
     res.json(formattedInvoices);

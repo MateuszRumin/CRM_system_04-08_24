@@ -16,7 +16,8 @@ router.post('/test', (req,res,next) =>{
 router.get('/', getAllInvoices);
 router.put('/status', updateInvoiceStatus);
 router.get('/settings', getAllSettings);
-router.post('/settings/update', updateAllSettings);
+router.put('/settings/update', updateAllSettings);
+router.put('/settings/add', updateAllSettings);
 
 
 router.use('/', (req,res,next) =>{

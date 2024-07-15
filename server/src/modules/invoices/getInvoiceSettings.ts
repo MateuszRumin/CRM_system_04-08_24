@@ -5,12 +5,11 @@ const prisma = new PrismaClient();
 
 export const getAllSettings = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const invoiceSettings = await prisma.invoiceSettings.findMany({
-    });
+    const invoiceSettings = await prisma.invoiceSettings.findMany({});
 
     const invoicePaymentSettings = await prisma.invoicePaymentSettings.findMany({
       include: {
-        Company: {
+        CompanySetting: {
           select: {
             name: true,
             address: true,
@@ -26,11 +25,17 @@ export const getAllSettings = async (req: Request, res: Response, next: NextFunc
       select: {
         invoice_type_id: true,
         invoice_type: true,
-        numbering_format: true
+        numbering_format: true,
+        email_notification: true,
+        sms_notification: true,
+        push_notification: true,
+        unpaid_reminder_enabled: true,
+        reminder_frequency: true,
+        reminder_content: true,
       }
     });
 
-    const companies = await prisma.companies.findMany({
+    const companies = await prisma.companySettings.findMany({
       select: {
         company_id: true,
         name: true,
@@ -57,12 +62,6 @@ export const getAllSettings = async (req: Request, res: Response, next: NextFunc
         periodicEnabled: setting.periodic_enabled,
         periodicAutoGenerate: setting.periodic_auto_generate,
         periodicFrequency: setting.periodic_frequency,
-        reminderEnabled: setting.reminder_enabled,
-        reminderFrequency: setting.reminder_frequency,
-        reminderContent: setting.reminder_content,
-        reminderChannelEmail: setting.reminder_channel_email,
-        reminderChannelSms: setting.reminder_channel_sms,
-        reminderChannelPush: setting.reminder_channel_push,
       })),
       invoicePaymentSettings: invoicePaymentSettings.map(setting => ({
         id: setting.payment_setting_id,
@@ -70,21 +69,27 @@ export const getAllSettings = async (req: Request, res: Response, next: NextFunc
         taxRate: setting.tax_rate,
         taxType: setting.tax_type,
         defaultVatAmount: setting.default_vat_amount,
-        company: setting.Company
+        company: setting.CompanySetting
       })),
       invoiceTypes: invoiceTypes.map(type => ({
         id: type.invoice_type_id,
         type: type.invoice_type,
-        numberingFormat: type.numbering_format
+        numberingFormat: type.numbering_format,
+        emailNotification: type.email_notification,
+        smsNotification: type.sms_notification,
+        pushNotification: type.push_notification,
+        unpaidReminderEnabled: type.unpaid_reminder_enabled,
+        reminderFrequency: type.reminder_frequency,
+        reminderContent: type.reminder_content
       })),
-      // companies: companies.map(company => ({
-      //   id: company.company_id,
-      //   name: company.name,
-      //   address: company.address,
-      //   regon: company.regon,
-      //   nip: company.nip,
-      //   krs: company.krs
-      // }))
+      companies: companies.map(company => ({
+        id: company.company_id,
+        name: company.name,
+        address: company.address,
+        regon: company.regon,
+        nip: company.nip,
+        krs: company.krs
+      }))
     };
 
     res.json(formattedSettings);
