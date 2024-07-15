@@ -189,6 +189,8 @@ model ClientTasks {
 
 model Invoices {
   invoice_id Int  @id @default(autoincrement())
+  year Int
+  month Int
   invoice_number String        @unique 
   status_id Int
   invoice_type_id Int
@@ -224,12 +226,10 @@ model InvoiceTypes {
   invoice_type_id Int     @id @default(autoincrement())
   invoice_type            String
   numbering_format  numberingFormats  @default(FV_rok_miesiac_numer)    
-  email_notification  Boolean @default(true)
-  sms_notification    Boolean @default(true)
-  push_notification   Boolean @default(true)
-  unpaid_reminder_enabled   Boolean
-  reminder_frequency        Int
-  reminder_content          String
+  enabled Boolean
+  current_number_sequence   Int
+  template                  String
+
 
   Invoice Invoices[]
 }
@@ -262,19 +262,16 @@ enum currencyTypeValues {
 
 model InvoiceSettings {
   invoice_setting_id        Int      @id @default(1)
-  current_number_year       Int
-  current_number_month      Int
-  current_number_sequence   Int 
   default_currency          currencyTypeValues
-  template                  String
   payment_term              Int
-  vat_enabled               Boolean
-  advance_enabled           Boolean
-  final_enabled             Boolean
-  proforma_enabled          Boolean
-  periodic_enabled          Boolean
   periodic_auto_generate    Boolean
   periodic_frequency        String
+  email_notification  Boolean @default(true)
+  sms_notification    Boolean @default(true)
+  push_notification   Boolean @default(true)
+  unpaid_reminder_enabled   Boolean
+  reminder_frequency        Int
+  reminder_content          String
 
   company_id                Int
 
