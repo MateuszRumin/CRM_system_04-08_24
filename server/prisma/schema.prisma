@@ -102,6 +102,7 @@ model Clients {
   Project Projects[]
   ClientEmail ClientEmails[]
   ClientPhone ClientPhones[]
+  
 }
 
 model ClientEmails {
@@ -244,7 +245,7 @@ enum numberingFormats {
 
 model CompanySettings {
   company_id Int @id @default(1)
-  name String
+  name String 
   address String
   regon String @default("brak") 
   nip String @default("brak") 
