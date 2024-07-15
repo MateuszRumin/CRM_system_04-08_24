@@ -1,0 +1,263 @@
+.body {
+    width: 100%; 
+    height: 100%; 
+    flex-direction: column; 
+    justify-content: flex-start; 
+    align-items: flex-start; 
+    gap: 10px; 
+    display: inline-flex;
+    font-family: Inter, sans-serif;
+    padding: 0px 20px 0px 20px;
+
+}
+
+.header_container {
+    align-self: stretch; 
+    padding-top: 15px; 
+    padding-bottom: 15px; 
+    border-bottom: 1px #E0E0E0 solid; 
+    justify-content: space-between; 
+    align-items: center; 
+    display: inline-flex;
+    font-family: Inter, sans-serif;
+  }
+  
+  /* Styl dla tytułu "Nowa Faktura" */
+  .title {
+    text-align: center;
+    color: #24304F;
+    font-size: 25px;
+    font-family: Inter, sans-serif;
+    font-weight: 700;
+    line-height: 35px;
+    word-wrap: break-word;
+  }
+  
+  /* Kontener dla przycisku "Zapisz" */
+  .button_container {
+    justify-content: flex-end;
+    align-items: center;
+    gap: 5px;
+    display: flex;
+    border: none;
+  }
+  
+  /* Styl dla przycisku "Zapisz" */
+  .save_button {
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    display: flex;
+    border: none;
+  }
+  
+  .save_button_inner {
+    width: 84px;
+    padding: 16px;
+    background: #24304F;
+    border-radius: 8px;
+    border: 1px #24304F solid;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+  }
+  .save_button_anuluj {
+    width: 84px;
+    padding: 16px;
+    background: #E0E0E0;
+    border-radius: 8px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+  }
+  
+  .save_button_text {
+    text-align: center;
+    color: #FBFBFB;
+    font-size: 16px;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+    
+  }
+  .anuluj_button_text {
+    text-align: center;
+    color: #24304F;
+    font-size: 16px;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+  }
+  .ogolne_container {
+    width: 100%; 
+    height: auto; 
+    padding: 20px; 
+    border-radius: 5px; 
+    border: 1px #E0E0E0 solid; 
+    display: flex;
+    flex-direction: column; 
+    gap: 30px;
+}
+
+.header_ogolne {
+    width: 100%; 
+    padding-top: 5px; 
+    padding-bottom: 5px; 
+    border-bottom: 1px #E0E0E0 solid; 
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; 
+    gap: 10px;
+}
+
+.text_ogolne {
+    text-align: center; 
+    color: #24304F; 
+    font-size: 18px; 
+    font-family: Inter, sans-serif;
+    font-weight: 700; 
+    line-height: 25.20px; 
+    word-wrap: break-word;
+}
+
+.ogolne_content {
+    width: 100%;
+    display: flex;
+    gap: 30px;
+    height: 100%; /* Ensure the content area takes the full height */
+}
+
+.ogolne_left_column, .ogolne_right_column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.ogolne_right_column {
+    justify-content: flex-start;
+    align-items: stretch;
+    gap:9px;
+}
+
+.ogolne_row {
+    width: 100%; 
+    display: flex;
+    gap: 30px;
+}
+
+.ogolne_row_full_height {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1; /* Allow this row to take all remaining height */
+}
+
+.ogolne_column {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.header_input {
+    width: 100%; 
+    color: black; 
+    font-size: 16px; 
+    font-family: Inter, sans-serif; 
+    font-weight: 500; 
+    line-height: 24px; 
+    word-wrap: break-word;
+}
+
+.input {
+    align-self: stretch; 
+    height: 40px;
+    width: 100%; 
+    padding-left: 16px; 
+    padding-right: 16px; 
+    padding-top: 8px; 
+    padding-bottom: 8px; 
+    background: white; 
+    border-radius: 8px; 
+    border: 1px #E0E0E0 solid; 
+    display: flex;
+    align-items: center; 
+    gap: 16px;
+}
+
+.input_text_area {
+    width: 100%; 
+    height: 100%; /* Ensure textarea takes full height of its parent */
+    padding-left: 16px; 
+    padding-right: 16px; 
+    padding-top: 8px; 
+    padding-bottom: 8px; 
+    background: white; 
+    border-radius: 8px; 
+    border: 1px #E0E0E0 solid; 
+    align-self: stretch;
+    /* Optional: to prevent resizing */
+}
+
+.checkboxContainer {
+    display: flex;
+    gap: 5px; /* Add some space between the checkboxes */
+  }
+  
+  .checkboxOption {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+
+.option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.checkbox {
+    width: 28px;
+    height: 28px;
+    background: white;
+    border-radius: 4px;
+    border: 1px #E1E1E1 solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.checkboxSelected {
+    width: 28px;
+    height: 28px;
+    position: relative;
+    background: url('./checkbox.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.optionText {
+    color: #505050;
+    font-size: 16px;
+    font-family: Roboto, sans-serif;
+    font-weight: 400;
+    line-height: 20px;
+}
+.pobierz_z_regon {
+    color: rgba(0, 0, 0, 0.58);
+    font-size: 16px;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    text-decoration: underline;
+    line-height: 24px;
+    word-wrap: break-word;
+    cursor: pointer;
+}
+.pobierz_z_regon:hover {
+    color:black;
+    background-color: #efefef76;
+}
