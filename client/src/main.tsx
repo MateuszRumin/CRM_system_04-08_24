@@ -15,6 +15,7 @@ import { StronaGlowna } from './views/StronaGlowna/StronaGlowna.tsx';
 import { Layout } from './components/Layout/Layout.tsx';
 import { Logowanie } from './views/Logowanie/Logowanie.tsx';
 import { Ustawienia } from './views/Ustawienia/Ustawienia.tsx'; 
+import { NewContractForm } from './components/Contracts/NewContractForm.tsx'; 
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: '/faktury',
         element: <Faktury />,
+      },
+      {
+        path: '/umowy/new',
+        element: <NewContractForm/>,
       },
       {
         path: '/umowy',
@@ -61,7 +66,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/ustawienia',
-        element: <Ustawienia />, // Nowa trasa dla ustawień
+        element: <Ustawienia />, 
       },
     ],
   },
