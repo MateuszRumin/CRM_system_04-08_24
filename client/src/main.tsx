@@ -17,6 +17,7 @@ import { Layout } from './components/Layout/Layout.tsx'
 import { AddNewClient } from './views/Klienci/Dodaj_nowego_klienta/AddNewClient.tsx'
 import { EditClient } from './views/Klienci/Edytuj_klienta/EditClient.tsx'
 import { Logowanie } from './views/Logowanie/Logowanie.tsx'
+import { ProjectDetails } from './views/Projekty/ProjectDetails.tsx'
 
 const router = createBrowserRouter([
 	{
@@ -44,10 +45,14 @@ const router = createBrowserRouter([
 				element: <Projekty />,
 				children: [
 					{
-						path: 'test/',
-						element: <Projekty />,
+						path: 'details-project/:name',
+						element: <ProjectDetails />,
 					},
 				],
+			},
+			{
+				path: 'projekty/details-project/:name',
+				element: <ProjectDetails />,
 			},
 			{
 				path: '/pracownicy',
