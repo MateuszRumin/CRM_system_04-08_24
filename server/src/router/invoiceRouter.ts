@@ -13,11 +13,11 @@ router.post('/test', (req,res,next) =>{
     res.status(200).json({error : "Witamy w fakturach"});
 })
 
-// router.get('/', getAllInvoices);
-// router.put('/status', updateInvoiceStatus);
-// router.get('/settings', getAllSettings);
-// router.put('/settings/update', updateAllSettings);
-// router.put('/settings/add', updateAllSettings);
+router.get('/', getAllInvoices);
+router.put('/status', updateInvoiceStatus);
+router.get('/settings', getAllSettings);
+router.put('/settings/update', updateAllSettings);
+router.put('/settings/add', updateAllSettings);
 
 
 router.use('/', (req,res,next) =>{

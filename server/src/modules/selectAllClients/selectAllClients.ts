@@ -13,10 +13,29 @@ exports.selectAllClients = async (req: Request, res: Response, next: NextFunctio
                 registration_date:true,
                 first_name:true,
                 second_name:true,
+                company_name:true,
                 Status:{
                     select:{
                         status_id:true,
                         name:true,
+                    }
+                },
+                Project:{
+                    select:{
+                        project_id:true,
+                        status_id:true
+                    }
+                },
+                Invoice:{
+                    select:{
+                        invoice_id:true,
+                        invoice_type_id:true,
+                        year:true,
+                        month:true,
+                        invoice_number:true,
+                        issue_date:true,
+                        due_date:true,
+                        prize_netto:true,
                     }
                 }
             }
@@ -26,8 +45,8 @@ exports.selectAllClients = async (req: Request, res: Response, next: NextFunctio
             status: 'info',
             display: true,
             error: null,
-            message: 'Dodano, klięta, notatki,zadania',
-            devmessage: `Fill database Succes`,
+            message: 'Wyswietlono dane kliętów',
+            devmessage: `Success`,
             data: selectDataClient
         };  
 

@@ -224,10 +224,10 @@ model InvoiceProducts {
 }
 
 model InvoiceTypes {
-  invoice_type_id Int     @id @default(autoincrement())
-  invoice_type            String
-  numbering_format  numberingFormats  @default(FV_rok_miesiac_numer)    
-  enabled Boolean
+  invoice_type_id Int       @id @default(autoincrement())
+  invoice_type              String
+  numbering_format          numberingFormats  @default(FV_rok_miesiac_numer)    
+  enabled                   Boolean
   current_number_sequence   Int
   template                  String
 
@@ -236,11 +236,11 @@ model InvoiceTypes {
 }
 
 enum numberingFormats {
-  FV_rok_miesiac_numer @map("FV/{rok}/{miesiąc}/{numer}")
-  FZ_rok_miesiac_numer @map("FZ/{rok}/{miesiąc}/{numer}")
-  FK_rok_miesiac_numer @map("FK/{rok}/{miesiąc}/{numer}")
-  PF_rok_miesiac_numer @map("PF/{rok}/{miesiąc}/{numer}")
-  FO_rok_miesiac_numer @map("FO/{rok}/{miesiąc}/{numer}")
+  FV_rok_miesiac_numer @map("FV/{rok}/{miesiac}/{numer}")
+  FZ_rok_miesiac_numer @map("FZ/{rok}/{miesiac}/{numer}")
+  FK_rok_miesiac_numer @map("FK/{rok}/{miesiac}/{numer}")
+  PF_rok_miesiac_numer @map("PF/{rok}/{miesiac}/{numer}")
+  FO_rok_miesiac_numer @map("FO/{rok}/{miesiac}/{numer}")
 }
 
 model CompanySettings {
