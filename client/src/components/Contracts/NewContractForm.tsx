@@ -1,16 +1,23 @@
-import React, { useState, forwardRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './NewContract.module.css';
 import CheckboxIcon from '../../../public/icons/checkbox.svg';
+import SearchIcon from '../../../public/icons/Search_White.svg';
+import ImportIcon from '../../../public/icons/File_Upload.svg';
+import EditFileIcon from '../../../public/icons/File_Edit.svg';
 
 type OptionKeys = 'link' | 'firma' | 'osobaPrywatna';
 
 export const NewContractForm = () => {
+  const navigate = useNavigate();
   const [selectedOptions, setSelectedOptions] = useState<Record<OptionKeys, boolean>>({
     link: true,
     firma: true,
     osobaPrywatna: false,
   });
-
+  const handleCancel = () => {
+    navigate(-1); 
+  };
   useEffect(() => {
     setSelectedOptions(prevState => ({
       ...prevState,
@@ -53,6 +60,9 @@ return (
             <div className={styles.save_button}>
               
               <button className={styles.save_button_anuluj}>
+                <div className={styles.anuluj_button_text}>Wyślij Umowę do klienta</div>
+              </button>
+              <button className={styles.save_button_anuluj} onClick={handleCancel}>
                 <div className={styles.anuluj_button_text}>Anuluj</div>
               </button>
               <button className={styles.save_button_inner} >
@@ -194,6 +204,42 @@ return (
           </>
         )}
       </div>
+
+
+      <div className={styles.container}>
+            <div className={styles.toolbar}>
+                <div className={styles.buttonGroup}>
+                    <button className={styles.button}>
+                        <div className={styles.icon}>
+                            <img src={ImportIcon} alt="Import" />
+                        </div>
+                        <div className={styles.text}>Importuj szablon</div>
+                    </button>
+                </div>
+                <div className={styles.buttonGroup}>
+                    <button className={styles.button}>
+                        <div className={styles.icon}>
+                        <img src={ImportIcon} alt="Import" />
+                        </div>
+                        <div className={styles.text}>Importuj umowę</div>
+                    </button>
+                </div>
+                <div className={styles.buttonGroup}>
+                    <button className={styles.largeButton}>
+                        <div className={styles.icon}>
+                        <img src={EditFileIcon} alt="Import" />
+                        </div>
+                        <div className={styles.text}>Zapisz wersję roboczą</div>
+                    </button>
+                </div>
+                <button className={styles.previewButton}>
+                    <div className={styles.icon}>
+                    <img src={SearchIcon} alt="Import" />
+                    </div>
+                    <div className={styles.previewText}>Podgląd umowy</div>
+                </button>
+            </div>
+        </div>
     </div>
   );
 };
