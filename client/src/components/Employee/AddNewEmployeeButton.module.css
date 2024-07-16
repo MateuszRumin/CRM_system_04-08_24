@@ -1,0 +1,18 @@
+.addNewEmployeeButton {
+  display: flex;
+  height: 40px;
+  padding: 16px;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 8px;
+  border: 1px solid #24304F;
+
+  background: #24304F;
+
+  color:white;
+}
+
+.addNewEmployeeButton:hover {
+  background-color: gray; 
+}
