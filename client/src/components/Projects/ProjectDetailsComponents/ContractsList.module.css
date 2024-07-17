@@ -1,0 +1,47 @@
+.contracts {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.contractsTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.contractsTable th, .contractsTable td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.contractsTable th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.addButton {
+  background-color: #2196f3;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.addButton:hover {
+  background-color: #0b7dda;
+}
+
+.detailsButton {
+  background-color: #24304f;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.detailsButton:hover {
+  background-color: gray;
+}

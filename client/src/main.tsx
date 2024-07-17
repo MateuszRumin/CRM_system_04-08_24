@@ -22,6 +22,7 @@ import { EditEmployee } from './views/Pracownicy/Edytuj_pracownika/EditEmployee.
 import { EmployeeDetails } from './views/Pracownicy/EmployeeDetails.tsx'
 import { AssignProjectToEmployee } from './views/Pracownicy/Przypisz_projekt_do_pracownika/AssignProjectToEmployee.tsx'
 import { RemoveEmployee } from './views/Pracownicy/Usun_pracownika/RemoveEmployee.tsx'
+import { ProjectDetails } from './views/Projekty/ProjectDetails.tsx'
 
 const router = createBrowserRouter([
   {
@@ -49,11 +50,15 @@ const router = createBrowserRouter([
         element: <Projekty />,
         children: [
           {
-            path: 'test/',
-            element: <Projekty />,
+            path: 'details-project/:name',
+            element: <ProjectDetails />,
           },
         ],
       },
+			{
+				path: 'projekty/details-project/:name',
+				element: <ProjectDetails />,
+			},
       {
         path: '/pracownicy',
         element: <Pracownicy />,
