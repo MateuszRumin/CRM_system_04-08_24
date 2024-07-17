@@ -1,40 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './RepositoryModal.module.css';
 
 interface RepositoryModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onSave: (link: string) => void;
+  projectId: number;
 }
 
-export const RepositoryModal: React.FC<RepositoryModalProps> = ({ visible, onClose, onSave }) => {
-  const [repositoryLink, setRepositoryLink] = useState('');
+export const RepositoryModal: React.FC<RepositoryModalProps> = ({ projectId }) => {
+  const [repositoryLinks, setRepositoryLinks] = useState<string[]>(() => {
+    const savedLinks = localStorage.getItem(`repositoryLinks_${projectId}`);
+    return savedLinks ? JSON.parse(savedLinks) : [''];
+  });
 
-  const handleSave = () => {
-    onSave(repositoryLink);
+  useEffect(() => {
+    localStorage.setItem(`repositoryLinks_${projectId}`, JSON.stringify(repositoryLinks));
+  }, [repositoryLinks, projectId]);
+
+  const handleAddLink = () => {
+    setRepositoryLinks([...repositoryLinks, '']);
   };
 
-  const handleGoToRepository = () => {
-    window.open(repositoryLink, '_blank');
+  const handleLinkChange = (index: number, value: string) => {
+    const newLinks = [...repositoryLinks];
+    newLinks[index] = value;
+    setRepositoryLinks(newLinks);
+  };
+
+  const handleSaveLink = (index: number) => {
+    localStorage.setItem(`repositoryLinks_${projectId}`, JSON.stringify(repositoryLinks));
+    alert('Link zapisany!');
+  };
+
+  const handleRemoveLink = (index: number) => {
+    const newLinks = repositoryLinks.filter((_, i) => i !== index);
+    setRepositoryLinks(newLinks);
+  };
+
+  const handleGoToLink = (link: string) => {
+    window.open(link, '_blank');
   };
 
   return (
-    <>
-      {visible && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h2>Link do repozytorium</h2>
-            <p>Link: <input type="text" value={repositoryLink} onChange={(e) => setRepositoryLink(e.target.value)} /></p>
-            <div className={styles.gotoButtonContainer}>
-              <button className={`${styles.button} ${styles.goToButton}`} onClick={handleGoToRepository}>Przejdź do repozytorium</button>
-            </div>
-            <div className={styles.saveAndCloseButtonContainer}>
-              <button className={styles.button} onClick={handleSave}>Zapisz</button>
-              <button className={`${styles.button} ${styles.closeButton}`} onClick={onClose}>Zamknij</button>
-            </div>
-          </div>
+    <div className={styles.container}>
+      <h2>Linki do repozytorium</h2>
+      {repositoryLinks.map((link, index) => (
+        <div key={index} className={styles.linkRow}>
+          <input
+            type="text"
+            value={link}
+            onChange={(e) => handleLinkChange(index, e.target.value)}
+            className={styles.input}
+          />
+          <button onClick={() => handleSaveLink(index)} className={styles.button}>Zapisz</button>
+          <button onClick={() => handleRemoveLink(index)} className={styles.button}>Usuń</button>
+          <button onClick={() => handleGoToLink(link)} className={styles.button}>Otwórz</button>
         </div>
-      )}
-    </>
+      ))}
+      <button onClick={handleAddLink} className={styles.addButton}>Dodaj nowe pole tekstowe</button>
+    </div>
   );
 };

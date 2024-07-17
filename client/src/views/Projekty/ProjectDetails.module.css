@@ -8,6 +8,19 @@
   border-radius: 10px;
 }
 
+.headerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.meetingsAndTasks {
+  display: flex;
+  gap: 10px;
+}
+
+/* Existing styles for projectInfo, projectLinks, additionalInfo, drawerButton, etc. */
+
 .projectInfo {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -61,13 +74,11 @@
   margin-top: 20px;
 }
 
-.meetingsAndTasks,
 .invoicesDocumentationContracts {
   display: flex;
   gap: 20px;
 }
 
-.meetingsAndTasks > *,
 .invoicesDocumentationContracts > * {
   flex: 1;
   background-color: #fff;
@@ -98,4 +109,23 @@
   color: #ccc;
   font-size: 18px;
   margin-right: 10px;
+}
+
+.drawerButton {
+  width: 103px;
+  height: 77px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drawerButton img {
+  width: 100%;
+  height: 100%;
 }
