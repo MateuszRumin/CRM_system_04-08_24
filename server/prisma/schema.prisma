@@ -20,7 +20,7 @@ model Users {
   email String @unique
   password String
 
-  UserData UserDatas? 
+  UserData UserDatas[]
   UserRole UserRoles[]
   Client Clients[]
   Task Tasks[]
@@ -44,13 +44,14 @@ model UserDatas {
 model Modules {
   module_id Int @id @default(autoincrement())
   name String
+  @@unique([name])
   
   Permission Permissions[]
 }
 
 model Roles {
   role_id Int @id @default(autoincrement())
-  name String
+  name String @unique
 
   Permission Permissions[]
   UserRole UserRoles[]
@@ -60,7 +61,7 @@ model Permissions {
   permission_id Int @id @default(autoincrement())
   module_id Int
   role_id Int
-  acces Boolean
+  access Boolean @default(false)
 
   Module Modules @relation(fields: [module_id],references: [module_id])
   Role Roles @relation(fields: [role_id],references: [role_id])
