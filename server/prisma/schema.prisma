@@ -25,7 +25,7 @@ model Users {
   Client Clients[]
   Task Tasks[]
   Note Notes[]
-  Project Projects[]
+  ProjectAssignment ProjectAssignments[]
 }
 
 model UserDatas {
@@ -34,8 +34,9 @@ model UserDatas {
   first_name String 
   second_name String
   employed_from DateTime
-  employed_to DateTime
+  employed_to DateTime?
   tel_number String
+  address String
   contract String
   position_id Int
 
@@ -66,6 +67,15 @@ model Roles {
   UserRole UserRoles[]
 }
 
+model UserRoles {
+  user_role_id Int @id @default(autoincrement())
+  user_id Int 
+  role_id Int
+
+  User Users @relation(fields: [user_id],references: [user_id])
+  Role Roles @relation(fields: [role_id],references: [role_id])
+}
+
 model Permissions {
   permission_id Int @id @default(autoincrement())
   module_id Int
@@ -73,15 +83,6 @@ model Permissions {
   access Boolean @default(false)
 
   Module Modules @relation(fields: [module_id],references: [module_id])
-  Role Roles @relation(fields: [role_id],references: [role_id])
-}
-
-model UserRoles {
-  user_role_id Int @id @default(autoincrement())
-  user_id Int 
-  role_id Int
-
-  User Users @relation(fields: [user_id],references: [user_id])
   Role Roles @relation(fields: [role_id],references: [role_id])
 }
 
@@ -305,17 +306,25 @@ model Projects {
   name        String
   client_id   Int
   status_id   Int
-  user_id     Int
   description String
   created_at   DateTime  @default(now())
   updated_at   DateTime  @default(now())
 
   Client Clients @relation(fields: [client_id], references: [client_id])
   Status Statuses @relation(fields: [status_id], references: [status_id])
-  User Users @relation(fields: [user_id], references: [user_id])
   ProjectDoc ProjectDocs[]
   ProjectDetail ProjectDetails[]
   InvoiceProduct InvoiceProducts[]
+  ProjectAssignment ProjectAssignments[]
+}
+
+model ProjectAssignments {
+  project_assignment_id Int     @id @default(autoincrement())
+  project_id            Int
+  user_id               Int
+
+  Project Projects @relation(fields: [project_id], references: [project_id])
+  User Users @relation(fields: [user_id], references: [user_id])
 }
 
 model ProjectDetails {

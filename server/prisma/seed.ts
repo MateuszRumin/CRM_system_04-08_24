@@ -8,40 +8,30 @@ async function main() {
   const currentMonth = currentDate.getMonth() + 1; // Miesiące w JavaScript są indeksowane od 0
   const currentDay = currentDate.getDate();
   
+  //username: admin
+  //password: admin
+
   let admin = await prisma.users.create({
     data:{
-        username:"Administrator",
-        email:"Administrator@gmail.com",
-        password:"administrator"
+        username:"admin",
+        email:"admin@weblance.com",
+        password:"$2a$10$0lZqJhfN7AtDbHK6VCxnU.8jmHWN6LQuVsqtV5Dp4KFhSs3gliKJm"
     }  
   })
   admin = await prisma.users.create({
     data:{
-        username:"Administrator2",
-        email:"Administrator2@gmail.com",
-        password:"administrator"
+        username:"admin2",
+        email:"admin22@weblance.com",
+        password:"$2a$10$0lZqJhfN7AtDbHK6VCxnU.8jmHWN6LQuVsqtV5Dp4KFhSs3gliKJm"
     }  
   })
-  admin = await prisma.users.create({
-    data:{
-        username:"Administrator3",
-        email:"Administrator3@gmail.com",
-        password:"administrator"
-    }  
-  })
-  admin = await prisma.users.create({
-    data:{
-        username:"Administrator4",
-        email:"Administrator4@gmail.com",
-        password:"administrator"
-    }  
-  })
+  
 
   let Status = await prisma.statuses.create({
     data:{
         status_type:'Klient',
         default:true,
-        name:'Niepodjęty'
+        name:'Nie podjety'
     }  
   })
   Status = await prisma.statuses.create({
@@ -69,7 +59,7 @@ async function main() {
     data:{
         status_type:'Zadanie',
         default:true,
-        name:'Nie zaczęty'
+        name:'Nie zaczety'
     }  
   })
   Status = await prisma.statuses.create({
@@ -90,7 +80,7 @@ async function main() {
     data:{
         status_type:'Zadanie',
         default:true,
-        name:'Porażka'
+        name:'Porazka'
     }  
   })
   Status = await prisma.statuses.create({
@@ -121,8 +111,29 @@ async function main() {
         name:'Wystawiona'
     }  
   })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Faktura',
+        default:true,
+        name:'Zapisana'
+    }  
+  })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Pojekt',
+        default:true,
+        name:'W trakcie realizacji'
+    }  
+  })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Pojekt',
+        default:true,
+        name:'W trakcie realizacji'
+    }  
+  })
   // Create Clients
-  const client1 = await prisma.clients.create({
+  let client = await prisma.clients.create({
     data: {
       status_id: 1,
       user_id: 1,
@@ -134,6 +145,36 @@ async function main() {
       krs: '1111111111',
       company_name: 'Doe Inc.',
       address: '456 Elm St',
+    },
+  });
+  let position = await prisma.companyPositions.create({
+    data: {
+      name: 'Programista',
+    },
+  });
+  position = await prisma.companyPositions.create({
+    data: {
+      name: 'Sieciowiec',
+    },
+  });
+  position = await prisma.companyPositions.create({
+    data: {
+      name: 'Designer UI',
+    },
+  });
+  let role = await prisma.roles.create({
+    data: {
+      name: 'Admin',
+    },
+  });
+  position = await prisma.companyPositions.create({
+    data: {
+      name: 'Moderator',
+    },
+  });
+  position = await prisma.companyPositions.create({
+    data: {
+      name: 'User',
     },
   });
 }
