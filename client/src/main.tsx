@@ -1,23 +1,24 @@
-import './styles/theme.css'
-import './styles/globals.css'
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import './styles/theme.css';
+import './styles/globals.css';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { DataProvider } from './contexts/DataContext.tsx'
-import { Kreator } from './views/Kreator/Kreator.tsx'
-import { Faktury } from './views/Faktury/Faktury.tsx'
-import { Umowy } from './views/Umowy/Umowy.tsx'
-import { Projekty } from './views/Projekty/Projekty.tsx'
-import { Pracownicy } from './views/Pracownicy/Pracownicy.tsx'
-import { Uprawnienia } from './views/Uprawnienia/Uprawnienia.tsx'
-import { Klienci } from './views/Klienci/Klienci.tsx'
-import { StronaGlowna } from './views/StronaGlowna/StronaGlowna.tsx'
-import { Layout } from './components/Layout/Layout.tsx'
+import { Kreator } from './views/Kreator/Kreator.tsx';
+import { Faktury } from './views/Faktury/Faktury.tsx';
+import { Umowy } from './views/Umowy/Umowy.tsx';
+import { Projekty } from './views/Projekty/Projekty.tsx';
+import { Pracownicy } from './views/Pracownicy/Pracownicy.tsx';
+import { Uprawnienia } from './views/Uprawnienia/Uprawnienia.tsx';
+import { Klienci } from './views/Klienci/Klienci.tsx';
+import { StronaGlowna } from './views/StronaGlowna/StronaGlowna.tsx';
+import { Layout } from './components/Layout/Layout.tsx';
 import { AddNewClient } from './views/Klienci/Dodaj_nowego_klienta/AddNewClient.tsx'
 import { EditClient } from './views/Klienci/Edytuj_klienta/EditClient.tsx'
-import { Logowanie } from './views/Logowanie/Logowanie.tsx'
-import { AddNewEmployee } from './views/Pracownicy/Dodaj_nowego_pracownika/AddNewEmployee.tsx'
+import { Logowanie } from './views/Logowanie/Logowanie.tsx';
+import { Ustawienia } from './views/Ustawienia/Ustawienia.tsx'; 
+import { NewContractForm } from './components/Contracts/NewContractForm.tsx'; import { AddNewEmployee } from './views/Pracownicy/Dodaj_nowego_pracownika/AddNewEmployee.tsx'
 import { EditEmployee } from './views/Pracownicy/Edytuj_pracownika/EditEmployee.tsx'
 import { EmployeeDetails } from './views/Pracownicy/EmployeeDetails.tsx'
 import { AssignProjectToEmployee } from './views/Pracownicy/Przypisz_projekt_do_pracownika/AssignProjectToEmployee.tsx'
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: 'faktury',
         element: <Faktury />,
+      },
+      {
+        path: '/umowy/new',
+        element: <NewContractForm/>,
       },
       {
         path: 'umowy',
@@ -108,6 +113,10 @@ const router = createBrowserRouter([
             element: <EditClient />,
           },
         ],
+      },
+      {
+        path: '/ustawienia',
+        element: <Ustawienia />, 
       },
     ],
   },
