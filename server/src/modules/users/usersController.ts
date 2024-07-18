@@ -8,8 +8,14 @@ const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
 // Funkcja pomocnicza do tworzenia JWT
-const createToken = (userId: number, role: string) => {
-    return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: '10h' });
+const createToken = (userId: number, username: string, role: string) => {
+    const payload = {
+        userId,
+        username,
+        role
+    };
+
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: '3h' });
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -60,8 +66,40 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
     const { username, email, password, userData, userRoles } = req.body;
+
     try {
+        // Sprawdzenei dostepnosci username
+        const existingUserByUsername = await prisma.users.findUnique({
+            where: { username },
+        });
+
+        if (existingUserByUsername) {
+            return res.status(400).json({ error: 'Username already exists' });
+        }
+
+        // Sprawdzenei istnienia maila
+        const existingUserByEmail = await prisma.users.findUnique({
+            where: { email },
+        });
+
+        if (existingUserByEmail) {
+            return res.status(400).json({ error: 'Email already exists' });
+        }
+
+        // Sprawdzenie istnienia roli
+        const roleChecks = await Promise.all(userRoles.map(async (role: { role_id: number }) => {
+            const existingRole = await prisma.roles.findUnique({
+                where: { role_id: role.role_id },
+            });
+            return existingRole !== null;
+        }));
+
+        if (roleChecks.includes(false)) {
+            return res.status(400).json({ error: 'One or more roles do not exist' });
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
+
         const newUser = await prisma.users.create({
             data: {
                 username,
@@ -82,9 +120,6 @@ export const createUser = async (req: Request, res: Response) => {
                 },
             },
         });
-
-        const userRole = newUser.UserRole[0].Role.name;
-        // const token = createToken(newUser.user_id, userRole);
 
         res.status(201).json({ newUser });
     } catch (error) {
@@ -182,12 +217,8 @@ export const loginUser = async (req: Request, res: Response) => {
 
     try {
         // Sprawdzamy czy username jest dostarczony,
-        const user = await prisma.users.findFirst({
-            where: {
-                OR: [
-                    { username },
-                ]
-            },
+        const user = await prisma.users.findUnique({
+            where: { username },
             include: {
                 UserRole: {
                     include: {
@@ -198,20 +229,21 @@ export const loginUser = async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Invalid username' });
         }
 
         // Sprawdzamy poprawność hasła
         const isValidPassword = await bcrypt.compare(password, user.password);
 
         if (!isValidPassword) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Invalid password' });
         }
 
         // Pobieramy rolę użytkownika
         const userRole = user.UserRole[0].Role.name;
+
         // Tworzymy token
-        const token = createToken(user.user_id, userRole);
+        const token = createToken(user.user_id, user.username, userRole);
 
         // Zwracamy token
         res.status(200).json({ token });
