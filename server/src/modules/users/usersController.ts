@@ -53,8 +53,8 @@ export const selectAllCompanyPositions = async (req: Request, res: Response) => 
 };
 
 export const assignUserToProject = async (req: Request, res: Response) => {
-    const { user_id } = req.params;
-    const { project_id } = req.body;
+    const { user_id, project_id } = req.params;
+    // const { project_id } = req.body;
 
     const userId = parseInt(user_id);
     const projectId = parseInt(project_id);

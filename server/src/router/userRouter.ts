@@ -6,11 +6,11 @@ import {authorizePermission} from '../middleware/authorizePermission';
 const router = Router();
 
 router.post('/login', loginUser);
-// router.post('/register', createUser); //odkomentowac zeby dalo sie dodac pierwszego usera
+// router.post('/register', createUser); //odkomentowac zeby dalo sie dodac pierwszego usera, podobnie z innymi
 router.post('/register', authenticateToken, authorizePermission('User management'), createUser);
 router.get('/position', authenticateToken, authorizePermission('User management'), selectAllCompanyPositions);
 router.get('/', authenticateToken, authorizePermission('User management'), getAllUsers);
-router.post('/:user_id/project/assign', authenticateToken, authorizePermission('User management'), assignUserToProject)
+router.post('/:user_id/project/:project_id', authenticateToken, authorizePermission('User management'), assignUserToProject)
 router.get('/:id', authenticateToken, authorizePermission('User management'), getUserById);
 router.put('/:id', authenticateToken, authorizePermission('User management'), updateUser);
 router.delete('/:user_id/project/:project_id', authenticateToken, authorizePermission('User management'), removeUserFromProject);

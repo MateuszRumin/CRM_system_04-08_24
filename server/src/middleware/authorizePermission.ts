@@ -6,7 +6,8 @@ const prisma = new PrismaClient();
 export const authorizePermission = (moduleName: string) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // Zakładamy, że `userId` jest przechowywane w `req.user` po uwierzytelnieniu
+            // Zakładamy, że userId jest przechowywane w `req.user` 
+            //po uwierzytelnieniu i zdekodowaniu tokena w authenticateToken i dodaniu userId do req
             const userId = req.user?.userId;
 
             if (!userId) {
