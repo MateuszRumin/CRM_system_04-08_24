@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
+import { userInfo } from 'os';
 
 const prisma = new PrismaClient();
 
@@ -53,8 +55,8 @@ export const selectAllCompanyPositions = async (req: Request, res: Response) => 
 };
 
 export const assignUserToProject = async (req: Request, res: Response) => {
-    const { user_id, project_id } = req.params;
-    // const { project_id } = req.body;
+    const { user_id} = req.params;
+    const { project_id } = req.body;
 
     const userId = parseInt(user_id);
     const projectId = parseInt(project_id);
@@ -109,8 +111,8 @@ export const assignUserToProject = async (req: Request, res: Response) => {
 };
 
 export const removeUserFromProject = async (req: Request, res: Response) => {
-    const { user_id, project_id } = req.params;
-
+    const { user_id} = req.params;
+    const { project_id } = req.body;
     // Check if user and project exist
     const userExists = await prisma.users.findUnique({
         where: { user_id: parseInt(user_id) }
@@ -148,7 +150,7 @@ export const removeUserFromProject = async (req: Request, res: Response) => {
             }
         });
 
-        res.status(200).json({ message: 'User removed from project successfully' });
+        res.status(200).json({ message: `User ${user_id} removed from project ${project_id} successfully` });
     } catch (error) {
         console.error(`Error removing user id ${user_id} from project id ${project_id}`, error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -195,15 +197,6 @@ export const createUser = async (req: Request, res: Response) => {
     const { username, email, password, userData, userRoles } = req.body;
 
     try {
-        // Sprawdzenie dostępności username
-        const existingUserByUsername = await prisma.users.findUnique({
-            where: { username },
-        });
-
-        if (existingUserByUsername) {
-            return res.status(400).json({ error: 'Username already exists' });
-        }
-
         // Sprawdzenie istnienia emaila
         const existingUserByEmail = await prisma.users.findUnique({
             where: { email },
@@ -213,45 +206,53 @@ export const createUser = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Email already exists' });
         }
 
-        // Sprawdzenie istnienia roli w firmie
-        const roleChecks = await Promise.all(userRoles.map(async (role: { role_id: number }) => {
-            const existingRole = await prisma.roles.findUnique({
-                where: { role_id: role.role_id },
-            });
-            return existingRole !== null;
-        }));
+        const uniqueUsername = username || `emp_${uuidv4().slice(0, 4)}`;
 
-        if (roleChecks.includes(false)) {
-            return res.status(400).json({ error: 'One or more roles do not exist' });
+        const tempPassword = password || 'securePass123';
+        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+        // Sprawdzenie istnienia roli w firmie, jeśli zostały podane w zapytaniu
+        if (userRoles) {
+            const roleChecks = await Promise.all(userRoles.map(async (role: { role_id: number }) => {
+                const existingRole = await prisma.roles.findUnique({
+                    where: { role_id: role.role_id },
+                });
+                return existingRole !== null;
+            }));
+
+            if (roleChecks.includes(false)) {
+                return res.status(400).json({ error: 'One or more roles do not exist' });
+            }
         }
 
-        // Sprawdzenie istnienia pozycji w firmie
-        const positionIds = Array.isArray(userData) ? userData.map(data => data.position_id) : [userData.position_id];
+        // Sprawdzenie istnienia stanowiska w firmie, jeśli userData zostały podane
+        if (userData) {
+            const positionIds = Array.isArray(userData) ? userData.map(data => data.position_id) : [userData.position_id];
 
-        const positionChecks = await Promise.all(positionIds.map(async (position_id) => {
-            const existingPosition = await prisma.companyPositions.findUnique({
-                where: { position_id },
-            });
-            return existingPosition !== null;
-        }));
+            const positionChecks = await Promise.all(positionIds.map(async (position_id) => {
+                const existingPosition = await prisma.companyPositions.findUnique({
+                    where: { position_id },
+                });
+                return existingPosition !== null;
+            }));
 
-        if (positionChecks.includes(false)) {
-            return res.status(400).json({ error: 'One or more positions do not exist within the company' });
+            if (positionChecks.includes(false)) {
+                return res.status(400).json({ error: 'One or more positions do not exist within the company' });
+            }
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-
+        // Tworzenie nowego użytkownika
         const newUser = await prisma.users.create({
             data: {
-                username,
+                username: uniqueUsername,
                 email,
                 password: hashedPassword,
-                UserData: {
+                UserData: userData ? {
                     create: Array.isArray(userData) ? userData : [userData],
-                },
-                UserRole: {
+                } : undefined,
+                UserRole: userRoles ? {
                     create: userRoles.map((role: { role_id: number }) => ({ role_id: role.role_id })),
-                },
+                } : undefined,
             },
             include: {
                 UserRole: {
@@ -267,7 +268,14 @@ export const createUser = async (req: Request, res: Response) => {
             },
         });
 
-        res.status(201).json({ newUser });
+        res.status(201).json({
+            newUser: {
+                ...newUser,
+                password: tempPassword
+            },
+            username: uniqueUsername,
+            password: tempPassword,
+        });
     } catch (error) {
         console.error('Error creating user:', error);
         res.status(500).json({ error: 'Internal Server Error' });
