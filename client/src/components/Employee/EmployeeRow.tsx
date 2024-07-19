@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './EmployeeRow.module.css';
 import ThreeDotsSettings from '../../assets/ClientPage/three_dots_settings.svg';
+import axios from 'axios';
 
 interface Employee {
   id: number;
@@ -14,7 +15,12 @@ interface Employee {
   role: string;
 }
 
-export const EmployeeRow: React.FC<{ employee: Employee }> = ({ employee }) => {
+interface EmployeeRowProps {
+  employee: Employee;
+  onDelete: (id: number) => void;
+}
+
+export const EmployeeRow: React.FC<EmployeeRowProps> = ({ employee, onDelete }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -51,20 +57,23 @@ export const EmployeeRow: React.FC<{ employee: Employee }> = ({ employee }) => {
     setIsModalOpen(true);
   };
 
-  const confirmDelete = () => {
-    console.log('Delete employee with id:', employee.id);
+  const confirmDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:3000/employees/${employee.id}`);
+      onDelete(employee.id); // Notify the parent component
+    } catch (error) {
+      console.error('There was a problem deleting the employee:', error);
+    }
     setIsModalOpen(false);
   };
 
   const handleDetails = () => {
-    const employeeId = employee.id;
     const modifiedName = employee.name
-      .normalize('NFD') // Normalize to decomposed
-      .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-      .replace(/\s+/g, '-'); // Replace spaces with "-"
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-');
 
-      navigate(`/pracownicy/details-employee/${modifiedName}`, { state: { employee } });
-    console.log(modifiedName, employeeId);
+    navigate(`/pracownicy/details-employee/${modifiedName}`, { state: { employee } });
   };
 
   return (

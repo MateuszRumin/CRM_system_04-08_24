@@ -14,12 +14,12 @@ interface BlueButtonProps {
 const BlueButton: React.FC<BlueButtonProps> = ({
   buttonText,
   buttonStyle,
-  redirectPath = '/klienci',
+  // redirectPath = '/klienci',
   disabled = false,
   onClickAction
 }) => {
   const { sendDataToServerAddedClient } = useData();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const handleClick = async () => {
     if (!disabled) {
@@ -28,7 +28,7 @@ const BlueButton: React.FC<BlueButtonProps> = ({
       } else {
         sendDataToServerAddedClient();
       }
-      navigate(redirectPath);
+      // navigate(redirectPath);
     }
   };
 

@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from './EmployeeDataForm.module.css';
 import { useData } from '../../../contexts/DataContext';
+import axios from 'axios';
 
 interface EmployeeDataFormProps {
   onSubmit: (data: any) => void;
@@ -22,6 +23,8 @@ interface EmployeeData {
 
 export function EmployeeDataForm({ onSubmit, formId }: EmployeeDataFormProps) {
   const { setEmployeeData, setValid, employeeData } = useData();
+  const [positions, setPositions] = useState([]);
+  const [roles, setRoles] = useState([]);
 
   const {
     register,
@@ -43,6 +46,24 @@ export function EmployeeDataForm({ onSubmit, formId }: EmployeeDataFormProps) {
   useEffect(() => {
     setValid(isValid);
   }, [isValid, setValid]);
+
+  useEffect(() => {
+    const fetchPositionsAndRoles = async () => {
+      try {
+        const [positionsResponse, rolesResponse] = await Promise.all([
+          axios.get('http://localhost:3000/employees/position'),
+          axios.get('http://localhost:3000/permissions/role')
+        ]);
+
+        setPositions(positionsResponse.data);
+        setRoles(rolesResponse.data);
+      } catch (error) {
+        console.error('Error fetching positions and roles:', error);
+      }
+    };
+
+    fetchPositionsAndRoles();
+  }, []);
 
   return (
     <div className={styles.formContainer}>
@@ -89,10 +110,11 @@ export function EmployeeDataForm({ onSubmit, formId }: EmployeeDataFormProps) {
               className={styles.select}
               {...register('position', { required: 'Stanowisko jest wymagane.' })}
             >
-              <option value="Programista">Programista</option>
-              <option value="Projektant">Projektant</option>
-              <option value="Manager">Manager</option>
-              <option value="Analityk">Analityk</option>
+              {positions.map((position: any) => (
+                <option key={position.position_id} value={position.name}>
+                  {position.name}
+                </option>
+              ))}
             </select>
             {errors.position && <span className={styles.error}>{errors.position.message as string}</span>}
           </label>
@@ -170,9 +192,11 @@ export function EmployeeDataForm({ onSubmit, formId }: EmployeeDataFormProps) {
               className={styles.select}
               {...register('role', { required: 'Rola jest wymagana.' })}
             >
-              <option value="Admin">Admin</option>
-              <option value="User">User</option>
-              <option value="Guest">Guest</option>
+              {roles.map((role: any) => (
+                <option key={role.role_id} value={role.name}>
+                  {role.name}
+                </option>
+              ))}
             </select>
             {errors.role && <span className={styles.error}>{errors.role.message as string}</span>}
           </label>

@@ -5,10 +5,12 @@ import { ClientTasks } from '../../../components/Client/AddNewClientComponents/C
 import BlueButton from '../../../components/Buttons/BlueButton';
 import axios from 'axios';
 import { useData } from '../../../contexts/DataContext';
+import { useNavigate } from 'react-router-dom';
 
 export function AddNewClient() {
   const { isValid, isValidNotes, isValidTasks } = useData();
   const { notes, tasks, setNotes, setAddedNotes, setTasks, setAddedTasks } = useData();
+  const navigate = useNavigate();
 
   const handleSubmit = async (data: any) => {
     console.log('Submitted data:', data);
@@ -54,6 +56,8 @@ export function AddNewClient() {
       setAddedNotes([]);
       setTasks([]);
       setAddedTasks([]);
+
+      navigate('/klienci');
 
     } catch (error) {
       console.error('Error:', error);

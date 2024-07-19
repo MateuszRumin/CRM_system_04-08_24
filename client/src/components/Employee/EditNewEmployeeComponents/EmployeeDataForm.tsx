@@ -5,26 +5,36 @@ interface Employee {
   id: number;
   name: string;
   email: string;
-  // contract: string;
   phoneNumber: string;
   address: string;
   position: string;
   role: string;
-  contractType: string;  // New field
+  contractType: string;
+}
+
+interface Position {
+  position_id: number;
+  name: string;
+}
+
+interface Role {
+  role_id: number;
+  name: string;
 }
 
 interface EmployeeDataFormProps {
   employee: Employee;
+  positions: Position[];
+  roles: Role[];
   onSave: (updatedEmployee: Employee) => void;
   onValidate: (isValid: boolean) => void;
 }
 
-export const EmployeeDataForm: React.FC<EmployeeDataFormProps> = ({ employee, onSave, onValidate }) => {
+export const EmployeeDataForm: React.FC<EmployeeDataFormProps> = ({ employee, positions, roles, onSave, onValidate }) => {
   const [formData, setFormData] = useState<Employee>({
     id: employee.id,
     name: employee.name || '',
     email: employee.email || '',
-    // contract: employee.contract || '',
     phoneNumber: employee.phoneNumber || '',
     address: employee.address || '',
     position: employee.position || '',
@@ -44,12 +54,11 @@ export const EmployeeDataForm: React.FC<EmployeeDataFormProps> = ({ employee, on
     const isValid =
       (formData.name?.trim() || '') !== '' &&
       (formData.email?.includes('@') || false) &&
-      // (formData.contract?.trim() || '') !== '' &&
       (formData.phoneNumber?.trim() || '') !== '' &&
       (formData.address?.trim() || '') !== '' &&
       (formData.position?.trim() || '') !== '' &&
       (formData.role?.trim() || '') !== '' &&
-      (formData.contractType?.trim() || '') !== ''; // Validation for the new field
+      (formData.contractType?.trim() || '') !== '';
       
     onValidate(isValid);
   }, [formData, onValidate]);
@@ -72,10 +81,6 @@ export const EmployeeDataForm: React.FC<EmployeeDataFormProps> = ({ employee, on
         </div>
       </div>
       <div className={styles['form-section']}>
-        {/* <div className={styles['form-group']}>
-          <label htmlFor="contract">Umowa:</label>
-          <input id="contract" name="contract" value={formData.contract} onChange={handleChange} />
-        </div> */}
         <div className={styles['form-group']}>
           <label htmlFor="contractType">Rodzaj umowy:</label>
           <select id="contractType" name="contractType" value={formData.contractType} onChange={handleChange}>
@@ -98,14 +103,22 @@ export const EmployeeDataForm: React.FC<EmployeeDataFormProps> = ({ employee, on
       <div className={styles['form-section']}>
         <div className={styles['form-group']}>
           <label htmlFor="position">Stanowisko:</label>
-          <input id="position" name="position" value={formData.position} onChange={handleChange} />
+          <select id="position" name="position" value={formData.position} onChange={handleChange}>
+            {positions.map(position => (
+              <option key={position.position_id} value={position.name}>
+                {position.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div className={styles['form-group']}>
           <label htmlFor="role">Rola:</label>
           <select id="role" name="role" value={formData.role} onChange={handleChange}>
-            <option value="Admin">Admin</option>
-            <option value="User">User</option>
-            <option value="Guest">Guest</option>
+            {roles.map(role => (
+              <option key={role.role_id} value={role.name}>
+                {role.name}
+              </option>
+            ))}
           </select>
         </div>
       </div>

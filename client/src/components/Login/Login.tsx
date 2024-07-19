@@ -16,7 +16,7 @@ export const Login: React.FC = () => {
 	const onSubmit = async (data: Object): Promise<void> => {
 		console.log(data)
 		try {
-			const response = await fetch('http://localhost:3000/users/login', {
+			const response = await fetch('http://localhost:3000/employees/login', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

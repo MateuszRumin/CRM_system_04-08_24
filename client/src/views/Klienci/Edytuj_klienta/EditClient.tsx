@@ -8,6 +8,7 @@ import { useData } from '../../../contexts/DataContext';
 import BlueButton from '../../../components/Buttons/BlueButton';
 import axios from 'axios';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 interface LocationState {
   clientId: string;
@@ -30,6 +31,7 @@ export const EditClient: React.FC = () => {
   const location = useLocation();
   const state = location.state as LocationState;
   const { modifiedName } = state;
+  const navigate = useNavigate();
   const { clientId, setClientId, isValid, isValidTasks, isValidNotes, deletedNotes, updateClient, sendDataToServerUpdatedClient } = useData();
 
   const [client, setClient] = useState<any>({
@@ -120,6 +122,7 @@ export const EditClient: React.FC = () => {
     if (formElement) {
       formElement.requestSubmit();
     }
+    navigate('/klienci');
   };
 
   return (

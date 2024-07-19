@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import styles from './EmployeeTable.module.css';
 import Pagination from './Pagination';
 import { EmployeeRow } from './EmployeeRow';
@@ -19,64 +20,37 @@ interface EmployeeTableProps {
   filterOptions: { [key: string]: string };
 }
 
-const employees: Employee[] = [
-  { 
-    id: 1,
-    name: 'Adam Kowalski',
-    email: 'adam.kowalski@firma.com',
-    contract: 'Umowa o pracę',
-    phoneNumber: '123456789',
-    address: 'Warszawa, Aleje Jerozolimskie 100',
-    position: 'Kierownik projektu',
-    role: 'Administrator',
-  },
-  {
-    id: 2,
-    name: 'Ewa Nowak',
-    email: 'ewa.nowak@firma.com',
-    contract: 'Umowa zlecenie',
-    phoneNumber: '987654321',
-    address: 'Kraków, ul. Rynek 5',
-    position: 'Programista',
-    role: 'Użytkownik',
-  },
-  {
-    id: 3,
-    name: 'Piotr Wiśniewski',
-    email: 'piotr.wisniewski@firma.com',
-    contract: 'Umowa Zlecenie',
-    phoneNumber: '567890123',
-    address: 'Gdańsk, Plac Solidarności 1',
-    position: 'Analityk',
-    role: 'Administrator',
-  },
-  {
-    id: 4,
-    name: 'Anna Lewandowska',
-    email: 'anna.lewandowska@firma.com',
-    contract: 'Umowa o pracę',
-    phoneNumber: '234567890',
-    address: 'Łódź, ul. Piotrkowska 50',
-    position: 'Specjalista ds. HR',
-    role: 'Administrator',
-  },
-  {
-    id: 5,
-    name: 'Marek Nowakowski',
-    email: 'marek.nowakowski@firma.com',
-    contract: 'Umowa o dzieło',
-    phoneNumber: '678901234',
-    address: 'Wrocław, Plac Grunwaldzki 10',
-    position: 'Architekt',
-    role: 'Użytkownik',
-  }
-];
-
 export const EmployeeTable: React.FC<EmployeeTableProps> = ({ searchTerm, filterOptions }) => {
-  const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>(employees);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const itemsPerPageOptions: number[] = [10, 20, 30, 50];
+
+  useEffect(() => {
+    axios.get('http://localhost:3000/employees')
+      .then(response => {
+        const apiEmployees = response.data.map((user: any) => {
+          const userData = user.UserData[0] || {};
+          const userRole = user.UserRole[0] || {};
+          return {
+            id: user.user_id,
+            name: `${userData.first_name || ''} ${userData.second_name || ''}`,
+            email: user.email,
+            contract: userData.contract || 'N/A',
+            phoneNumber: userData.tel_number || 'N/A',
+            address: userData.address || 'N/A',
+            position: userData.Position?.name || 'N/A',
+            role: userRole.Role?.name || 'N/A',
+          };
+        });
+        setEmployees(apiEmployees);
+        setFilteredEmployees(apiEmployees);
+      })
+      .catch(error => {
+        console.error('There was an error fetching the employees!', error);
+      });
+  }, []);
 
   useEffect(() => {
     let results = employees.filter(employee =>
@@ -93,7 +67,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({ searchTerm, filter
 
     setFilteredEmployees(results);
     setCurrentPage(1);
-  }, [searchTerm, filterOptions]);
+  }, [searchTerm, filterOptions, employees]);
 
   const indexOfLastEmployee: number = currentPage * itemsPerPage;
   const indexOfFirstEmployee: number = indexOfLastEmployee - itemsPerPage;
@@ -104,6 +78,12 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({ searchTerm, filter
   const changeItemsPerPage = (newItemsPerPage: number) => {
     setItemsPerPage(newItemsPerPage);
     setCurrentPage(1);
+  };
+
+  const handleDelete = (id: number) => {
+    // Remove employee from the local state after successful deletion
+    setEmployees(prevEmployees => prevEmployees.filter(employee => employee.id !== id));
+    setFilteredEmployees(prevEmployees => prevEmployees.filter(employee => employee.id !== id));
   };
 
   return (
@@ -123,7 +103,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({ searchTerm, filter
         </thead>
         <tbody>
           {currentEmployees.map((employee) => (
-            <EmployeeRow key={employee.id} employee={employee} />
+            <EmployeeRow key={employee.id} employee={employee} onDelete={handleDelete} />
           ))}
         </tbody>
       </table>
