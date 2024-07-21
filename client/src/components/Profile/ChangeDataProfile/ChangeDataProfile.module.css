@@ -62,3 +62,9 @@
 .contentSection label{
     padding: 0px 10px;
 }
+.error {
+	color: red;
+	font-size: 0.8em;
+	margin-top: 0.5em;
+	margin-left:10px;
+  }
