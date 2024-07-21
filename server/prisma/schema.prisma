@@ -75,10 +75,7 @@ model UserRoles {
   Role Roles @relation(fields: [role_id],references: [role_id])
 }
 
-enum clientTypeValues {
-  Prywatny
-  Firma
-}
+
 
 model Clients {
   client_id Int @id @default(autoincrement())
@@ -88,9 +85,9 @@ model Clients {
   registration_date DateTime @default(now())
   first_name String
   second_name String
-  regon String @default("brak") 
-  nip String @default("brak") 
-  krs String @default("brak") 
+  regon String @default("brak") @unique
+  nip String @default("brak") @unique
+  krs String @default("brak") @unique
   company_name String @default("brak")
   address String
   
@@ -103,6 +100,11 @@ model Clients {
   ClientEmail ClientEmails[]
   ClientPhone ClientPhones[]
   
+}
+
+enum clientTypeValues {
+  Prywatny @map("Prywatny")
+  Firma @map("Firma")
 }
 
 model ClientEmails {
@@ -124,10 +126,10 @@ model ClientPhones {
 }
 
 enum statusTypeValues {
-  Klient
+  Klient 
   Pojekt
-  Zadanie
-  Faktura
+  Zadanie 
+  Faktura 
 }
 
 model Statuses {
@@ -190,6 +192,7 @@ model ClientTasks {
 
 model Invoices {
   invoice_id Int  @id @default(autoincrement())
+  block Boolean @default(false)
   year Int
   month Int
   invoice_number String        @unique 
@@ -225,23 +228,39 @@ model InvoiceProducts {
 
 model InvoiceTypes {
   invoice_type_id Int     @id @default(autoincrement())
-  invoice_type            String
-  numbering_format  numberingFormats  @default(FV_rok_miesiac_numer)    
+  invoice_type    invoiceTypeNames @unique
+  marker_id Int
   enabled Boolean
-  current_number_sequence   Int
-  template                  String
+  
+  
 
-
+  Marker Markers @relation(fields: [marker_id],references: [marker_id])
   Invoice Invoices[]
 }
 
-enum numberingFormats {
-  FV_rok_miesiac_numer @map("FV/{rok}/{miesiąc}/{numer}")
-  FZ_rok_miesiac_numer @map("FZ/{rok}/{miesiąc}/{numer}")
-  FK_rok_miesiac_numer @map("FK/{rok}/{miesiąc}/{numer}")
-  PF_rok_miesiac_numer @map("PF/{rok}/{miesiąc}/{numer}")
-  FO_rok_miesiac_numer @map("FO/{rok}/{miesiąc}/{numer}")
+enum invoiceTypeNames {
+  Zaliczkowa 
+  Koncowa
+  Okresowa 
+  Vat 
 }
+
+model Markers {
+  marker_id Int     @id @default(autoincrement())
+  marker_name MarkerNames @unique
+  current_month_sequence Int
+  current_year_sequence Int
+  current_number_sequence   Int
+
+  InvoiceType InvoiceTypes[]
+}
+
+enum MarkerNames {
+  FV @map("FV")
+  FZ @map("FZ")
+}
+
+
 
 model CompanySettings {
   company_id Int @id @default(1)

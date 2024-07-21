@@ -37,7 +37,6 @@ exports.addInvocieClientCheck = async (req: Request, res: Response, next: NextFu
         const insertData = {
             status_id:status.status_id,
             invoice_type_id:invoiceType.invoice_type_id ,
-            invoice_number:initData.main.invoice_number || null,
             client_id:initData.client.client_id,
             issue_date:initData.main.issue_date,
             due_date:initData.main.due_date,
