@@ -1,4 +1,5 @@
 // main.js (lub App.js, w zależności od Twojej struktury plików)
+
 import './styles/theme.css'
 import './styles/globals.css'
 
@@ -15,6 +16,7 @@ import { StronaGlowna } from './views/StronaGlowna/StronaGlowna.tsx'
 import { Layout } from './components/Layout/Layout.tsx'
 import { Logowanie } from './views/Logowanie/Logowanie.tsx'
 import ProtectedRoute from './components/auth/ProctectedRoute.tsx'
+import { Testowy } from './components/testowy/Testowy.tsx'
 
 
 
@@ -46,8 +48,8 @@ const router = createBrowserRouter([
 				element: <Projekty />,
 				children: [
 					{
-						path: '/projekty/test/',
-						element: <Projekty />,
+						path: '/projekty/test2/',
+						element: <Testowy />,
 					},
 				],
 			},

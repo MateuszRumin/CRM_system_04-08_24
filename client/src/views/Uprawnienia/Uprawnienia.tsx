@@ -1,11 +1,19 @@
 import { useState } from 'react'
 import styles from './Uprawnienia.module.css'
-import FilterSettingsModal from '../../components/Invoice/FilterSettingsModal'
-import invoices from '../../data/rolesDta'
+import { Roles } from '../../components/Roles/Roles'
+import { modulesAndRoles } from '../../data/rolesAndPermissions'
+import { Fragment } from 'react'
+
 export const Uprawnienia = () => {
-	const [searchText, setSearchText] = useState('')
 	const [isModalOpen, setIsModalOpen] = useState(false)
-	const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({})
+	const [{ modul, role }, setModules] = useState(modulesAndRoles)
+
+	const rolesAcces = role.map(r => {
+		return r.roles.map(r => {
+			return r.access
+		})
+	})
+
 	return (
 		<div className={styles.body}>
 			<div>
@@ -13,22 +21,7 @@ export const Uprawnienia = () => {
 				<div className={styles.topbar}>
 					<div className={styles.title}>Uprawnienia</div>
 					<div className={styles.controls}>
-						<div className={styles.search_box}>
-							<img src="/icons/search.svg" alt="Search" className={styles.icon} />
-
-							<input
-								type="text"
-								className={styles.search_input}
-								value={searchText}
-								onChange={e => setSearchText(e.target.value)}
-								placeholder="Wyszukaj uprawnienia..."
-							/>
-						</div>
-						<button className={styles.filter_box} onClick={() => setIsModalOpen(true)}>
-							<img src="/icons/filter.svg" alt="Filter" className={styles.icon} />
-							<div className={styles.filter_text}>Filtruj</div>
-						</button>
-						<button className={styles.create_button}>
+						<button className={styles.create_button} onClick={() => setIsModalOpen(true)}>
 							<div className={styles.create_text}>Stwórz nową Role</div>
 						</button>
 					</div>
@@ -39,77 +32,46 @@ export const Uprawnienia = () => {
 						<table className={styles.table}>
 							<thead>
 								<tr>
-									<th>
-										<div className={styles.headerCell}>
-											Nazwa uprawnienia <img src="/icons/bxs_sort-alt.svg" alt="Sort" className={styles.sortIcon} />
-										</div>
-									</th>
-									<th>
-										<div className={styles.headerCell}>
-											Admin <img src="/icons/bxs_sort-alt.svg" alt="Sort" className={styles.sortIcon} />
-										</div>
-									</th>
-									<th>
-										<div className={styles.headerCell}>
-											Designer UI <img src="/icons/bxs_sort-alt.svg" alt="Sort" className={styles.sortIcon} />
-										</div>
-									</th>
-									<th>
-										<div className={styles.headerCell}>
-											Programista <img src="/icons/bxs_sort-alt.svg" alt="Sort" className={styles.sortIcon} />
-										</div>
-									</th>
+									<th>Moduł:</th>
+
+									{role.map(modul => (
+										<th key={modul.id_role}>
+											<span className={styles.headerCell}>
+												{modul.name}
+												<img src="/otherIcon/Note_Edit.svg" alt="Sort" className={styles.sortIcon} />
+											</span>
+										</th>
+									))}
 								</tr>
 							</thead>
 							<tbody>
-								{invoices.map((invoice, index) => (
-									<tr key={index}>
-										<td className={styles.permissions}>{invoice.client}</td>
+								{modul.map(modul => (
+									<Fragment key={modul.id_module}>
+										{modul.main ? (
+											<tr>
+												<td colSpan={role.length + 1} className={styles.mainModules}>
+													{modul.name}
+												</td>
+											</tr>
+										) : (
+											<tr className={styles.checkbox}>
+												<td className={styles.permissions}>{modul.name}</td>
 
-										<td className={styles.checkbox}>
-											<input type="checkbox" name="" id="" />
-										</td>
-										<td className={styles.checkbox}>
-											<input type="checkbox" name="" id="" />
-										</td>
-										<td className={styles.checkbox}>
-											<input type="checkbox" name="" id="" />
-										</td>
-
-										<td>
-											<div className={styles.actionsContainer}>
-												{/* Wysuwa to menu do konkretnego wiersza */}
-												<button
-													className={styles.actionButton}
-													onClick={() => {
-														const newOpenMenus = { ...openMenus }
-														Object.keys(newOpenMenus).forEach(key => {
-															if (key !== index.toString()) {
-																newOpenMenus[key] = false
-															}
-														})
-														newOpenMenus[index.toString()] = !newOpenMenus[index.toString()]
-														setOpenMenus(newOpenMenus)
-													}}>
-													<img alt="Options" src="/icons/3dot.svg" className={styles.iconSmall} />
-												</button>
-
-												{openMenus[index.toString()] && (
-													<div className={styles.menu}>
-														<div className={styles.menuItem}>Edytuj</div>
-														<div className={styles.menuItem}>Usuń</div>
-													</div>
-												)}
-											</div>
-										</td>
-									</tr>
+												{role.map(r => (
+													<td key={r.id_role}>
+														<input type="checkbox" />
+													</td>
+												))}
+											</tr>
+										)}
+									</Fragment>
 								))}
 							</tbody>
 						</table>
 					</div>
 				</div>
 				{/* Modal */}
-				{isModalOpen && <FilterSettingsModal onClose={() => setIsModalOpen(false)} />}
+				{isModalOpen && <Roles onClose={() => setIsModalOpen(false)} />}
 			</div>
 		</div>
 	)
