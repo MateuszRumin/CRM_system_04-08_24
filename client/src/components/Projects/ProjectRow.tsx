@@ -4,12 +4,13 @@ import styles from './ProjectRow.module.css';
 import ThreeDotsSettings from '../../assets/ClientPage/three_dots_settings.svg';
 
 interface Project {
-  id: number;
+  project_id: number;
   name: string;
-  status: string;
-  client: string;
-  startDate: string;
-  endDate: string;
+  description: string;
+  client_id: number;
+  status_id: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface ProjectRowProps {
@@ -55,7 +56,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({ project, onDelete }) => 
   };
 
   const confirmDelete = () => {
-    onDelete(project.id);
+    onDelete(project.project_id);
     setIsModalOpen(false);
   };
 
@@ -71,10 +72,10 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({ project, onDelete }) => 
     <>
       <tr className={`${styles.row} ${styles.projectRow}`}>
         <td>{project.name}</td>
-        <td>{project.status}</td>
-        <td>{project.client}</td>
-        <td>{new Date(project.startDate).toLocaleDateString()}</td>
-        <td>{new Date(project.endDate).toLocaleDateString()}</td>
+        <td>{project.status_id}</td> {/* Update this based on your status mapping */}
+        <td>{project.client_id}</td> {/* Update this based on your client mapping */}
+        <td>{new Date(project.created_at).toLocaleDateString()}</td>
+        <td>{new Date(project.updated_at).toLocaleDateString()}</td>
         <td className={styles.settingsContainer}>
           <button className={styles.detailsButton} onClick={handleDetails}>
             Szczegóły

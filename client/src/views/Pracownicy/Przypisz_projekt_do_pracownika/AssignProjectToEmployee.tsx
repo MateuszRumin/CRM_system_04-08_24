@@ -1,38 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { EmployeeTable } from '../../../components/Employee/AssignProjectToEmployeeComponents/EmployeeTable';
 import Pagination from '../../../components/Employee/Pagination';
 import styles from './AssignProjectToEmployee.module.css';
 import BlueButton from '../../../components/Buttons/BlueButton';
 
+
 interface Project {
-  id: string;
-  projectName: string;
-  clientName: string;
-  status: string;
-  deadline: string;
+  project_id: string;
+  name: string;
+  client_id: string;
+  status_id: string;
+  created_at: string;
 }
 
 export function AssignProjectToEmployee() {
   const location = useLocation();
+  const navigate = useNavigate();
   const employee = location.state?.employee;
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [projects, setProjects] = useState<Project[]>([
-    { id: '1', projectName: 'Projekt A', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-    { id: '2', projectName: 'Projekt B', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-    { id: '3', projectName: 'Projekt C', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-    { id: '4', projectName: 'Projekt D', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-    { id: '5', projectName: 'Projekt E', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-    { id: '6', projectName: 'Projekt F', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-    { id: '7', projectName: 'Projekt G', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-    { id: '8', projectName: 'Projekt H', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-    { id: '9', projectName: 'Projekt I', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-    { id: '10', projectName: 'Projekt J', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-  ]); // Symulowane dane projektów
-
+  const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/projects/without/${employee?.id}`);
+        const projectsData = response.data;
+        setProjects(projectsData);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };
+
+    fetchProjects();
+  }, [employee?.id]);
 
   useEffect(() => {
     // Reset selectedProjects when projects change
@@ -55,15 +60,20 @@ export function AssignProjectToEmployee() {
     }
   };
 
-  const handleAssignClick = () => {
-    // Prepare data for submission
-    const data = {
-      employeeId: employee?.id,
-      projects: projects.filter((project) => selectedProjects.includes(project.id))
-    };
-    console.log('Submitted data:', data);
-    // Tutaj implementacja z API
+  const handleAssignClick = async () => {
+    try {
+      const projectsData = selectedProjects.map(id => ({ project_id: parseInt(id, 10) }));
+      for (const project of projectsData) {
+        await axios.post(`http://localhost:3000/employees/${employee?.id}/project/assign`, project);
+      }
+  
+      navigate(`/pracownicy`);
+      console.log('Projects assigned successfully');
+    } catch (error) {
+      console.error('Error assigning projects:', error);
+    }
   };
+  
 
   return (
     <div className={styles.container}>

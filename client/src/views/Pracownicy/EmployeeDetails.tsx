@@ -1,45 +1,54 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { Drawer, Button, Typography, Box, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { LocalizationProvider, DateCalendar } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import format from 'date-fns/format';
+import axios from 'axios';
 import styles from './EmployeeDetails.module.css';
 import CalendarIcon from '../../assets/EmployeePage/calendar_drawer.svg';
 import ExaxmpleProfilePicture from '../../assets/EmployeePage/example_profile_picture.svg';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import SignatureCanvas from 'react-signature-canvas';
-import { PDFDocument } from 'pdf-lib'; // Removed unnecessary import
+import { PDFDocument } from 'pdf-lib';
 
 interface Project {
-  id: string;
-  projectName: string;
+  project_id: string;
+  name: string;
+  client_id: string;
+  status_id: string;
+  created_at: string;
 }
 
 export function EmployeeDetails() {
   const location = useLocation();
   const navigate = useNavigate();
   const employee = location.state?.employee;
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const [projects] = useState<Project[]>([
-    { id: '1', projectName: 'Projekt A' },
-    { id: '2', projectName: 'Projekt B' },
-    { id: '3', projectName: 'Projekt C' },
-    { id: '4', projectName: 'Projekt D' },
-    { id: '5', projectName: 'Projekt E' },
-    { id: '6', projectName: 'Projekt F' },
-    { id: '7', projectName: 'Projekt G' },
-    { id: '8', projectName: 'Projekt H' },
-    { id: '9', projectName: 'Projekt I' },
-    { id: '10', projectName: 'Projekt J' },
-  ]);
-
-  const signatureRef = useRef<SignatureCanvas | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [signatureImage, setSignatureImage] = useState<string | null>(null);
+
+  const signatureRef = useRef<SignatureCanvas | null>(null);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/projects/with/${employee?.id}`);
+        setProjects(response.data);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };
+
+    if (employee) {
+      fetchProjects();
+    }
+  }, [employee]);
 
   if (!employee) {
     return <div>Nie znaleziono szczegółów pracownika</div>;
@@ -54,15 +63,16 @@ export function EmployeeDetails() {
   };
 
   const handleAssignProjectToEmployee = () => {
-    navigate(`assign-project-to-employee`, { state: { employee } });
+    navigate('assign-project-to-employee', { state: { employee } });
   };
 
   const handleRemoveEmployee = () => {
-    navigate(`remove-employee`, { state: { employee } });
+    navigate('remove-employee', { state: { employee } });
   };
 
-  const handleDisplayProject = () => {
-    console.log("tutaj będzie przejście do odpowiedniego projektu (jego id) za pomocą danych z API.");
+  const handleDisplayProject = (projectId: string) => {
+    console.log(`Przechodzę do projektu o ID: ${projectId}`);
+    // Możesz dodać kod do nawigacji do szczegółów projektu
   };
 
   const isAssignProjectRoute = location.pathname.includes('assign-project-to-employee');
@@ -84,71 +94,66 @@ export function EmployeeDetails() {
       console.log("Brak wybranej daty, nie generujemy PDF-a");
       return;
     }
-  
+
     const selectedDateString = format(selectedDate, 'dd.MM.yyyy');
     const daysInMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
-  
+
     const tableData = Array.from({ length: daysInMonth }, (_, i) => [
       `${i + 1}`,
-      `${5 + i % 8} H`, // Symulowane dane godzin
+      `${5 + i % 8} H`,
       signatureImage ? { content: signatureImage, type: 'image' } : '',
       ''
     ]);
-  
+
     const doc = new jsPDF();
     doc.setFontSize(18);
     doc.setFont('helvetica', 'unicode');
-    
-    // Dodanie szarego paska na górze strony
-    doc.setDrawColor(233,233,233); // Ustawienie koloru RGB (szary)
-    doc.setFillColor(233,233,233);
-    doc.rect(0, 0, doc.internal.pageSize.width, 20, 'F'); // Rysowanie prostokąta (fill)
-  
+
+    doc.setDrawColor(233, 233, 233);
+    doc.setFillColor(233, 233, 233);
+    doc.rect(0, 0, doc.internal.pageSize.width, 20, 'F');
+
     doc.text('Wykaz godzin', 15, 12);
-  
+
     autoTable(doc, {
       head: [['Dzien', 'Ilosc godzin', 'Podpis zleceniodawcy', 'Podpis zleceniobiorcy']],
       body: tableData,
       startY: 30,
       theme: 'grid',
     });
-  
+
     const pdfOutput = doc.output('blob');
     setPdfBlob(pdfOutput);
   };
-  
 
   const signPDF = async () => {
     if (!pdfBlob) return;
-  
+
     const signatureImage = signatureRef.current?.getTrimmedCanvas().toDataURL('image/png');
     if (!signatureImage) return;
-  
+
     setSignatureImage(signatureImage);
-  
+
     const arrayBuffer = await pdfBlob.arrayBuffer();
     const pdfDoc = await PDFDocument.load(arrayBuffer);
-  
+
     const pages = pdfDoc.getPages();
     const firstPage = pages[0];
-  
+
     const pngImageBytes = await fetch(signatureImage).then((res) => res.arrayBuffer());
     const pngImage = await pdfDoc.embedPng(pngImageBytes);
-  
+
     const { width, height } = firstPage.getSize();
     const signatureWidth = 50;
     const signatureHeight = 20;
-  
-    // Calculate total number of days in the selected month
+
     const daysInMonth = selectedDate ? new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate() : 0;
-  
-    // Define signature positions for all days in the month
+
     const signaturePositions = Array.from({ length: daysInMonth }, (_, index) => ({
-      x: 260, // Adjust X position as needed
-      y: height - (128 + index * 21.5), // Adjust Y position spacing based on index
+      x: 260,
+      y: height - (128 + index * 21.5),
     }));
-  
-    // Iterate over positions and draw signatures
+
     signaturePositions.forEach((position) => {
       firstPage.drawImage(pngImage, {
         x: position.x,
@@ -157,13 +162,12 @@ export function EmployeeDetails() {
         height: signatureHeight,
       });
     });
-  
+
     const signedPdfBytes = await pdfDoc.save();
     const signedPdfBlob = new Blob([signedPdfBytes], { type: 'application/pdf' });
     setPdfBlob(signedPdfBlob);
     setOpenSignatureDialog(false);
   };
-  
 
   const downloadSignedPDF = () => {
     if (!pdfBlob) return;
@@ -207,12 +211,18 @@ export function EmployeeDetails() {
             </div>
             <div className={styles.projectsContainer}>
               <h2>Projekty</h2>
-              {projects.map((project) => (
-                <div key={project.id} className={styles.projectRow}>
-                  <span className={styles.projectName}>{project.projectName}</span>
-                  <button onClick={handleDisplayProject} className={styles.showButton}>Wyświetl</button>
-                </div>
-              ))}
+              {projects.length > 0 ? (
+                projects.map((project) => (
+                  <div key={project.project_id} className={styles.projectRow}>
+                    <span className={styles.projectName}>{project.name}</span>
+                    <button onClick={() => handleDisplayProject(project.project_id)} className={styles.showButton}>
+                      Wyświetl
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p>Brak przypisanych projektów.</p>
+              )}
               <button className={styles.addButton} onClick={handleAssignProjectToEmployee}>
                 Dodaj
               </button>

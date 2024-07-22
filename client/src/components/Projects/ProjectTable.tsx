@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import styles from './ProjectTable.module.css';
 import { ProjectRow } from './ProjectRow';
 import Pagination from '../Client/Pagination';
 
 interface Project {
-  id: number;
+  project_id: number;
   name: string;
-  status: string;
-  client: string;
-  startDate: string;
-  endDate: string;
+  description: string;
+  client_id: number;
+  status_id: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface ProjectTableProps {
@@ -17,63 +19,25 @@ interface ProjectTableProps {
   filterOptions: { [key: string]: string };
 }
 
-const exampleProjects: Project[] = [
-  {
-    id: 1,
-    name: 'Projekt Alpha',
-    status: 'Nie rozpoczęty',
-    client: 'Klient B',
-    startDate: '2023-01-01',
-    endDate: '2023-02-02',
-  },
-  {
-    id: 2,
-    name: 'Projekt Beta',
-    status: 'W trakcie',
-    client: 'Klient B',
-    startDate: '2023-02-01',
-    endDate: '2023-02-02',
-  },
-  {
-    id: 3,
-    name: 'Projekt Gamma',
-    status: 'Zakończony',
-    client: 'Klient C',
-    startDate: '2023-03-01',
-    endDate: '2023-02-02',
-  },
-  {
-    id: 4,
-    name: 'Projekt Alpha',
-    status: 'Nie rozpoczęty',
-    client: 'Klient B',
-    startDate: '2023-01-01',
-    endDate: '2023-02-02',
-  },
-  {
-    id: 5,
-    name: 'Projekt Beta',
-    status: 'W trakcie',
-    client: 'Klient B',
-    startDate: '2023-02-01',
-    endDate: '2023-05-02',
-  },
-  {
-    id: 6,
-    name: 'Projekt Gamma',
-    status: 'Zakończony',
-    client: 'Klient C',
-    startDate: '2023-03-01',
-    endDate: '2023-07-02',
-  },
-];
-
 export const ProjectTable: React.FC<ProjectTableProps> = ({ searchTerm, filterOptions }) => {
-  const [projects, setProjects] = useState<Project[]>(exampleProjects);
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>(exampleProjects);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const itemsPerPageOptions: number[] = [10, 20, 30, 50];
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/projects/');
+        setProjects(response.data);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   useEffect(() => {
     let results = projects.filter(project =>
@@ -84,7 +48,7 @@ export const ProjectTable: React.FC<ProjectTableProps> = ({ searchTerm, filterOp
       results = results.filter(project => {
         return Object.entries(filterOptions).every(([key, value]) => {
           if (typeof value === 'string') {
-            return project[key as keyof Project].toString().toLowerCase().includes(value.toLowerCase());
+            return project[key as keyof Project]?.toString().toLowerCase().includes(value.toLowerCase());
           } else {
             return project[key as keyof Project] === value;
           }
@@ -108,8 +72,8 @@ export const ProjectTable: React.FC<ProjectTableProps> = ({ searchTerm, filterOp
   };
 
   const handleDeleteProject = (projectId: number) => {
-    setProjects(prevProjects => prevProjects.filter(project => project.id !== projectId));
-    setFilteredProjects(prevProjects => prevProjects.filter(project => project.id !== projectId));
+    setProjects(prevProjects => prevProjects.filter(project => project.project_id !== projectId));
+    setFilteredProjects(prevProjects => prevProjects.filter(project => project.project_id !== projectId));
   };
 
   return (
@@ -127,7 +91,7 @@ export const ProjectTable: React.FC<ProjectTableProps> = ({ searchTerm, filterOp
         </thead>
         <tbody>
           {currentProjects.map((project) => (
-            <ProjectRow key={project.id} project={project} onDelete={handleDeleteProject} />
+            <ProjectRow key={project.project_id} project={project} onDelete={handleDeleteProject} />
           ))}
         </tbody>
       </table>

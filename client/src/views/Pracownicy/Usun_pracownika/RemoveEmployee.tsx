@@ -1,47 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';  
 import { EmployeeTable } from '../../../components/Employee/RemoveEmployeeComponents/EmployeeTable';
 import Pagination from '../../../components/Employee/Pagination';
 import styles from './RemoveEmployee.module.css';
 import BlueButton from '../../../components/Buttons/BlueButton';
 
+// Definiowanie interfejsu Project lokalnie
 interface Project {
-  id: string;
-  projectName: string;
-  clientName: string;
-  status: string;
-  deadline: string;
+  project_id: string;
+  name: string;
+  client_id: string;
+  status_id: string;
+  created_at: string;
 }
-
-const dummyData: Project[] = [
-  { id: '1', projectName: 'Projekt A', clientName: 'Adam Nowak', status: 'Wykonane', deadline: '12.12.2024' },
-  { id: '2', projectName: 'Projekt B', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-  { id: '3', projectName: 'Projekt C', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-  { id: '4', projectName: 'Projekt D', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-  { id: '5', projectName: 'Projekt E', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-  { id: '6', projectName: 'Projekt F', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-  { id: '7', projectName: 'Projekt G', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-  { id: '8', projectName: 'Projekt H', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-  { id: '9', projectName: 'Projekt I', clientName: 'Adam Nowak', status: 'W trakcie realizacji', deadline: '12.12.2024' },
-];
 
 export function RemoveEmployee() {
   const location = useLocation();
+  const navigate = useNavigate(); 
   const employee = location.state?.employee;
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
 
   useEffect(() => {
-    // Reset selectedProjects when projects change
-    setSelectedProjects([]);
-  }, [dummyData]);
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/projects/with/${employee?.id}`);
+        setProjects(response.data);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };
 
-  // Paginacja
+    fetchProjects();
+  }, [employee?.id]);
+
+  useEffect(() => {
+    setSelectedProjects([]);
+  }, [projects]);
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = dummyData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = projects.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -55,15 +58,20 @@ export function RemoveEmployee() {
     }
   };
 
-  const handleRemoveClick = () => {
-    // Prepare data for submission
-    const data = {
-      employeeId: employee?.id,
-      projects: dummyData.filter((project) => selectedProjects.includes(project.id))
-    };
-    console.log('Submitted data:', data);
-    // Tutaj implementacja z API
+  const handleRemoveClick = async () => {
+    try {
+      for (const projectId of selectedProjects) {
+        await axios.delete(`http://localhost:3000/employees/${employee?.id}/project/remove`, {
+          data: { project_id: parseInt(projectId, 10) }
+        });
+      }
+      navigate('/pracownicy');
+      console.log('Projects removed successfully');
+    } catch (error) {
+      console.error('Error removing projects:', error);
+    }
   };
+  
 
   return (
     <div className={styles.container}>
@@ -83,7 +91,7 @@ export function RemoveEmployee() {
       <Pagination
         itemsPerPageOptions={[5, 10, 15]}
         itemsPerPage={itemsPerPage}
-        totalItems={dummyData.length}
+        totalItems={projects.length}
         currentPage={currentPage}
         paginate={paginate}
         changeItemsPerPage={changeItemsPerPage}
