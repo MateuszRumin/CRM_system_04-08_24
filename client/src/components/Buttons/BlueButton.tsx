@@ -33,7 +33,11 @@ const BlueButton: React.FC<BlueButtonProps> = ({
   };
 
   return (
-    <button className={`${buttonStyle || styles.blueButton} ${disabled ? styles.disabled : ''}`} onClick={handleClick} disabled={disabled}>
+    <button
+      className={`${buttonStyle || styles.blueButton} ${disabled ? styles.disabled : ''}`}
+      onClick={handleClick}
+      disabled={disabled}
+    >
       {buttonText}
     </button>
   );

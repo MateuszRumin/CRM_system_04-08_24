@@ -1,0 +1,81 @@
+.notesContainer {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  margin-bottom: 15px;
+}
+
+.notesFieldContainer {
+  margin-bottom: 15px;
+}
+
+.richTextEditor {
+  margin-bottom: 10px;
+}
+
+.TextAreaField {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.TextAreaField:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.saveNoteButton {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.saveNoteButton:hover {
+  background-color: #0056b3;
+}
+
+.notes {
+  margin-top: 20px;
+}
+
+.note {
+  background-color: white;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.noteContent {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.noteFooter {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.noteAuthor {
+  font-size: 14px;
+  color: #666;
+}
