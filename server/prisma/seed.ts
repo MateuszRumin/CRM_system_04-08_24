@@ -4,9 +4,6 @@ async function main() {
 
   // Pobranie bieżącej daty
   const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth() + 1; // Miesiące w JavaScript są indeksowane od 0
-  const currentDay = currentDate.getDate();
   
   //username: admin
   //password: admin
@@ -24,34 +21,44 @@ async function main() {
         email:"admin22@weblance.com",
         password:"$2a$10$0lZqJhfN7AtDbHK6VCxnU.8jmHWN6LQuVsqtV5Dp4KFhSs3gliKJm"
     }  
+  })  
+  let userRole = await prisma.userRoles.create({
+    data:{
+        user_id:1,
+        role_id:1,
+    }  
   })
-  
-
+  userRole = await prisma.userRoles.create({
+    data:{
+        user_id:2,
+        role_id:1,
+    }  
+  })
   let Status = await prisma.statuses.create({
     data:{
         status_type:'Klient',
-        default:true,
+        default:false,
         name:'Nie podjety'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Klient',
-        default:true,
+        default:false,
         name:'W trakcie'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Klient',
-        default:true,
+        default:false,
         name:'Zdobyty'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Klient',
-        default:true,
+        default:false,
         name:'Stracony'
     }  
   })
@@ -65,21 +72,21 @@ async function main() {
   Status = await prisma.statuses.create({
     data:{
         status_type:'Zadanie',
-        default:true,
+        default:false,
         name:'W trakcie'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Zadanie',
-        default:true,
+        default:false,
         name:'Zrobiony'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Zadanie',
-        default:true,
+        default:false,
         name:'Porazka'
     }  
   })
@@ -93,43 +100,50 @@ async function main() {
   Status = await prisma.statuses.create({
     data:{
         status_type:'Faktura',
-        default:true,
+        default:false,
         name:'Oplacona'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Faktura',
-        default:true,
+        default:false,
         name:'Oczekuje na platnosc'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Faktura',
-        default:true,
+        default:false,
         name:'Wystawiona'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Faktura',
-        default:true,
+        default:false,
         name:'Zapisana'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
-        status_type:'Pojekt',
+        status_type:'Projekt',
         default:true,
+        name:'Nie rozpoczety'
+    }  
+  })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Projekt',
+        default:false,
         name:'W trakcie realizacji'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
-        status_type:'Pojekt',
-        default:true,
-        name:'W trakcie realizacji'
+        status_type:'Projekt',
+        default:false,
+        name:'Zakonczony'
     }  
   })
   // Create Clients
@@ -162,19 +176,67 @@ async function main() {
       name: 'Designer UI',
     },
   });
+  position = await prisma.companyPositions.create({
+    data: {
+      name: 'Ksiegowy',
+    },
+  });
   let role = await prisma.roles.create({
     data: {
       name: 'Admin',
     },
   });
-  position = await prisma.companyPositions.create({
+  role = await prisma.roles.create({
     data: {
       name: 'Moderator',
     },
   });
-  position = await prisma.companyPositions.create({
+  role = await prisma.roles.create({
     data: {
       name: 'User',
+    },
+  });
+  let module = await prisma.modules.create({
+    data: {
+      name: 'User management',
+    },
+  });
+  module = await prisma.modules.create({
+    data: {
+      name: 'Project management',
+    },
+  });
+  module = await prisma.modules.create({
+    data: {
+      name: 'Invoice management',
+    },
+  });
+  let permission = await prisma.permissions.create({
+    data: {
+      module_id: 1,
+      role_id: 1,
+      access: true
+    },
+  });
+  permission = await prisma.permissions.create({
+    data: {
+      module_id: 2,
+      role_id: 1,
+      access: true
+    },
+  });
+  permission = await prisma.permissions.create({
+    data: {
+      module_id: 3,
+      role_id: 1,
+      access: true
+    },
+  });
+  permission = await prisma.permissions.create({
+    data: {
+      module_id: 1,
+      role_id: 2,
+      access: false
     },
   });
 }

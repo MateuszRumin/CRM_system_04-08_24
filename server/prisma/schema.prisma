@@ -136,7 +136,7 @@ model ClientPhones {
 
 enum statusTypeValues {
   Klient
-  Pojekt
+  Projekt
   Zadanie
   Faktura
 }

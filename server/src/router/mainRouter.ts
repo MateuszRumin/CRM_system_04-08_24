@@ -15,6 +15,9 @@ router.use('/invoices', invoiceRouter);
 const permissionRouter = require('./permissionRouter');
 router.use('/permissions', permissionRouter);
 
+const projectRouter = require('./projectRouter');
+router.use('/projects', projectRouter);
+
 router.get('/test', (req,res,next) =>{
     res.status(200).json({error : "Witamy w crm"});
 })
