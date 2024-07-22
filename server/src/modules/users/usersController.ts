@@ -178,7 +178,12 @@ export const getUserById = async (req: Request, res: Response) => {
                 Note: true,
                 ProjectAssignment: {
                     include: {
-                        Project: true
+                        Project: {
+                            include: {
+                                Status: true
+                            }
+                        }
+
                     }
                 }
             },
