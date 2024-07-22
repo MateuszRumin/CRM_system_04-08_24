@@ -113,7 +113,7 @@ model Clients {
   Project Projects[]
   ClientEmail ClientEmails[]
   ClientPhone ClientPhones[]
-  
+  ClientMeeting ClientMeetings[]
 }
 
 model ClientEmails {
@@ -173,6 +173,20 @@ model ClientNotes {
 
   Client Clients @relation(fields: [client_id],references: [client_id])
   Note Notes @relation(fields: [note_id],references: [note_id])
+  ClientMeeting ClientMeetings[]
+}
+
+model ClientMeetings {
+  meeting_id Int @id @default(autoincrement())
+  client_id           Int
+  project_id          Int 
+  client_note_id      Int 
+  date                DateTime       
+  time_spent          Float    
+
+  Client Clients @relation(fields: [client_id],references: [client_id])
+  Project Projects @relation(fields: [project_id], references: [project_id])
+  ClientNote ClientNotes @relation(fields: [client_note_id], references: [client_note_id])
 }
 
 model Tasks {
@@ -187,6 +201,7 @@ model Tasks {
   Status Statuses @relation(fields: [status_id], references: [status_id])
   User Users @relation(fields: [user_id],references: [user_id])
   ClientTask ClientTasks[]
+  ProjectTask ProjectTasks[]
 }
 
 model ClientTasks {
@@ -316,6 +331,9 @@ model Projects {
   ProjectDetail ProjectDetails[]
   InvoiceProduct InvoiceProducts[]
   ProjectAssignment ProjectAssignments[]
+  ProjectTask ProjectTasks[]
+  ClientMeeting ClientMeetings[]
+  Contract Contracts[]
 }
 
 model ProjectAssignments {
@@ -349,6 +367,19 @@ model ProjectDocs {
   Note Notes @relation(fields: [note_id], references: [note_id])
 }
 
+model ProjectTasks {
+  task_project_id     Int @id @default(autoincrement())
+  project_id          Int
+  task_id             Int
+
+  Project Projects @relation(fields: [project_id], references: [project_id])
+  Task Tasks @relation(fields: [task_id],references: [task_id])
+}
+
 model Contracts {
   contract_id Int @id @default(autoincrement())
+  data_link String
+  project_id  Int
+
+  Project Projects @relation(fields: [project_id], references: [project_id])
 }
