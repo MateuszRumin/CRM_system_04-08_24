@@ -20,12 +20,12 @@ model Users {
   email String @unique
   password String
 
-  UserData UserDatas? 
+  UserData UserDatas[]
   UserRole UserRoles[]
   Client Clients[]
   Task Tasks[]
   Note Notes[]
-  Project Projects[]
+  ProjectAssignment ProjectAssignments[]
 }
 
 model UserDatas {
@@ -34,36 +34,37 @@ model UserDatas {
   first_name String 
   second_name String
   employed_from DateTime
-  employed_to DateTime
-  tel_number String 
-  concract String
+  employed_to DateTime?
+  tel_number String
+  address String
+  contract String
+  position_id Int
 
+  Position CompanyPositions @relation(fields: [position_id],references: [position_id])
   User Users @relation(fields: [user_id],references: [user_id])
+}
+
+model CompanyPositions {
+  position_id Int @id @default(autoincrement())
+  name String @unique
+
+  UserData UserDatas[]
 }
 
 model Modules {
   module_id Int @id @default(autoincrement())
   name String
+  @@unique([name])
   
   Permission Permissions[]
 }
 
 model Roles {
   role_id Int @id @default(autoincrement())
-  name String
+  name String @unique
 
   Permission Permissions[]
   UserRole UserRoles[]
-}
-
-model Permissions {
-  permission_id Int @id @default(autoincrement())
-  module_id Int
-  role_id Int
-  acces Boolean
-
-  Module Modules @relation(fields: [module_id],references: [module_id])
-  Role Roles @relation(fields: [role_id],references: [role_id])
 }
 
 model UserRoles {
@@ -72,6 +73,16 @@ model UserRoles {
   role_id Int
 
   User Users @relation(fields: [user_id],references: [user_id])
+  Role Roles @relation(fields: [role_id],references: [role_id])
+}
+
+model Permissions {
+  permission_id Int @id @default(autoincrement())
+  module_id Int
+  role_id Int
+  access Boolean @default(false)
+
+  Module Modules @relation(fields: [module_id],references: [module_id])
   Role Roles @relation(fields: [role_id],references: [role_id])
 }
 
@@ -102,7 +113,7 @@ model Clients {
   Project Projects[]
   ClientEmail ClientEmails[]
   ClientPhone ClientPhones[]
-  
+  ClientMeeting ClientMeetings[]
 }
 
 model ClientEmails {
@@ -125,7 +136,7 @@ model ClientPhones {
 
 enum statusTypeValues {
   Klient
-  Pojekt
+  Projekt
   Zadanie
   Faktura
 }
@@ -162,6 +173,20 @@ model ClientNotes {
 
   Client Clients @relation(fields: [client_id],references: [client_id])
   Note Notes @relation(fields: [note_id],references: [note_id])
+  ClientMeeting ClientMeetings[]
+}
+
+model ClientMeetings {
+  meeting_id Int @id @default(autoincrement())
+  client_id           Int
+  project_id          Int 
+  client_note_id      Int 
+  date                DateTime       
+  time_spent          Float    
+
+  Client Clients @relation(fields: [client_id],references: [client_id])
+  Project Projects @relation(fields: [project_id], references: [project_id])
+  ClientNote ClientNotes @relation(fields: [client_note_id], references: [client_note_id])
 }
 
 model Tasks {
@@ -176,6 +201,7 @@ model Tasks {
   Status Statuses @relation(fields: [status_id], references: [status_id])
   User Users @relation(fields: [user_id],references: [user_id])
   ClientTask ClientTasks[]
+  ProjectTask ProjectTasks[]
 }
 
 model ClientTasks {
@@ -295,17 +321,28 @@ model Projects {
   name        String
   client_id   Int
   status_id   Int
-  user_id     Int
   description String
   created_at   DateTime  @default(now())
   updated_at   DateTime  @default(now())
 
   Client Clients @relation(fields: [client_id], references: [client_id])
   Status Statuses @relation(fields: [status_id], references: [status_id])
-  User Users @relation(fields: [user_id], references: [user_id])
   ProjectDoc ProjectDocs[]
   ProjectDetail ProjectDetails[]
   InvoiceProduct InvoiceProducts[]
+  ProjectAssignment ProjectAssignments[]
+  ProjectTask ProjectTasks[]
+  ClientMeeting ClientMeetings[]
+  Contract Contracts[]
+}
+
+model ProjectAssignments {
+  project_assignment_id Int     @id @default(autoincrement())
+  project_id            Int
+  user_id               Int
+
+  Project Projects @relation(fields: [project_id], references: [project_id])
+  User Users @relation(fields: [user_id], references: [user_id])
 }
 
 model ProjectDetails {
@@ -330,6 +367,19 @@ model ProjectDocs {
   Note Notes @relation(fields: [note_id], references: [note_id])
 }
 
+model ProjectTasks {
+  task_project_id     Int @id @default(autoincrement())
+  project_id          Int
+  task_id             Int
+
+  Project Projects @relation(fields: [project_id], references: [project_id])
+  Task Tasks @relation(fields: [task_id],references: [task_id])
+}
+
 model Contracts {
   contract_id Int @id @default(autoincrement())
+  data_link String
+  project_id  Int
+
+  Project Projects @relation(fields: [project_id], references: [project_id])
 }

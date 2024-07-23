@@ -5,6 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
 interface JwtPayload {
     userId: number;
+    username:string;
     role: string;
 }
 
@@ -26,20 +27,22 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
         if (err) {
             return res.sendStatus(403);
         }
+        console.log('Decoded user:', user);
         req.user = user as JwtPayload;
         // Sprawdzamy czy user jest obiektem JwtPayload i zawiera userId
         if (user && typeof user !== 'string' && 'userId' in user) {
             req.body.user_id = (user as jwt.JwtPayload).userId;
         }
+        
         next();
     });
 };
 
-export const authorizeRole = (roles: string[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        if (!req.user || !roles.includes(req.user.role)) {
-            return res.sendStatus(403);
-        }
-        next();
-    };
-};
+// export const authorizeRole = (roles: string[]) => {
+//     return (req: Request, res: Response, next: NextFunction) => {
+//         if (!req.user || !roles.includes(req.user.role)) {
+//             return res.sendStatus(403);
+//         }
+//         next();
+//     };
+// };

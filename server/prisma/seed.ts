@@ -4,64 +4,61 @@ async function main() {
 
   // Pobranie bieżącej daty
   const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth() + 1; // Miesiące w JavaScript są indeksowane od 0
-  const currentDay = currentDate.getDate();
   
+  //username: admin
+  //password: admin
+
   let admin = await prisma.users.create({
     data:{
-        username:"Administrator",
-        email:"Administrator@gmail.com",
-        password:"administrator"
+        username:"admin",
+        email:"admin@weblance.com",
+        password:"$2a$10$0lZqJhfN7AtDbHK6VCxnU.8jmHWN6LQuVsqtV5Dp4KFhSs3gliKJm"
     }  
   })
   admin = await prisma.users.create({
     data:{
-        username:"Administrator2",
-        email:"Administrator2@gmail.com",
-        password:"administrator"
+        username:"admin2",
+        email:"admin22@weblance.com",
+        password:"$2a$10$0lZqJhfN7AtDbHK6VCxnU.8jmHWN6LQuVsqtV5Dp4KFhSs3gliKJm"
     }  
-  })
-  admin = await prisma.users.create({
+  })  
+  let userRole = await prisma.userRoles.create({
     data:{
-        username:"Administrator3",
-        email:"Administrator3@gmail.com",
-        password:"administrator"
+        user_id:1,
+        role_id:1,
     }  
   })
-  admin = await prisma.users.create({
+  userRole = await prisma.userRoles.create({
     data:{
-        username:"Administrator4",
-        email:"Administrator4@gmail.com",
-        password:"administrator"
+        user_id:2,
+        role_id:1,
     }  
   })
-
   let Status = await prisma.statuses.create({
     data:{
         status_type:'Klient',
-        default:true,
-        name:'Niepodjęty'
+        default:false,
+        name:'Nie podjety'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Klient',
-        default:true,
+        default:false,
         name:'W trakcie'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Klient',
-        default:true,
+        default:false,
         name:'Zdobyty'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Klient',
-        default:true,
+        default:false,
         name:'Stracony'
     }  
   })
@@ -69,28 +66,28 @@ async function main() {
     data:{
         status_type:'Zadanie',
         default:true,
-        name:'Nie zaczęty'
+        name:'Nie zaczety'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Zadanie',
-        default:true,
+        default:false,
         name:'W trakcie'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Zadanie',
-        default:true,
+        default:false,
         name:'Zrobiony'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Zadanie',
-        default:true,
-        name:'Porażka'
+        default:false,
+        name:'Porazka'
     }  
   })
   Status = await prisma.statuses.create({
@@ -103,26 +100,54 @@ async function main() {
   Status = await prisma.statuses.create({
     data:{
         status_type:'Faktura',
-        default:true,
+        default:false,
         name:'Oplacona'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Faktura',
-        default:true,
+        default:false,
         name:'Oczekuje na platnosc'
     }  
   })
   Status = await prisma.statuses.create({
     data:{
         status_type:'Faktura',
-        default:true,
+        default:false,
         name:'Wystawiona'
     }  
   })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Faktura',
+        default:false,
+        name:'Zapisana'
+    }  
+  })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Projekt',
+        default:true,
+        name:'Nie rozpoczety'
+    }  
+  })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Projekt',
+        default:false,
+        name:'W trakcie realizacji'
+    }  
+  })
+  Status = await prisma.statuses.create({
+    data:{
+        status_type:'Projekt',
+        default:false,
+        name:'Zakonczony'
+    }  
+  })
   // Create Clients
-  const client1 = await prisma.clients.create({
+  let client = await prisma.clients.create({
     data: {
       status_id: 1,
       user_id: 1,
@@ -134,6 +159,84 @@ async function main() {
       krs: '1111111111',
       company_name: 'Doe Inc.',
       address: '456 Elm St',
+    },
+  });
+  let position = await prisma.companyPositions.create({
+    data: {
+      name: 'Programista',
+    },
+  });
+  position = await prisma.companyPositions.create({
+    data: {
+      name: 'Sieciowiec',
+    },
+  });
+  position = await prisma.companyPositions.create({
+    data: {
+      name: 'Designer UI',
+    },
+  });
+  position = await prisma.companyPositions.create({
+    data: {
+      name: 'Ksiegowy',
+    },
+  });
+  let role = await prisma.roles.create({
+    data: {
+      name: 'Admin',
+    },
+  });
+  role = await prisma.roles.create({
+    data: {
+      name: 'Moderator',
+    },
+  });
+  role = await prisma.roles.create({
+    data: {
+      name: 'User',
+    },
+  });
+  let module = await prisma.modules.create({
+    data: {
+      name: 'User management',
+    },
+  });
+  module = await prisma.modules.create({
+    data: {
+      name: 'Project management',
+    },
+  });
+  module = await prisma.modules.create({
+    data: {
+      name: 'Invoice management',
+    },
+  });
+  let permission = await prisma.permissions.create({
+    data: {
+      module_id: 1,
+      role_id: 1,
+      access: true
+    },
+  });
+  permission = await prisma.permissions.create({
+    data: {
+      module_id: 2,
+      role_id: 1,
+      access: true
+    },
+  });
+  permission = await prisma.permissions.create({
+    data: {
+      module_id: 3,
+      role_id: 1,
+      access: true
+    },
+  });
+  permission = await prisma.permissions.create({
+    data: {
+      module_id: 1,
+      role_id: 2,
+      access: false
     },
   });
 }
