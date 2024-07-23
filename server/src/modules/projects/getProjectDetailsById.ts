@@ -5,7 +5,22 @@ const prisma = new PrismaClient();
 
 export const getProjectDetailsById = async (req: Request, res: Response) => {
     try {
-        const projects = await prisma.projects.findMany({
+        const { project_id } = req.params;
+
+        if (!project_id) {
+            return res.status(400).json({ error: 'Missing project_id parameter' });
+        }
+        
+        const projectExists = await prisma.projects.findFirst({
+            where: { project_id: parseInt(project_id) }
+        });
+
+        if (!projectExists) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        const project = await prisma.projects.findUnique({
+            where: { project_id: parseInt(project_id, 10) },
             select: {
                 project_id: true,
                 name: true,
@@ -46,6 +61,7 @@ export const getProjectDetailsById = async (req: Request, res: Response) => {
                     select: {
                         Task: {
                             select: {
+                                task_id:true,
                                 task_name: true,
                                 deadline: true,
                                 Status: true
@@ -73,7 +89,11 @@ export const getProjectDetailsById = async (req: Request, res: Response) => {
             }
         });
 
-        res.status(200).json(projects);
+        if (!project) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        res.status(200).json(project);
     } catch (error) {
         console.error("Error fetching project details:", error);
         res.status(500).json({ error: 'Internal Server Error' });

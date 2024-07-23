@@ -26,6 +26,8 @@ model Users {
   Task Tasks[]
   Note Notes[]
   ProjectAssignment ProjectAssignments[]
+  TaskTime TaskTimes[]
+  TaskAssignment TaskAssignments[]
 }
 
 model UserDatas {
@@ -190,29 +192,53 @@ model ClientMeetings {
 }
 
 model Tasks {
-  task_id Int @id @default(autoincrement())
-  status_id Int
-  user_id Int
-  task_name String @default("brak")
-  task_text String
-  deadline DateTime? 
-  created_at DateTime @default(now())
+  task_id Int             @id @default(autoincrement())
+  status_id               Int
+  user_id                 Int 
+  task_name               String @default("brak")
+  task_text               String  @default("brak")
+  deadline                DateTime? 
+  created_at DateTime     @default(now())
+  predicted_time          Int?
+  days_to_reminder_app    Int?  @default(4)
+  days_to_reminder_email  Int?  @default(2)
 
   Status Statuses @relation(fields: [status_id], references: [status_id])
   User Users @relation(fields: [user_id],references: [user_id])
   ClientTask ClientTasks[]
   ProjectTask ProjectTasks[]
+  TaskTime TaskTimes[]
 }
 
 model ClientTasks {
   client_task_id Int @id @default(autoincrement())
-  client_id Int
-  task_id Int
+  client_id     Int
+  task_id       Int
 
   Client Clients @relation(fields: [client_id],references: [client_id])
   Task Tasks @relation(fields: [task_id],references: [task_id])
 }
 
+model TaskTimes {
+    task_time_id    Int @id @default(autoincrement())
+    user_id         Int
+    task_id         Int
+    time_spent      Float
+    added_at        DateTime  @default(now())
+    comments        String
+
+    Task Tasks @relation(fields: [task_id],references: [task_id])
+    User Users  @relation(fields: [user_id],references: [user_id])
+}
+
+model TaskAssignments {
+    task_assignment_id      Int @id @default(autoincrement())
+    task_project_id         Int
+    user_id                 Int
+
+    ProjectTask ProjectTasks @relation(fields: [task_project_id],references: [task_project_id])
+    User Users  @relation(fields: [user_id],references: [user_id])
+}
 
 model Invoices {
   invoice_id Int  @id @default(autoincrement())
@@ -348,12 +374,12 @@ model ProjectAssignments {
 model ProjectDetails {
   project_detail_id Int @id @default(autoincrement())
   project_id        Int
-  figma_link        String
-  repo_link         String
+  figma_link        String  @default("brak")
+  repo_link         String  @default("brak")
   block_no_payment  Boolean @default(false)
   cost              Float
   deadline          DateTime
-  advance_payment_percentage Float
+  advance_payment_percentage Float  @default(0)
 
   Project Projects @relation(fields: [project_id], references: [project_id])
 }
@@ -374,6 +400,7 @@ model ProjectTasks {
 
   Project Projects @relation(fields: [project_id], references: [project_id])
   Task Tasks @relation(fields: [task_id],references: [task_id])
+  TaskAssignment TaskAssignments[]
 }
 
 model Contracts {
