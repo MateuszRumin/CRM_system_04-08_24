@@ -3,6 +3,12 @@ import styles from './ProjectTable.module.css';
 import { ProjectRow } from './ProjectRow';
 import Pagination from '../Client/Pagination';
 
+interface Note {
+  note_id: string;
+  note_text: string;
+  timestamp: string;
+}
+
 interface Project {
   id: number;
   name: string;
@@ -10,6 +16,7 @@ interface Project {
   client: string;
   startDate: string;
   endDate: string;
+  notes: Note[];
 }
 
 interface ProjectTableProps {
@@ -25,6 +32,10 @@ const exampleProjects: Project[] = [
     client: 'Klient B',
     startDate: '2023-01-01',
     endDate: '2023-02-02',
+    notes: [
+      { note_id: '1', note_text: 'Notatka do projektu Alpha 1', timestamp: '2023-01-10' },
+      { note_id: '2', note_text: 'Notatka do projektu Alpha 2', timestamp: '2023-01-15' },
+    ],
   },
   {
     id: 2,
@@ -33,6 +44,9 @@ const exampleProjects: Project[] = [
     client: 'Klient B',
     startDate: '2023-02-01',
     endDate: '2023-02-02',
+    notes: [
+      { note_id: '3', note_text: 'Notatka do projektu Beta 1', timestamp: '2023-02-10' },
+    ],
   },
   {
     id: 3,
@@ -41,7 +55,9 @@ const exampleProjects: Project[] = [
     client: 'Klient C',
     startDate: '2023-03-01',
     endDate: '2023-02-02',
+    notes: [],
   },
+  // Dodaj notatki do pozostałych projektów
   {
     id: 4,
     name: 'Projekt Alpha',
@@ -49,6 +65,10 @@ const exampleProjects: Project[] = [
     client: 'Klient B',
     startDate: '2023-01-01',
     endDate: '2023-02-02',
+    notes: [
+      { note_id: '4', note_text: 'Notatka do projektu Alpha 1', timestamp: '2023-01-10' },
+      { note_id: '5', note_text: 'Notatka do projektu Alpha 2', timestamp: '2023-01-15' },
+    ],
   },
   {
     id: 5,
@@ -57,6 +77,9 @@ const exampleProjects: Project[] = [
     client: 'Klient B',
     startDate: '2023-02-01',
     endDate: '2023-05-02',
+    notes: [
+      { note_id: '6', note_text: 'Notatka do projektu Beta 1', timestamp: '2023-02-10' },
+    ],
   },
   {
     id: 6,
@@ -65,8 +88,10 @@ const exampleProjects: Project[] = [
     client: 'Klient C',
     startDate: '2023-03-01',
     endDate: '2023-07-02',
+    notes: [],
   },
 ];
+
 
 export const ProjectTable: React.FC<ProjectTableProps> = ({ searchTerm, filterOptions }) => {
   const [projects, setProjects] = useState<Project[]>(exampleProjects);

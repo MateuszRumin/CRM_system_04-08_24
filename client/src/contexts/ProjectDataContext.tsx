@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from 'react';
+import React, { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction, useEffect } from 'react';
 
 // Typy danych dla kontekstu
 interface Note {
@@ -25,6 +25,10 @@ interface ProjectDataContextProps {
   isValidNotes: boolean;
   setValidNotes: Dispatch<SetStateAction<boolean>>;
   setAddedNotes: (notes: Note[]) => void;
+  isEditingNote: boolean;
+  setIsEditingNote: Dispatch<SetStateAction<boolean>>;
+  isAddingNote: boolean;
+  setIsAddingNote: Dispatch<SetStateAction<boolean>>;
 }
 
 // Domyślne wartości kontekstu
@@ -39,6 +43,10 @@ const defaultContextValue: ProjectDataContextProps = {
   isValidNotes: false,
   setValidNotes: () => {},
   setAddedNotes: () => {},
+  isEditingNote: false,
+  setIsEditingNote: () => {},
+  isAddingNote: false,
+  setIsAddingNote: () => {},
 };
 
 // Tworzenie kontekstu
@@ -54,14 +62,21 @@ export const ProjectDataProvider: React.FC<ProjectDataProviderProps> = ({ childr
   const [isValid, setValid] = useState<boolean>(false);
   const [notes, setNotes] = useState<Note[]>([]);
   const [isValidNotes, setValidNotes] = useState<boolean>(false);
+  const [isEditingNote, setIsEditingNote] = useState<boolean>(false);
+  const [isAddingNote, setIsAddingNote] = useState<boolean>(false);
 
   const addNote = (note: Note) => {
     setNotes(prevNotes => [...prevNotes, note]);
+    setIsAddingNote(false); // Update state to indicate that adding is complete
   };
 
   const setAddedNotes = (notes: Note[]) => {
     setNotes(notes);
   };
+
+  useEffect(() => {
+    setValidNotes(!isEditingNote && !isAddingNote);
+  }, [isEditingNote, isAddingNote]);
 
   return (
     <ProjectDataContext.Provider
@@ -76,6 +91,10 @@ export const ProjectDataProvider: React.FC<ProjectDataProviderProps> = ({ childr
         isValidNotes,
         setValidNotes,
         setAddedNotes,
+        isEditingNote,
+        setIsEditingNote,
+        isAddingNote,
+        setIsAddingNote,
       }}
     >
       {children}

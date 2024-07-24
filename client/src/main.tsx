@@ -25,6 +25,8 @@ import { AssignProjectToEmployee } from './views/Pracownicy/Przypisz_projekt_do_
 import { RemoveEmployee } from './views/Pracownicy/Usun_pracownika/RemoveEmployee.tsx'
 import { ProjectDetails } from './views/Projekty/ProjectDetails.tsx'
 import { AddNewProject } from './views/Projekty/Dodaj_nowy_projekt/AddNewProject.tsx'
+import { EditProject } from './views/Projekty/Edytuj_projekt/EditProject.tsx'
+
 
 const router = createBrowserRouter([
   {
@@ -58,6 +60,10 @@ const router = createBrowserRouter([
           {
             path: 'add-project',
             element: <AddNewProject />,
+          },
+          {
+            path: 'edit-project/:id',
+            element: <EditProject />,
           },
         ],
       },
