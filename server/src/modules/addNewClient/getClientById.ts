@@ -26,7 +26,8 @@ export const getClientById = async (req: Request, res: Response) => {
                 },
                 ClientTask: {
                     include: {
-                        Task: true
+                        Task: true,
+                        //Status: true
                     }
                 },
                 //ClientContact: true,

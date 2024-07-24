@@ -5,10 +5,15 @@ const clientRouter = require('./clientRouter');
 router.use('/client', clientRouter);
 
 const userRouter = require('./userRouter');
-router.use('/users', userRouter);
+// router.use('/users', userRouter);
+
+router.use('/employees', userRouter);
 
 const invoiceRouter = require('./invoiceRouter');
 router.use('/invoices', invoiceRouter);
+
+const permissionRouter = require('./permissionRouter');
+router.use('/permissions', permissionRouter);
 
 router.get('/test', (req,res,next) =>{
     res.status(200).json({error : "Witamy w crm"});

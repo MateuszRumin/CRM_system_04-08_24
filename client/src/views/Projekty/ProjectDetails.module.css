@@ -1,0 +1,101 @@
+.detailsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.projectInfo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.projectInfo > div {
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.projectInfo h2 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: #24304f;
+}
+
+.projectInfo p {
+  margin: 5px 0;
+  font-size: 16px;
+  color: #555;
+}
+
+.projectLinks {
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.projectLinks > button {
+  background-color: #24304f;
+  color: #fff;
+  border: 1px solid #24304f;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.projectLinks > button:hover {
+  background-color: gray;
+}
+
+.additionalInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.meetingsAndTasks,
+.invoicesDocumentationContracts {
+  display: flex;
+  gap: 20px;
+}
+
+.meetingsAndTasks > *,
+.invoicesDocumentationContracts > * {
+  flex: 1;
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+.additionalInfo h2 {
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.additionalInfo ul {
+  list-style: none;
+  padding: 0;
+}
+
+.additionalInfo li {
+  margin-bottom: 5px;
+  padding-left: 10px;
+  border-left: 2px solid #ccc;
+}
+
+.additionalInfo li:before {
+  content: "\2022";
+  color: #ccc;
+  font-size: 18px;
+  margin-right: 10px;
+}

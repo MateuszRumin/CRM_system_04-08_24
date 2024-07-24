@@ -1,5 +1,3 @@
-/* FilterSettingsModal.module.css */
-
 .overlay {
     position: fixed;
     top: 0;
@@ -10,46 +8,182 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Dodano z-index, aby upewnić się, że overlay jest na wierzchu */
+    z-index: 1000;
   }
   
   .modal {
-    background-color: white;
+    width: 100%; /* Pełna szerokość */
+    max-width: 70%;
+    min-height: 50%; /* Minimalna wysokość modala */
     padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    width: 600px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap; /* Zawijanie kolumn na mniejszych ekranach */
     gap: 20px;
-}
+  }
   
-.modal h2 {
-    grid-column: span 3;
-    margin-bottom: 15px;
-}
+  .container {
+    flex: 1 1 0; /* Równomierny podział przestrzeni na kolumny */
+    min-width: 0; /* Minimalna szerokość dla zawijających się kolumn */
+    background: #F9F9F9;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
   
-.modal label {
-    display: block;
-    margin-bottom: 5px;
-}
+  .section {
+    flex: 1; /* Każda sekcja w kontenerze zajmuje 100% wysokości */
+    min-height: 0; /* Minimalna wysokość dla zawijających się kolumn */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
   
-.modal select,
-.modal input[type='date'],
-.modal input[type='number'] {
+  @media (max-width: 992px) {
+    .modal {
+      flex-direction: column; /* Na mniejszych ekranach zmień na układ pionowy */
+    }
+    
+    .container {
+      width: 100%; /* Na mniejszych ekranach kontenery zajmują całą szerokość */
+    }
+  }
+  
+  .section {
     width: 100%;
-    padding: 8px;
+    padding: 20px;
+  }
+  
+  .sectionTitle {
+    color: black;
+    font-size: 16px;
+    font-family: Inter, sans-serif;
+    font-weight: 700;
+    line-height: 24px;
     margin-bottom: 10px;
-}
+  }
   
-.modal .buttons {
-    grid-column: span 3;
-    margin-top: 15px;
-    text-align: right;
-}
-  
-.modal button {
-    margin-left: 10px;
-    padding: 8px 15px;
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
     cursor: pointer;
-}
+  }
+  
+  .checkbox {
+    width: 28px;
+    height: 28px;
+    background: white;
+    border-radius: 4px;
+    border: 1px #E1E1E1 solid;
+  }
+  
+  .checkboxSelected {
+    width: 28px;
+    height: 28px;
+    position: relative;
+    background: url('./checkbox.svg') no-repeat center center;
+    background-size: cover;
+  }
+  
+  .optionText {
+    color: #505050;
+    font-size: 16px;
+    font-family: Roboto, sans-serif;
+    font-weight: 400;
+    line-height: 20px;
+  }
+  
+  .dateRange {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  
+  .dateContainer {
+    flex: 1;
+  }
+  
+  .dateLabel {
+    color: black;
+    font-size: 16px;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    line-height: 24px;
+    margin-bottom: 8px;
+  }
+  
+  .dateInput {
+    width: 100%;
+    height: 40px;
+    position: relative; /* Dodaj pozycjonowanie relatywne */
+    background: white;
+    border-radius: 8px;
+    border: 1px #E0E0E0 solid;
+    display: flex; /* Dodaj flexbox do kontenera */
+    align-items: center;
+    cursor: pointer;
+    
+  }
+  .inputField {
+    width: 100%;
+    height: 100%;
+    padding: 8px 16px;
+    border: none;
+    outline: none;
+    background: transparent; /* Przezroczyste tło, żeby nie przeszkadzało w stylach */
+    border-radius: 8px;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+  .calendarIcon {
+    position: absolute; /* Pozycjonowanie absolutne względem rodzica */
+    right: 10px; /* Odległość od prawej krawędzi */
+    width: 24px; /* Szerokość ikony */
+    height: 24px; /* Wysokość ikony */
+  }
+  .customInput {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  .actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+  }
+
+  
+  
+  .buttonCancel,
+  .buttonFilter {
+    padding: 14px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    font-family: Montserrat, sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .buttonCancel {
+    background: #E0E0E0;
+    color: #24304F;
+  }
+  
+  .buttonFilter {
+    background: #24304F;
+    color: #FBFBFB;
+  }
+  

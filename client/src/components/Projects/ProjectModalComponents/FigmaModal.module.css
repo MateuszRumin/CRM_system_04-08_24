@@ -1,0 +1,60 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalContent {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalContent h2 {
+  margin-bottom: 10px;
+}
+
+.modalContent input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.button {
+  background-color: #24304f;
+  color: #fff;
+  border: 1px solid #24304f;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.button:hover {
+  background-color: #1a2538;
+  border-color: #1a2538;
+}
+
+.gotoButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.saveAndCloseButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+

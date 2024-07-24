@@ -8,15 +8,25 @@ const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
 // Funkcja pomocnicza do tworzenia JWT
-const createToken = (userId: number, role: string) => {
-    return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: '10h' });
+const createToken = (userId: number, username: string, role: string) => {
+    const payload = {
+        userId,
+        username,
+        role
+    };
+
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: '3h' });
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
         const users = await prisma.users.findMany({
             include: {
-                UserData: true,
+                UserData: {
+                    include: {
+                        Position: true
+                    }
+                },
                 UserRole: {
                     include: {
                         Role: true
@@ -31,13 +41,131 @@ export const getAllUsers = async (req: Request, res: Response) => {
     }
 };
 
+export const selectAllCompanyPositions = async (req: Request, res: Response) => {
+    try {
+            const positions = await prisma.companyPositions.findMany({
+        });
+        res.status(200).json(positions);
+    } catch (error) {
+        console.error("Error fetching positions:", error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+export const assignUserToProject = async (req: Request, res: Response) => {
+    const { user_id, project_id } = req.params;
+    // const { project_id } = req.body;
+
+    const userId = parseInt(user_id);
+    const projectId = parseInt(project_id);
+
+    // Check if user exists
+    const userExists = await prisma.users.findUnique({
+        where: { user_id: userId }
+    });
+
+    if (!userExists) {
+        return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if project exists
+    const projectExists = await prisma.projects.findUnique({
+        where: { project_id: projectId }
+    });
+
+    if (!projectExists) {
+        return res.status(404).json({ error: 'Project not found' });
+    }
+
+    // Check if the user is already assigned to the project
+    const existingAssignment = await prisma.projectAssignments.findFirst({
+        where: {
+            user_id: parseInt(user_id),
+            project_id: parseInt(project_id)
+        }
+    });
+
+    if (existingAssignment) {
+        return res.status(400).json({ error: 'User already assigned to this project' });
+    }
+
+    try {
+        const newProjectAssignment = await prisma.projectAssignments.create({
+            data: {
+                user_id: userId,
+                project_id: projectId
+            },
+            include: {
+                User: true,
+                Project: true
+            }
+        });
+
+        res.status(201).json({ newProjectAssignment });
+    } catch (error) {
+        console.error(`Error assigning user id ${userId} to project id ${projectId}`, error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+export const removeUserFromProject = async (req: Request, res: Response) => {
+    const { user_id, project_id } = req.params;
+
+    // Check if user and project exist
+    const userExists = await prisma.users.findUnique({
+        where: { user_id: parseInt(user_id) }
+    });
+
+    if (!userExists) {
+        return res.status(404).json({ error: 'User not found' });
+    }
+
+    const projectExists = await prisma.projects.findUnique({
+        where: { project_id: parseInt(project_id) }
+    });
+
+    if (!projectExists) {
+        return res.status(404).json({ error: 'Project not found' });
+    }
+
+    try {
+        // Find the project assignment to delete
+        const assignmentToDelete = await prisma.projectAssignments.findFirst({
+            where: {
+                user_id: parseInt(user_id),
+                project_id: parseInt(project_id)
+            }
+        });
+
+        if (!assignmentToDelete) {
+            return res.status(404).json({ error: 'User is not assigned to this project' });
+        }
+
+        // Delete the project assignment
+        await prisma.projectAssignments.delete({
+            where: {
+                project_assignment_id: assignmentToDelete.project_assignment_id
+            }
+        });
+
+        res.status(200).json({ message: 'User removed from project successfully' });
+    } catch (error) {
+        console.error(`Error removing user id ${user_id} from project id ${project_id}`, error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 export const getUserById = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const user = await prisma.users.findUnique({
             where: { user_id: parseInt(id) },
             include: {
-                UserData: true,
+                UserData: {
+                    include: {
+                        Position: true
+                    }
+                },
                 UserRole: {
                     include: {
                         Role: true,
@@ -46,6 +174,11 @@ export const getUserById = async (req: Request, res: Response) => {
                 Client: true,
                 Task: true,
                 Note: true,
+                ProjectAssignment: {
+                    include: {
+                        Project: true
+                    }
+                }
             },
         });
         if (!user) {
@@ -60,15 +193,61 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
     const { username, email, password, userData, userRoles } = req.body;
+
     try {
+        // Sprawdzenie dostępności username
+        const existingUserByUsername = await prisma.users.findUnique({
+            where: { username },
+        });
+
+        if (existingUserByUsername) {
+            return res.status(400).json({ error: 'Username already exists' });
+        }
+
+        // Sprawdzenie istnienia emaila
+        const existingUserByEmail = await prisma.users.findUnique({
+            where: { email },
+        });
+
+        if (existingUserByEmail) {
+            return res.status(400).json({ error: 'Email already exists' });
+        }
+
+        // Sprawdzenie istnienia roli w firmie
+        const roleChecks = await Promise.all(userRoles.map(async (role: { role_id: number }) => {
+            const existingRole = await prisma.roles.findUnique({
+                where: { role_id: role.role_id },
+            });
+            return existingRole !== null;
+        }));
+
+        if (roleChecks.includes(false)) {
+            return res.status(400).json({ error: 'One or more roles do not exist' });
+        }
+
+        // Sprawdzenie istnienia pozycji w firmie
+        const positionIds = Array.isArray(userData) ? userData.map(data => data.position_id) : [userData.position_id];
+
+        const positionChecks = await Promise.all(positionIds.map(async (position_id) => {
+            const existingPosition = await prisma.companyPositions.findUnique({
+                where: { position_id },
+            });
+            return existingPosition !== null;
+        }));
+
+        if (positionChecks.includes(false)) {
+            return res.status(400).json({ error: 'One or more positions do not exist within the company' });
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
+
         const newUser = await prisma.users.create({
             data: {
                 username,
                 email,
                 password: hashedPassword,
                 UserData: {
-                    create: userData,
+                    create: Array.isArray(userData) ? userData : [userData],
                 },
                 UserRole: {
                     create: userRoles.map((role: { role_id: number }) => ({ role_id: role.role_id })),
@@ -77,14 +256,16 @@ export const createUser = async (req: Request, res: Response) => {
             include: {
                 UserRole: {
                     include: {
-                        Role: true,
+                        Role: true
                     },
                 },
+                UserData: {
+                    include: {
+                        Position: true
+                    }
+                }
             },
         });
-
-        const userRole = newUser.UserRole[0].Role.name;
-        // const token = createToken(newUser.user_id, userRole);
 
         res.status(201).json({ newUser });
     } catch (error) {
@@ -96,19 +277,81 @@ export const createUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { username, email, password, userData, userRoles } = req.body;
-    try {
-        const dataToUpdate: any = {
-            username,
-            email,
-            UserData: {
-                update: userData,
-            },
-            UserRole: {
-                deleteMany: { user_id: parseInt(id) }, // Usuń istniejące role użytkownika
-                create: userRoles.map((role: { role_id: number }) => ({ role_id: role.role_id })),
-            },
-        };
 
+    try {
+        const dataToUpdate: any = {};
+
+        // Sprawdzenie dostępności username
+        if (username) {
+            const existingUserByUsername = await prisma.users.findUnique({
+                where: { username },
+            });
+
+            if (existingUserByUsername && existingUserByUsername.user_id !== parseInt(id)) {
+                return res.status(400).json({ error: 'Username already exists' });
+            }
+
+            dataToUpdate.username = username;
+        }
+
+        // Sprawdzenie dostępności emaila
+        if (email) {
+            const existingUserByEmail = await prisma.users.findUnique({
+                where: { email },
+            });
+
+            if (existingUserByEmail && existingUserByEmail.user_id !== parseInt(id)) {
+                return res.status(400).json({ error: 'Email already exists' });
+            }
+
+            dataToUpdate.email = email;
+        }
+
+        // Sprawdzenie istnienia roli
+        if (userRoles) {
+            const roleChecks = await Promise.all(userRoles.map(async (role: { role_id: number }) => {
+                const existingRole = await prisma.roles.findUnique({
+                    where: { role_id: role.role_id },
+                });
+                return existingRole !== null;
+            }));
+
+            if (roleChecks.includes(false)) {
+                return res.status(400).json({ error: 'One or more roles do not exist' });
+            }
+
+            dataToUpdate.UserRole = {
+                deleteMany: { user_id: parseInt(id) },
+                create: userRoles.map((role: { role_id: number }) => ({ role_id: role.role_id })),
+            };
+        }
+
+        // Sprawdzenie istnienia stanowiska w firmie
+        if (userData && userData.position_id) {
+            const existingPosition = await prisma.companyPositions.findUnique({
+                where: { position_id: userData.position_id },
+            });
+
+            if (!existingPosition) {
+                return res.status(400).json({ error: 'Position does not exist' });
+            }
+
+            dataToUpdate.UserData = {
+                update: {
+                    where: { user_id: parseInt(id) },
+                    data: userData,
+                },
+            };
+        } else if (userData) {
+            dataToUpdate.UserData = {
+                update: {
+                    where: { user_id: parseInt(id) },
+                    data: userData,
+                },
+            };
+        }
+
+        // Aktualizacja hasła jesli podane
         if (password) {
             dataToUpdate.password = await bcrypt.hash(password, 10);
         }
@@ -117,7 +360,11 @@ export const updateUser = async (req: Request, res: Response) => {
             where: { user_id: parseInt(id) },
             data: dataToUpdate,
             include: {
-                UserData: true,
+                UserData: {
+                    include: {
+                        Position: true,
+                    },
+                },
                 UserRole: {
                     include: {
                         Role: true,
@@ -164,6 +411,9 @@ export const deleteUser = async (req: Request, res: Response) => {
             prisma.notes.deleteMany({
                 where: { user_id: userId }
             }),
+            prisma.projectAssignments.deleteMany({
+                where: { user_id: userId }
+            }),
             // Usuń użytkownika
             prisma.users.delete({
                 where: { user_id: userId }
@@ -182,12 +432,8 @@ export const loginUser = async (req: Request, res: Response) => {
 
     try {
         // Sprawdzamy czy username jest dostarczony,
-        const user = await prisma.users.findFirst({
-            where: {
-                OR: [
-                    { username },
-                ]
-            },
+        const user = await prisma.users.findUnique({
+            where: { username },
             include: {
                 UserRole: {
                     include: {
@@ -198,20 +444,21 @@ export const loginUser = async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Invalid username' });
         }
 
         // Sprawdzamy poprawność hasła
         const isValidPassword = await bcrypt.compare(password, user.password);
 
         if (!isValidPassword) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Invalid password' });
         }
 
         // Pobieramy rolę użytkownika
         const userRole = user.UserRole[0].Role.name;
+
         // Tworzymy token
-        const token = createToken(user.user_id, userRole);
+        const token = createToken(user.user_id, user.username, userRole);
 
         // Zwracamy token
         res.status(200).json({ token });

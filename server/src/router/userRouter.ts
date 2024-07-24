@@ -1,14 +1,19 @@
 import { Router } from 'express';
-import { createUser, getAllUsers, getUserById, updateUser, deleteUser, loginUser } from '../modules/users/usersController';
-import { authenticateToken, authorizeRole } from '../middleware/auth';
+import { createUser, getAllUsers, getUserById, updateUser, deleteUser, loginUser, selectAllCompanyPositions, assignUserToProject, removeUserFromProject } from '../modules/users/usersController';
+import {authenticateToken} from '../middleware/authenticateToken';
+import {authorizePermission} from '../middleware/authorizePermission';
 
 const router = Router();
 
 router.post('/login', loginUser);
-router.post('/register', authenticateToken, authorizeRole(['admin']), createUser);
-router.get('/', authenticateToken, authorizeRole(['admin', 'user']), getAllUsers);
-router.get('/:id', authenticateToken, authorizeRole(['admin', 'user']), getUserById);
-router.put('/:id', authenticateToken, authorizeRole(['admin']), updateUser);
-router.delete('/:id', authenticateToken, authorizeRole(['admin']), deleteUser);
+// router.post('/register', createUser); //odkomentowac zeby dalo sie dodac pierwszego usera, podobnie z innymi
+router.post('/register', authenticateToken, authorizePermission('User management'), createUser);
+router.get('/position', authenticateToken, authorizePermission('User management'), selectAllCompanyPositions);
+router.get('/', authenticateToken, authorizePermission('User management'), getAllUsers);
+router.post('/:user_id/project/:project_id', authenticateToken, authorizePermission('User management'), assignUserToProject)
+router.get('/:id', authenticateToken, authorizePermission('User management'), getUserById);
+router.put('/:id', authenticateToken, authorizePermission('User management'), updateUser);
+router.delete('/:user_id/project/:project_id', authenticateToken, authorizePermission('User management'), removeUserFromProject);
+router.delete('/:id', authenticateToken, authorizePermission('User management'), deleteUser);
 
 module.exports = router

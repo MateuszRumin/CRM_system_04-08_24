@@ -4,6 +4,7 @@ import invoices from '../../data/invoices';
 import ThreeDotIcon from '../../../public/icons/3dot.svg';
 import SortIcon from '../../../public/icons/bxs_sort-alt.svg';
 import FilterSettingsModal from '../../components/Invoice/FilterSettingsModal';
+import NewInvoiceForm from '../../components/Invoice/NewInvoiceForm'
 
 export const Faktury = () => {
 
@@ -26,6 +27,7 @@ export const Faktury = () => {
   const itemsPerPageOptions = [10, 20, 30, 50];
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNewInvoiceFormOpen, setIsNewInvoiceFormOpen] = useState(false); // Nowy state do zarządzania otwarciem formularza
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -33,6 +35,13 @@ export const Faktury = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+  const handleNewInvoiceClick = () => {
+    setIsNewInvoiceFormOpen(true);
+  };
+
+  const closeNewInvoiceForm = () => {
+    setIsNewInvoiceFormOpen(false);
   };
 
   useEffect(() => {
@@ -216,7 +225,12 @@ export const Faktury = () => {
 
   return (
     <div className={styles.body}>
-      <div className={styles.topbar}>
+      {isNewInvoiceFormOpen ? (
+        <NewInvoiceForm onClose={closeNewInvoiceForm} /> // Renderowanie nowego komponentu faktury
+      ) : (
+        <div>
+          {/* Topbar */}
+          <div className={styles.topbar}>
         <div className={styles.title}>Faktury</div>
         <div className={styles.controls}>
           <div className={styles.search_box}>
@@ -240,7 +254,7 @@ export const Faktury = () => {
           <img src="/icons/filter.svg" alt="Filter" className={styles.icon} />
           <div className={styles.filter_text}>Filtruj</div>
         </button>
-          <button className={styles.create_button}>
+          <button className={styles.create_button}onClick={handleNewInvoiceClick}>
             <div className={styles.create_text}>Stwórz nową Fakturę</div>
           </button>
         </div>
@@ -365,7 +379,11 @@ export const Faktury = () => {
           </div>
         )}
       </div>
-      {isModalOpen && <FilterSettingsModal onClose={closeModal} />}
+          {/* Modal */}
+          {isModalOpen && <FilterSettingsModal onClose={closeModal} />}
+
+        </div>
+      )}
     </div>
   );
 };
