@@ -165,7 +165,6 @@ model Notes {
 
   ClientNote ClientNotes[]
   User Users @relation(fields: [user_id],references: [user_id])
-  ProjectDoc ProjectDocs []
 }
 
 model ClientNotes {
@@ -175,20 +174,6 @@ model ClientNotes {
 
   Client Clients @relation(fields: [client_id],references: [client_id])
   Note Notes @relation(fields: [note_id],references: [note_id])
-  ClientMeeting ClientMeetings[]
-}
-
-model ClientMeetings {
-  meeting_id Int @id @default(autoincrement())
-  client_id           Int
-  project_id          Int 
-  client_note_id      Int 
-  date                DateTime       
-  time_spent          Float    
-
-  Client Clients @relation(fields: [client_id],references: [client_id])
-  Project Projects @relation(fields: [project_id], references: [project_id])
-  ClientNote ClientNotes @relation(fields: [client_note_id], references: [client_note_id])
 }
 
 model Tasks {
@@ -358,8 +343,9 @@ model Projects {
   InvoiceProduct InvoiceProducts[]
   ProjectAssignment ProjectAssignments[]
   ProjectTask ProjectTasks[]
-  ClientMeeting ClientMeetings[]
   Contract Contracts[]
+  ProjectLink ProjectLinks[]
+  ProjectMeeting ProjectMeetings[]
 }
 
 model ProjectAssignments {
@@ -374,8 +360,6 @@ model ProjectAssignments {
 model ProjectDetails {
   project_detail_id Int @id @default(autoincrement())
   project_id        Int
-  figma_link        String  @default("brak")
-  repo_link         String  @default("brak")
   block_no_payment  Boolean @default(false)
   cost              Float
   deadline          DateTime
@@ -384,13 +368,33 @@ model ProjectDetails {
   Project Projects @relation(fields: [project_id], references: [project_id])
 }
 
-model ProjectDocs {
-  project_doc_id Int @id @default(autoincrement())
-  project_id Int
-  note_id   Int
+enum LinkTypes {
+  Figma
+  Repository
+  Documentation
+  Signature
+}
+
+model ProjectLinks {
+  link_id       Int @id @default(autoincrement())
+  project_id    Int
+  link_type     LinkTypes
+  link          String
+  name          String @default("brak")  
 
   Project Projects @relation(fields: [project_id], references: [project_id])
-  Note Notes @relation(fields: [note_id], references: [note_id])
+  ProjectDoc ProjectDocs[]
+}
+
+model ProjectDocs {
+  project_doc_id    Int @id @default(autoincrement())
+  project_id        Int
+  file_name         String
+  doc_description   String @default("brak")
+  link_id           Int
+
+  Project Projects @relation(fields: [project_id], references: [project_id])
+  ProjectLink ProjectLinks @relation(fields: [link_id], references: [link_id])
 }
 
 model ProjectTasks {
@@ -401,6 +405,36 @@ model ProjectTasks {
   Project Projects @relation(fields: [project_id], references: [project_id])
   Task Tasks @relation(fields: [task_id],references: [task_id])
   TaskAssignment TaskAssignments[]
+}
+
+model Meetings {
+  meeting_id                  Int @id @default(autoincrement())
+  date                        DateTime?       
+  time_spent                  Float?
+  meeting_description         String   @default("brak")
+  meeting_outcomes            String   @default("brak")
+  meeting_link                String   @default("brak")
+
+  ProjectMeeting ProjectMeetings[]
+  ClientMeeting ClientMeetings[]
+}
+
+model ClientMeetings {
+  client_meeting_id Int @id @default(autoincrement())
+  client_id           Int
+  meeting_id          Int
+
+  Meeting Meetings  @relation(fields: [meeting_id],references: [meeting_id])
+  Client Clients @relation(fields: [client_id],references: [client_id])
+}
+
+model ProjectMeetings {
+  project_meeting_id    Int @id @default(autoincrement())
+  meeting_id            Int
+  project_id            Int
+
+  Meeting Meetings  @relation(fields: [meeting_id],references: [meeting_id])
+  Project Projects @relation(fields: [project_id], references: [project_id])
 }
 
 model Contracts {

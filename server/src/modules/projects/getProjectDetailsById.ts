@@ -24,6 +24,12 @@ export const getProjectDetailsById = async (req: Request, res: Response) => {
             select: {
                 project_id: true,
                 name: true,
+                ProjectLink: {
+                    select: {
+                        link_type:true,
+                        link:true,
+                    }
+                },
                 Client: {
                     select: {
                         first_name: true,
@@ -32,29 +38,30 @@ export const getProjectDetailsById = async (req: Request, res: Response) => {
                         address: true,
                         ClientPhone: true,
                         ClientEmail: true,
-                        ClientMeeting: {
-                            select: {
-                                time_spent: true,
-                                date: true,
-                                Project: {
-                                    select: {
-                                        name: true
-                                    }
-                                }
-                            }
-                        }
+                        // ClientMeeting: {
+                        //     select: {
+                        //         time_spent: true,
+                        //         date: true,
+                        //         Project: {
+                        //             select: {
+                        //                 name: true
+                        //             }
+                        //         }
+                        //     }
+                        // }
                     }
                 },
                 Status: {
                     select: {
+                        status_id:true,
                         name: true
                     }
                 },
                 ProjectDetail: {
                     select: {
                         deadline: true,
-                        repo_link: true,
-                        figma_link: true
+                        // repo_link: true,
+                        // figma_link: true
                     }
                 },
                 ProjectTask: {
@@ -72,20 +79,37 @@ export const getProjectDetailsById = async (req: Request, res: Response) => {
                 InvoiceProduct: {
                     select: {
                         invoice_product_id: true,
-                        product_name: true
-                    }
-                },
-                ProjectDoc: {
-                    select: {
-                        Note: {
+                        product_name: true,
+                        Invoice: {
                             select: {
-                                note_id: true,
-                                note_name: true
+                                invoice_id:true,
+                                invoice_number:true,
                             }
                         }
                     }
                 },
-                Contract: true
+                ProjectDoc: {
+                    select: {
+                        project_doc_id:true,
+                        file_name:true,
+                    }
+                },
+                Contract: true,
+                ProjectMeeting: {
+                    include: {
+                        Meeting: {
+                            select: {
+                                time_spent:true,
+                                date:true,
+                            }
+                        },
+                        Project: {
+                            select: {
+                                name:true,
+                            }
+                        }
+                    }
+                }
             }
         });
 

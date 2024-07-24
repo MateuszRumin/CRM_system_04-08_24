@@ -95,7 +95,8 @@ export const addNewProject = async (req: Request, res: Response) => {
                     include: {
                         User: true
                     }
-                }
+                },
+                ProjectLink:true
             }
         });
 
