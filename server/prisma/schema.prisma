@@ -299,7 +299,7 @@ model InvoiceSettings {
 }
 
 model InvoicePaymentSettings {
-  payment_setting_id Int     @id @default(autoincrement())
+  payment_setting_id Int     @id @default(1)
   advancement_rate   Int
   tax_rate           Int
   tax_type           String @default("brak")

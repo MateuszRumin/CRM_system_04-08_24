@@ -19,6 +19,8 @@ router.post('/test', (req,res,next) =>{
 // router.put('/settings/update', updateAllSettings);
 // router.put('/settings/add', updateAllSettings);
 
+const { initInvoiceSite } = require('../modules/invoices/initInvoiceTab');
+router.get("/init",initInvoiceSite)
 
 router.use('/', (req,res,next) =>{
     const logger = req.app.get('logger')
