@@ -1,6 +1,9 @@
+// ProjectDetails.tsx
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import styles from './ProjectDetails.module.css'
+import IconButton from '@mui/material/IconButton';
+import Drawer from '@mui/material/Drawer';
+import styles from './ProjectDetails.module.css';
 import { RepositoryModal } from '../../components/Projects/ProjectModalComponents/RepositoryModal';
 import { FigmaModal } from '../../components/Projects/ProjectModalComponents/FigmaModal';
 import MeetingsList from '../../components/Projects/ProjectDetailsComponents/MettingsList';
@@ -8,70 +11,56 @@ import TasksList from '../../components/Projects/ProjectDetailsComponents/TaskLi
 import InvoicesList from '../../components/Projects/ProjectDetailsComponents/InvoicesList';
 import DocumentationList from '../../components/Projects/ProjectDetailsComponents/DocumentationList';
 import ContractsList from '../../components/Projects/ProjectDetailsComponents/ContractsList';
+import MettingListButtonDrawer from '../../assets/ProjectPage/meeting_icon.svg';
+import TaskListButtonDrawer from '../../assets/ProjectPage/task-square-svgrepo-com.svg';
 
 export const ProjectDetails: React.FC = () => {
   const location = useLocation();
   const project = location.state?.project;
 
-  const [repositoryModalVisible, setRepositoryModalVisible] = useState(false);
-  const [figmaModalVisible, setFigmaModalVisible] = useState(false);
+  const [meetingsDrawerVisible, setMeetingsDrawerVisible] = useState(false);
+  const [tasksDrawerVisible, setTasksDrawerVisible] = useState(false);
 
-  const handleAddMeeting = () => {
-    console.log('test dodania');
+  const toggleMeetingsDrawer = () => {
+    setMeetingsDrawerVisible(!meetingsDrawerVisible);
   };
 
-  const handleRepositoryLinkButtonClick = () => {
-    setRepositoryModalVisible(true);
-  };
-
-  const handleFigmaLinkButtonClick = () => {
-    setFigmaModalVisible(true);
-  };
-
-  const handleCloseRepositoryModal = () => {
-    setRepositoryModalVisible(false);
-  };
-
-  const handleCloseFigmaModal = () => {
-    setFigmaModalVisible(false);
-  };
-
-  const handleSaveRepositoryLink = (link: string) => {
-    console.log('Zapisano link do repozytorium:', link);
-    setRepositoryModalVisible(false);
-  };
-
-  const handleSaveFigmaLink = (link: string) => {
-    console.log('Zapisano link do figmy:', link);
-    setFigmaModalVisible(false);
+  const toggleTasksDrawer = () => {
+    setTasksDrawerVisible(!tasksDrawerVisible);
   };
 
   return (
     <div className={styles.detailsContainer}>
-      <h1>Szczegóły projektu {project.name} o id: {project.id}</h1>
+      <div className={styles.headerContainer}>
+        <h1>Szczegóły projektu {project.name} o id: {project.id}</h1>
+        <div className={styles.meetingsAndTasks}>
+          <IconButton onClick={toggleMeetingsDrawer} className={styles.drawerButton}>
+            <img src={MettingListButtonDrawer} alt="Open Meetings" />
+          </IconButton>
+          <IconButton onClick={toggleTasksDrawer} className={styles.drawerButton}>
+            <img src={TaskListButtonDrawer} alt="Open Tasks" />
+          </IconButton>
+        </div>
+      </div>
       <div className={styles.projectInfo}>
-      <div>
-        <h2>Nazwa Usługi: {project?.name}</h2>
-        <p>Nazwa klienta: {project?.client}</p>
-        <p>Status: {project?.status}</p>
-        <p>Termin wykonania: {project?.endDate}</p>
+        <div>
+          <h2>Nazwa Usługi: {project?.name}</h2>
+          <p>Nazwa klienta: {project?.client}</p>
+          <p>Status: {project?.status}</p>
+          <p>Termin wykonania: {project?.endDate}</p>
+        </div>
+        <div>
+          <h2>Kontakt z klientem</h2>
+          <p>Imię i nazwisko: Adam Nowak</p>
+          <p>Adres: Kraków, Lwowska 10</p>
+          <p>Numer telefonu: 575637463</p>
+        </div>
       </div>
-      <div>
-        <h2>Kontakt z klientem</h2>
-        <p>Imię i nazwisko: Adam Nowak</p>
-        <p>Adres: Kraków, Lwowska 10</p>
-        <p>Numer telefonu: 575637463</p>
-      </div>
-    </div>
       <div className={styles.projectLinks}>
-        <button onClick={handleRepositoryLinkButtonClick}>Link do repozytorium</button>
-        <button onClick={handleFigmaLinkButtonClick}>Link do Figmy</button>
+        <RepositoryModal projectId={project.id} />
+        <FigmaModal projectId={project.id} />
       </div>
       <div className={styles.additionalInfo}>
-        <div className={styles.meetingsAndTasks}>
-          <MeetingsList onAddMeeting={handleAddMeeting} />
-          <TasksList />
-        </div>
         <div className={styles.invoicesDocumentationContracts}>
           <InvoicesList />
           <DocumentationList />
@@ -79,9 +68,27 @@ export const ProjectDetails: React.FC = () => {
         </div>
       </div>
 
-      {/* Modals */}
-      <RepositoryModal visible={repositoryModalVisible} onClose={handleCloseRepositoryModal} onSave={handleSaveRepositoryLink} />
-      <FigmaModal visible={figmaModalVisible} onClose={handleCloseFigmaModal} onSave={handleSaveFigmaLink} />
+      {/* Drawers */}
+      <Drawer
+        anchor="right"
+        open={meetingsDrawerVisible}
+        onClose={toggleMeetingsDrawer}
+        PaperProps={{
+          style: { width: '38.00%' }
+        }}
+      >
+        <MeetingsList />
+      </Drawer>
+      <Drawer
+        anchor="right"
+        open={tasksDrawerVisible}
+        onClose={toggleTasksDrawer}
+        PaperProps={{
+          style: { width: '38.00%' }
+        }}
+      >
+        <TasksList />
+      </Drawer>
     </div>
   );
 };

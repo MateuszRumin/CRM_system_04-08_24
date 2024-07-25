@@ -1,0 +1,47 @@
+/* AddNewProject.module.css */
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #E0E0E0;
+  margin-bottom: 20px;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* AddNewProject.module.css */
+.row {
+  display: flex;
+  flex-direction: column; /* Zmiana z row na column */
+  width: 100%;
+  gap: 20px; /* Utrzymanie odstępów między elementami */
+}
+
+.row > div {
+  flex: 1; /* Zapewnia, że elementy będą elastyczne i wypełnią dostępne miejsce */
+}
+
+
+.saveButton {
+  /* Dodaj styl do przycisku, jeśli to konieczne */
+}
+
+.disabled {
+  /* Styl dla przycisku w stanie nieaktywnym */
+}

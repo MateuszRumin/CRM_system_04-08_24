@@ -3,9 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import styles from './ProjectRow.module.css';
 import ThreeDotsSettings from '../../assets/ClientPage/three_dots_settings.svg';
 
+interface Note {
+  note_id: string;
+  note_text: string;
+  timestamp: string;
+}
+
 interface Project {
   project_id: number;
   name: string;
+  status: string;
+  client: string;
+  startDate: string;
+  endDate: string;
+  notes: Note[];
   description: string;
   client_id: number;
   status_id: number;
@@ -43,12 +54,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({ project, onDelete }) => 
   };
 
   const handleEdit = () => {
-    const modifiedName = project.name
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/\s+/g, '-');
-
-    navigate(`/projekty/edit-project/${modifiedName}`, { state: { project } });
+    navigate(`/projekty/edit-project/${project.id}`, { state: { project } });
   };
 
   const handleDelete = () => {
@@ -61,11 +67,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({ project, onDelete }) => 
   };
 
   const handleDetails = () => {
-    const modifiedName = project.name
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/\s+/g, '-');
-    navigate(`/projekty/details-project/${modifiedName}`, { state: { project } });
+    navigate(`/projekty/details-project/${project.id}`, { state: { project } });
   };
 
   return (

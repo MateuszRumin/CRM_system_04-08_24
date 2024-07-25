@@ -6,9 +6,26 @@ const prisma = new PrismaClient();
 export const getAllProjects = async (req: Request, res: Response) => {
     try {
         const projects = await prisma.projects.findMany({
-            include: {
-                ProjectDetail: true,
-                Status: true
+            select: {
+                project_id:true,
+                name:true,
+                ProjectDetail: {
+                    select: {
+                        deadline: true
+                    }
+                },
+                Status: {
+                    select: {
+                        name:true
+                    }
+                },
+                Client: {
+                    select: {
+                        first_name:true,
+                        second_name:true,
+                        company_name:true,
+                    }
+                }
             }
         });
         res.status(200).json(projects);

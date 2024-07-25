@@ -4,6 +4,12 @@ import styles from './ProjectTable.module.css';
 import { ProjectRow } from './ProjectRow';
 import Pagination from '../Client/Pagination';
 
+interface Note {
+  note_id: string;
+  note_text: string;
+  timestamp: string;
+}
+
 interface Project {
   project_id: number;
   name: string;
@@ -12,6 +18,7 @@ interface Project {
   status_id: number;
   created_at: string;
   updated_at: string;
+  notes: Note[];
 }
 
 interface ProjectTableProps {

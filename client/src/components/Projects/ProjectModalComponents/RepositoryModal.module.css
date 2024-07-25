@@ -1,59 +1,64 @@
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modalContent {
+.container {
   background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 400px;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.linkRow {
   display: flex;
-  flex-direction: column;
-}
-
-.modalContent h2 {
+  align-items: center;
   margin-bottom: 10px;
 }
 
-.modalContent input {
-  width: 100%;
+.input {
+  flex: 1;
   padding: 10px;
-  margin-bottom: 10px;
   border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.button {
-  background-color: #24304f;
-  color: #fff;
-  border: 1px solid #24304f;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
+  border-radius: 5px;
   margin-right: 10px;
 }
 
-.button:hover {
-  background-color: #1a2538;
-  border-color: #1a2538;
-}
-
-.gotoButtonContainer {
+.button {
   display: flex;
+  height: 40px;
+  padding: 10px 15px;
+  margin-right: 5px;
   justify-content: center;
-  margin-bottom: 10px;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid #24304F;
+  background: #24304F;
+  color: white;
+  text-decoration: none;
 }
 
-.saveAndCloseButtonContainer {
+.button:hover {
+  background-color: gray;
+  cursor: pointer;
+}
+
+.addButton {
   display: flex;
-  justify-content: flex-end;
+  height: 40px;
+  padding: 10px 15px;
+  margin-right: 5px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid #24304F;
+  background: #24304F;
+  color: white;
+  text-decoration: none;
+}
+
+.addButton:hover {
+  background-color: gray;
+  cursor: pointer;
 }

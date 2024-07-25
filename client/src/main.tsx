@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom/client';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { DataProvider } from './contexts/DataContext.tsx'
+import { ProjectDataProvider  } from './contexts/ProjectDataContext.tsx'
 import { Kreator } from './views/Kreator/Kreator.tsx';
 import { Faktury } from './views/Faktury/Faktury.tsx';
 import { Umowy } from './views/Umowy/Umowy.tsx';
@@ -24,6 +25,9 @@ import { EmployeeDetails } from './views/Pracownicy/EmployeeDetails.tsx'
 import { AssignProjectToEmployee } from './views/Pracownicy/Przypisz_projekt_do_pracownika/AssignProjectToEmployee.tsx'
 import { RemoveEmployee } from './views/Pracownicy/Usun_pracownika/RemoveEmployee.tsx'
 import { ProjectDetails } from './views/Projekty/ProjectDetails.tsx'
+import { AddNewProject } from './views/Projekty/Dodaj_nowy_projekt/AddNewProject.tsx'
+import { EditProject } from './views/Projekty/Edytuj_projekt/EditProject.tsx'
+
 
 const router = createBrowserRouter([
   {
@@ -57,6 +61,14 @@ const router = createBrowserRouter([
           {
             path: 'details-project/:name',
             element: <ProjectDetails />,
+          },
+          {
+            path: 'add-project',
+            element: <AddNewProject />,
+          },
+          {
+            path: 'edit-project/:id',
+            element: <EditProject />,
           },
         ],
       },
@@ -129,7 +141,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <DataProvider>
-      <RouterProvider router={router}></RouterProvider>
+      <ProjectDataProvider>
+        <RouterProvider router={router}></RouterProvider>
+      </ProjectDataProvider>
     </DataProvider>
   </React.StrictMode>
-)
+);
