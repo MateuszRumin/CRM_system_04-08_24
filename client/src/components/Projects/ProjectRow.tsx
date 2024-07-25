@@ -3,29 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import styles from './ProjectRow.module.css';
 import ThreeDotsSettings from '../../assets/ClientPage/three_dots_settings.svg';
 
-interface Note {
-  note_id: string;
-  note_text: string;
-  timestamp: string;
-}
-
-interface Project {
-  project_id: number;
-  name: string;
-  status: string;
-  client: string;
-  startDate: string;
-  endDate: string;
-  notes: Note[];
-  description: string;
-  client_id: number;
-  status_id: number;
-  created_at: string;
-  updated_at: string;
-}
-
 interface ProjectRowProps {
-  project: Project;
+  project: {
+    project_id: number;
+    name: string;
+    status: { name: string };
+    client: { first_name: string; second_name: string; company_name: string };
+    startDate: string;
+    endDate: string;
+  };
   onDelete: (projectId: number) => void;
 }
 
@@ -54,7 +40,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({ project, onDelete }) => 
   };
 
   const handleEdit = () => {
-    navigate(`/projekty/edit-project/${project.id}`, { state: { project } });
+    navigate(`/projekty/edit-project/${project.project_id}`, { state: { project } });
   };
 
   const handleDelete = () => {
@@ -67,17 +53,17 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({ project, onDelete }) => 
   };
 
   const handleDetails = () => {
-    navigate(`/projekty/details-project/${project.id}`, { state: { project } });
+    navigate(`/projekty/details-project/${project.project_id}`, { state: { project } });
   };
 
   return (
     <>
       <tr className={`${styles.row} ${styles.projectRow}`}>
-        <td>{project.name}</td>
-        <td>{project.status_id}</td> {/* Update this based on your status mapping */}
-        <td>{project.client_id}</td> {/* Update this based on your client mapping */}
-        <td>{new Date(project.created_at).toLocaleDateString()}</td>
-        <td>{new Date(project.updated_at).toLocaleDateString()}</td>
+        <td>{project.name || 'Brak nazwy'}</td>
+        <td>{project.status?.name || 'Brak statusu'}</td>
+        <td>{`${project.client?.first_name || 'Brak'} ${project.client?.second_name || 'Danych'}`}</td>
+        <td>{new Date(project.startDate).toLocaleDateString()}</td>
+        <td>{new Date(project.endDate).toLocaleDateString()}</td>
         <td className={styles.settingsContainer}>
           <button className={styles.detailsButton} onClick={handleDetails}>
             Szczegóły

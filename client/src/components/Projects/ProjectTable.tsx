@@ -13,7 +13,11 @@ interface Note {
 interface Project {
   project_id: number;
   name: string;
+  status: { name: string };
   description: string;
+  client: { first_name: string; second_name: string; company_name: string };
+  startDate: string;
+  endDate: string;
   client_id: number;
   status_id: number;
   created_at: string;
@@ -37,12 +41,19 @@ export const ProjectTable: React.FC<ProjectTableProps> = ({ searchTerm, filterOp
     const fetchProjects = async () => {
       try {
         const response = await axios.get('http://localhost:3000/projects/');
-        setProjects(response.data);
+        const projectsWithDates = response.data.map((project: any) => ({
+          ...project,
+          startDate: project.startDate || '2023-01-01',
+          endDate: project.endDate || '2023-12-31',
+          status: project.Status || { name: 'Brak statusu' },
+          client: project.Client || { first_name: 'Brak', second_name: 'Danych', company_name: '' }
+        }));
+        setProjects(projectsWithDates);
       } catch (error) {
         console.error('Error fetching projects:', error);
       }
     };
-
+  
     fetchProjects();
   }, []);
 

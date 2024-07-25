@@ -1,4 +1,3 @@
-// ProjectDetails.tsx
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
@@ -32,7 +31,7 @@ export const ProjectDetails: React.FC = () => {
   return (
     <div className={styles.detailsContainer}>
       <div className={styles.headerContainer}>
-        <h1>Szczegóły projektu {project.name} o id: {project.id}</h1>
+        <h1>Szczegóły projektu {project?.name} o id: {project?.project_id}</h1>
         <div className={styles.meetingsAndTasks}>
           <IconButton onClick={toggleMeetingsDrawer} className={styles.drawerButton}>
             <img src={MettingListButtonDrawer} alt="Open Meetings" />
@@ -44,10 +43,10 @@ export const ProjectDetails: React.FC = () => {
       </div>
       <div className={styles.projectInfo}>
         <div>
-          <h2>Nazwa Usługi: {project?.name}</h2>
-          <p>Nazwa klienta: {project?.client}</p>
-          <p>Status: {project?.status}</p>
-          <p>Termin wykonania: {project?.endDate}</p>
+          <h2>Nazwa Usługi: {project?.name || 'Brak nazwy'}</h2>
+          <p>Nazwa klienta: {project?.client?.first_name || 'Brak'} {project?.client?.second_name || 'Danych'}</p>
+          <p>Status: {project?.status?.name || 'Brak statusu'}</p>
+          <p>Termin wykonania: {project?.endDate || 'Brak daty'}</p>
         </div>
         <div>
           <h2>Kontakt z klientem</h2>
@@ -57,8 +56,8 @@ export const ProjectDetails: React.FC = () => {
         </div>
       </div>
       <div className={styles.projectLinks}>
-        <RepositoryModal projectId={project.id} />
-        <FigmaModal projectId={project.id} />
+        <RepositoryModal projectId={project?.project_id} />
+        <FigmaModal projectId={project?.project_id} />
       </div>
       <div className={styles.additionalInfo}>
         <div className={styles.invoicesDocumentationContracts}>
