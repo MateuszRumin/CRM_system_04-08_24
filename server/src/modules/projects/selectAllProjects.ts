@@ -16,6 +16,7 @@ export const getAllProjects = async (req: Request, res: Response) => {
                 },
                 Status: {
                     select: {
+                        status_id:true,
                         name:true
                     }
                 },
@@ -52,7 +53,8 @@ export const getAllProjectsWithoutUser = async (req: Request, res: Response) => 
                 }
             },
             include: {
-                ProjectDetail: true
+                ProjectDetail: true,
+                Status:true,
             }
         });
 
@@ -84,7 +86,8 @@ export const getAllProjectsWithUser = async (req: Request, res: Response) => {
                 }
             },
             include: {
-                ProjectDetail: true
+                ProjectDetail: true,
+                Status:true,
             }
         });
 
