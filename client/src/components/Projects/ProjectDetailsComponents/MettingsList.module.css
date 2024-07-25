@@ -22,7 +22,7 @@
 .addButton {
   display: flex;
   height: 40px;
-  padding: 16px;
+  padding: 10px;
   justify-content: center;
   align-items: center;
   border-radius: 8px;
@@ -30,22 +30,32 @@
   background: #24304F;
   color: white;
   text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .addButton:hover {
-  background-color: gray;
-  cursor: pointer;
+  background-color: #555;
 }
 
-.detailsButton {
+.detailsButton, .editButton, .deleteButton {
   background-color: #24304f;
   color: #fff;
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 8px; /* Dodaj odstęp pomiędzy przyciskami */
 }
 
-.detailsButton:hover {
+.detailsButton:hover, .editButton:hover, .deleteButton:hover {
   background-color: gray;
+}
+
+/* Usuwamy prawy margines dla ostatniego przycisku */
+.detailsButton:last-child, 
+.editButton:last-child, 
+.deleteButton:last-child {
+  margin-right: 0;
 }

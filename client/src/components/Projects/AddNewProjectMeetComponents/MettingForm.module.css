@@ -1,0 +1,60 @@
+.meetingFormContainer {
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.meetingForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.meetingForm label {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.meetingForm input,
+.meetingForm textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.formButtons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.submitButton, .cancelButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submitButton {
+  background-color: #24304f;
+  color: #fff;
+}
+
+.submitButton:hover {
+  background-color: gray;
+}
+
+.cancelButton {
+  background-color: #ddd;
+  color: #333;
+}
+
+.cancelButton:hover {
+  background-color: #bbb;
+}

@@ -1,6 +1,5 @@
 .tasks {
   width: 100%;
-  overflow-x: auto;
 }
 
 .tasksTable {
@@ -10,7 +9,7 @@
 }
 
 .tasksTable th, .tasksTable td {
-  padding: 8px 12px;
+  padding: 8px 8px;
   border-bottom: 1px solid #ddd;
 }
 
@@ -20,32 +19,41 @@
 }
 
 .addButton {
-  display: flex;
+  display: block; /* Umożliwia margin do działania */
+  margin: 20px 0; /* Dodaje marginesy na górze i na dole */
   height: 40px;
-  padding: 16px;
-  justify-content: center;
-  align-items: center;
+  padding: 10px;
   border-radius: 8px;
   border: 1px solid #24304F;
   background: #24304F;
   color: white;
   text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
+
+
 
 .addButton:hover {
-  background-color: gray;
-  cursor: pointer;
+  background-color: #555;
 }
 
-.detailsButton {
+.detailsButton, .editButton, .deleteButton {
   background-color: #24304f;
   color: #fff;
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 8px; /* Odstęp między przyciskami */
 }
 
-.detailsButton:hover {
+.detailsButton:hover, .editButton:hover, .deleteButton:hover {
   background-color: gray;
+}
+
+/* Usuwamy margines dla ostatniego przycisku, jeśli chcesz, żeby ostatni przycisk nie miał marginesu */
+.tasksTable td button:last-child {
+  margin-right: 0;
 }

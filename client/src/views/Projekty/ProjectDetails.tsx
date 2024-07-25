@@ -1,3 +1,4 @@
+// ProjectDetails.tsx
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
@@ -68,10 +69,24 @@ export const ProjectDetails: React.FC = () => {
       </div>
 
       {/* Drawers */}
-      <Drawer anchor="right" open={meetingsDrawerVisible} onClose={toggleMeetingsDrawer}>
-        <MeetingsList onAddMeeting={() => console.log('Add meeting')} />
+      <Drawer
+        anchor="right"
+        open={meetingsDrawerVisible}
+        onClose={toggleMeetingsDrawer}
+        PaperProps={{
+          style: { width: '38.00%' }
+        }}
+      >
+        <MeetingsList />
       </Drawer>
-      <Drawer anchor="right" open={tasksDrawerVisible} onClose={toggleTasksDrawer}>
+      <Drawer
+        anchor="right"
+        open={tasksDrawerVisible}
+        onClose={toggleTasksDrawer}
+        PaperProps={{
+          style: { width: '38.00%' }
+        }}
+      >
         <TasksList />
       </Drawer>
     </div>
