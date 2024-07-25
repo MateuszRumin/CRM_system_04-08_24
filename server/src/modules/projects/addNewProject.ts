@@ -93,7 +93,22 @@ export const addNewProject = async (req: Request, res: Response) => {
                 ProjectDetail: true,
                 ProjectAssignment: {
                     include: {
-                        User: true
+                        User: {
+                            select: {
+                                UserData: {
+                                    select: {
+                                        user_id:true,
+                                        first_name:true,
+                                        second_name:true,
+                                        Position: {
+                                            select: {
+                                                name:true,
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 ProjectLink:true

@@ -49,26 +49,22 @@ export const updateProjectById = async (req: Request, res: Response) => {
             });
 
             if (existingProjectDetail) {
-                dataToUpdate.ProjectDetail = {
-                    update: {
-                        where: { project_detail_id: existingProjectDetail.project_detail_id },
-                        data: {
-                            ...projectDetails
-                        }
-                    }
-                };
+                await prisma.projectDetails.update({
+                    where: { project_detail_id: existingProjectDetail.project_detail_id },
+                    data: projectDetails
+                });
             } else {
-                dataToUpdate.ProjectDetail = {
-                    create: {
+                await prisma.projectDetails.create({
+                    data: {
                         project_id: parseInt(project_id, 10),
                         ...projectDetails
                     }
-                };
+                });
             }
         }
 
         // Aktualizacja przypisań projektu
-        if (assignedUsers) {
+        if (assignedUsers.length > 0) {
             const userChecks = await Promise.all(assignedUsers.map(async (user_id: number) => {
                 const userExists = await prisma.users.findUnique({
                     where: { user_id },
@@ -80,22 +76,45 @@ export const updateProjectById = async (req: Request, res: Response) => {
                 return res.status(400).json({ error: 'One or more users do not exist' });
             }
 
-            dataToUpdate.ProjectAssignment = {
-                deleteMany: { project_id: parseInt(project_id, 10) },
-                create: assignedUsers.map((user_id: number) => ({
+            // Usuwanie istniejących przypisań użytkowników do projektu
+            await prisma.projectAssignments.deleteMany({
+                where: { project_id: parseInt(project_id, 10) },
+            });
+
+            // Tworzenie nowych przypisań użytkowników do projektu
+            await prisma.projectAssignments.createMany({
+                data: assignedUsers.map((user_id: number) => ({
                     project_id: parseInt(project_id, 10),
                     user_id,
                 }))
-            };
+            });
         }
-        
+
         const updatedProject = await prisma.projects.update({
             where: { project_id: parseInt(project_id, 10) },
             data: dataToUpdate,
             include: {
                 ProjectDetail: true,
-                ProjectAssignment: true,
-            },
+                ProjectAssignment: {
+                    include: {
+                        User: {
+                            select: {
+                                user_id: true,
+                                username: true,
+                                UserData: {
+                                    select: {
+                                        Position: {
+                                            select: {
+                                                name: true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         });
 
         res.status(200).json(updatedProject);

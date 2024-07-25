@@ -117,6 +117,7 @@ export const updateTaskProject = async (req: Request, res: Response) => {
                 task_name: true,
                 deadline: true,
                 task_text: true,
+                predicted_time:true,
                 Status: true,
                 ProjectTask: {
                     select: {

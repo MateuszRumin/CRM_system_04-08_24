@@ -23,6 +23,13 @@ export const deleteProject = async (req: Request, res: Response) => {
 
         const taskProjectIds = taskProjects.map(tp => tp.task_project_id);
 
+        const meetingIdsToDelete = await prisma.projectMeetings.findMany({
+            where: { project_id: parseInt(project_id, 10) },
+            select: { meeting_id: true }
+        });
+        
+        const meetingIds = meetingIdsToDelete.map(meeting => meeting.meeting_id);
+
         await prisma.$transaction([
             prisma.taskAssignments.deleteMany({
                 where: { 
@@ -48,6 +55,9 @@ export const deleteProject = async (req: Request, res: Response) => {
             }),
             prisma.projectMeetings.deleteMany({
                 where: { project_id: parseInt(project_id, 10) }
+            }),
+            prisma.meetings.deleteMany({
+                where: { meeting_id: { in: meetingIds } }
             }),
             prisma.projectDocs.deleteMany({
                 where: { project_id: parseInt(project_id, 10) }

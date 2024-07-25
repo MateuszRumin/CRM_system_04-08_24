@@ -109,6 +109,26 @@ export const getProjectDetailsById = async (req: Request, res: Response) => {
                             }
                         }
                     }
+                },
+                ProjectAssignment: {
+                    select: {
+                        User: {
+                            select: {
+                                UserData: {
+                                    select: {
+                                        user_id:true,
+                                        first_name:true,
+                                        second_name:true,
+                                        Position: {
+                                            select: {
+                                                name:true,
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         });

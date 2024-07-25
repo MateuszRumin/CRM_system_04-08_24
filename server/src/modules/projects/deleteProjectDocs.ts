@@ -4,11 +4,11 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export const deleteProjectDoc = async (req: Request, res: Response) => {
-    const { project_doc_id } = req.params;
+    const { doc_id } = req.params;
 
     try {
         const projectDoc = await prisma.projectDocs.findUnique({
-            where: { project_doc_id: parseInt(project_doc_id, 10) }
+            where: { project_doc_id: parseInt(doc_id, 10) }
         });
 
         if (!projectDoc) {
@@ -25,7 +25,7 @@ export const deleteProjectDoc = async (req: Request, res: Response) => {
 
         res.status(200).json({ deletedDoc, deletedLink });
     } catch (error) {
-        console.error('Error deleting project doc with link:', error);
+        console.error('Error deleting project documentation:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
