@@ -64,7 +64,7 @@ export const addNewTaskProject = async (req: Request, res: Response) => {
             finalTaskStatusId = defaultStatus.status_id;
         }
 
-        // Tworzenie zadania
+        // Tworzenie zadania i przypisanie go do projektu w jednym zapytaniu
         const task = await prisma.tasks.create({
             data: {
                 user_id,
@@ -77,7 +77,7 @@ export const addNewTaskProject = async (req: Request, res: Response) => {
                 days_to_reminder_email,
                 ProjectTask: {
                     create: {
-                        project_id
+                        project_id: parseInt(project_id, 10)
                     }
                 }
             },
@@ -87,20 +87,12 @@ export const addNewTaskProject = async (req: Request, res: Response) => {
             }
         });
 
-        // Dodanie zadania do projektu
-        const projectTask = await prisma.projectTasks.create({
-            data: {
-                project_id,
-                task_id: task.task_id
-            }
-        });
-
         // Przypisanie użytkowników do zadania (jeśli są podani)
         if (assignedUsers.length > 0) {
             for (const user_id of assignedUsers) {
                 const existingAssignment = await prisma.taskAssignments.findFirst({
                     where: {
-                        task_project_id: projectTask.task_project_id,
+                        task_project_id: task.ProjectTask[0].task_project_id,
                         user_id
                     }
                 });
@@ -108,39 +100,40 @@ export const addNewTaskProject = async (req: Request, res: Response) => {
                 if (!existingAssignment) {
                     await prisma.taskAssignments.create({
                         data: {
-                            task_project_id: projectTask.task_project_id,
+                            task_project_id: task.ProjectTask[0].task_project_id,
                             user_id
                         }
                     });
-                }
-                else
+                } else {
                     return res.status(404).json({ error: 'User already assigned to project task' });
+                }
             }
         }
 
-        // wypisanie przypisania użytkowników do taska
+        // Wypisanie przypisania użytkowników do taska
         const updatedTask = await prisma.tasks.findUnique({
             where: { task_id: task.task_id },
             select: {
-                task_name:true,
-                deadline:true,
-                task_text:true,
-                Status:true,
+                task_id: true,
+                task_name: true,
+                deadline: true,
+                task_text: true,
+                Status: true,
                 ProjectTask: {
                     select: {
                         Project: {
                             select: {
-                                name:true,
-                                description:true,
-                                Status:true,
+                                name: true,
+                                description: true,
+                                Status: true,
                             }
                         },
                         TaskAssignment: {
                             select: {
                                 User: {
                                     select: {
-                                        user_id:true,
-                                        username:true
+                                        user_id: true,
+                                        username: true
                                     }
                                 }
                             }

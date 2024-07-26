@@ -26,12 +26,14 @@ export const getProjectDetailsById = async (req: Request, res: Response) => {
                 name: true,
                 ProjectLink: {
                     select: {
+                        link_id:true,
                         link_type:true,
                         link:true,
                     }
                 },
                 Client: {
                     select: {
+                        client_id:true,
                         first_name: true,
                         second_name: true,
                         company_name: true,
@@ -54,6 +56,7 @@ export const getProjectDetailsById = async (req: Request, res: Response) => {
                 Status: {
                     select: {
                         status_id:true,
+                        status_type:true,
                         name: true
                     }
                 },
@@ -92,6 +95,13 @@ export const getProjectDetailsById = async (req: Request, res: Response) => {
                     select: {
                         project_doc_id:true,
                         file_name:true,
+                        doc_description:true,
+                        ProjectLink: {
+                            select: {
+                                link_id:true,
+                                link:true,
+                            }
+                        },
                     }
                 },
                 Contract: true,
