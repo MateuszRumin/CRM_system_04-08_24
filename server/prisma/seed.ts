@@ -66,7 +66,7 @@ async function main() {
     data:{
         status_type:'Zadanie',
         default:true,
-        name:'Nie zaczety'
+        name:'Zaplanowane'
     }  
   })
   Status = await prisma.statuses.create({
