@@ -86,10 +86,6 @@ model Permissions {
   Role Roles @relation(fields: [role_id],references: [role_id])
 }
 
-enum clientTypeValues {
-  Prywatny
-  Firma
-}
 
 model Clients {
   client_id Int @id @default(autoincrement())
@@ -207,23 +203,23 @@ model ClientTasks {
 model Invoices {
   invoice_id Int  @id @default(autoincrement())
   block Boolean @default(false)
-  year Int
-  month Int
-  invoice_number String        @unique 
+  year Int?
+  month Int?
+  invoice_number String?        
   status_id Int
   invoice_type_id Int
   client_id Int
-  issue_date     DateTime
-  due_date       DateTime
-  prize_netto Float
-  prize_brutto Float
-  tax_ammount Float
-  comments String
+  issue_date     DateTime?
+  due_date       DateTime?
+  prize_netto Float?
+  prize_brutto Float?
+  tax_ammount Float?
+  comments String?
 
-  Status     Statuses     @relation(fields: [status_id], references: [status_id])
   InvoiceType InvoiceTypes @relation(fields: [invoice_type_id], references: [invoice_type_id])
   Client     Clients      @relation(fields: [client_id], references: [client_id])
   InvoiceProduct InvoiceProducts[]
+  Status Statuses @relation(fields: [status_id],references: [status_id])
 }
 
 model InvoiceProducts {

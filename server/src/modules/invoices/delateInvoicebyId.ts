@@ -8,7 +8,7 @@ exports.addInvocieClient = async (req: Request, res: Response, next: NextFunctio
 
     try {
         //dodać obsługę zblokowanyh/wystawionych
-       const fvId = req.body.invoice_id
+       const fvId = req.body.main.invoice_id
 
        await prisma.InvoiceProducts.delate({
         where:{

@@ -9,6 +9,7 @@ interface MarkerLocal {
 }
 
 interface InvoiceTypeLocal {
+    invoice_type_id:Number;
     invoice_type: string;
     Marker: MarkerLocal;
 }
@@ -21,7 +22,7 @@ exports.initInvoiceSite = async (req: Request, res: Response, next: NextFunction
         
         
         const currentYear = new Date().getFullYear();
-        const currentMonth = new Date().getMonth();
+        const currentMonth = new Date().getMonth()+1;
         
        const markers =  await prisma.markers.findMany({
             select:{
@@ -53,6 +54,7 @@ exports.initInvoiceSite = async (req: Request, res: Response, next: NextFunction
 
         const initInvSiteData = await prisma.invoiceTypes.findMany({
             select: {
+                invoice_type_id:true,
                 invoice_type: true,
                 Marker: {
                     select: {
@@ -68,6 +70,7 @@ exports.initInvoiceSite = async (req: Request, res: Response, next: NextFunction
 
         const mapInvInitData = initInvSiteData.flatMap((data: InvoiceTypeLocal) =>{
             return{
+                invoice_type_id:data.invoice_type_id,
                 invoice_type: data.invoice_type,
                 marker_name: data.Marker.marker_name,
                 current_month_sequence: data.Marker.current_month_sequence,
@@ -75,6 +78,10 @@ exports.initInvoiceSite = async (req: Request, res: Response, next: NextFunction
                 current_number_sequence: data.Marker.current_number_sequence,
              } }
         )
+        const resData = {
+            inv_types:mapInvInitData
+            
+        }
         
         const response: IResponse = {
             status: 'success',
@@ -82,7 +89,7 @@ exports.initInvoiceSite = async (req: Request, res: Response, next: NextFunction
             error: null,
             message: 'Dane inicjacyjne',
             devmessage: `Pszesłano numery sekwencji oraz typy faktur`,
-            data: mapInvInitData
+            data: resData
         };   
         
         res.status(200).json(response)
