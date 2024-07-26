@@ -1,53 +1,77 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './TaskList.module.css';
 import TaskForm from '../AddNewTaskComponents/TaskForm';
 import TaskDetails from '../DetailsTaskProjectComponents/TaskDetails';
 
-const initialTasks = [
-  { id: 1, taskName: 'Projekt A', hours: '5h', status: 'W trakcie', date: '12.12.2024', employees: ['Jan Kowalski'] },
-  { id: 2, taskName: 'Projekt B', hours: '3h', status: 'Zakończone', date: '15.12.2024', employees: [] },
-  // Możesz dodać więcej zadań w razie potrzeby
-];
+interface Task {
+  task_id: number;
+  task_name: string;
+  predicted_time: string;
+  status: string;
+  deadline: string;
+  Status: {
+    name: string;
+  };
+  assignedUsers: string[];
+}
 
-const employeesList = [
-  'Jan Kowalski',
-  'Anna Nowak',
-  'Marek Wiśniewski',
-  'Maria Kowalczyk',
-];
-
-const TasksList: React.FC = () => {
-  const [tasks, setTasks] = useState(initialTasks);
-  const [selectedTask, setSelectedTask] = useState<any>(null);
+const TasksList: React.FC<{ projectId: number }> = ({ projectId }) => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [view, setView] = useState<'list' | 'details' | 'edit' | 'add'>('list');
+
+  useEffect(() => {
+    fetch(`http://localhost:3000/projects/${projectId}`)
+      .then(response => response.json())
+      .then(data => setTasks(data.ProjectTask.map((task: any) => task.Task)));
+  }, [projectId]);
 
   const handleAddTask = () => {
     setSelectedTask(null);
     setView('add');
   };
 
-  const handleEditTask = (task: any) => {
+  const handleEditTask = (task: Task) => {
     setSelectedTask(task);
     setView('edit');
   };
 
-  const handleViewTaskDetails = (task: any) => {
+  const handleViewTaskDetails = (task: Task) => {
     setSelectedTask(task);
     setView('details');
   };
 
   const handleDeleteTask = (taskId: number) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
+    fetch(`http://localhost:3000/projects/task/${taskId}`, { method: 'DELETE' })
+      .then(response => response.json())
+      .then(() => setTasks(tasks.filter(task => task.task_id !== taskId)))
+      .catch(error => console.error('Error:', error));
     setView('list');
   };
 
-  const handleSaveTask = (task: any) => {
-    if (selectedTask) {
-      setTasks(tasks.map(t => (t.id === task.id ? task : t)));
-    } else {
-      setTasks([...tasks, { ...task, id: tasks.length + 1 }]);
-    }
-    setView('list');
+  const handleSaveTask = (task: Task) => {
+    const method = selectedTask ? 'PUT' : 'POST';
+    const url = selectedTask ? `http://localhost:3000/projects/task/${selectedTask.task_id}` : `http://localhost:3000/projects/task/new`;
+
+    fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...task,
+        project_id: projectId,
+        user_id: 1,
+      }),
+    })
+      .then(response => response.json())
+      .then((savedTask: Task) => {
+        if (selectedTask) {
+          setTasks(tasks.map(t => (t.task_id === savedTask.task_id ? savedTask : t)));
+        } else {
+          setTasks([...tasks, savedTask]);
+        }
+        setView('list');
+      })
+      .catch(error => console.error('Error:', error));
   };
 
   const handleBackToList = () => {
@@ -72,14 +96,14 @@ const TasksList: React.FC = () => {
             <tbody>
               {tasks.map((task, index) => (
                 <tr key={index}>
-                  <td>{task.taskName}</td>
-                  <td>{task.hours}</td>
-                  <td>{task.status}</td>
-                  <td>{task.date}</td>
+                  <td>{task.task_name}</td>
+                  <td>{task.predicted_time}</td>
+                  <td>{task.Status.name}</td>
+                  <td>{new Date(task.deadline).toLocaleDateString()}</td>
                   <td className={styles.buttonCell}>
                     <button className={styles.detailsButton} onClick={() => handleViewTaskDetails(task)}>Szczegóły</button>
                     <button className={styles.editButton} onClick={() => handleEditTask(task)}>Edytuj</button>
-                    <button className={styles.deleteButton} onClick={() => handleDeleteTask(task.id)}>Usuń</button>
+                    <button className={styles.deleteButton} onClick={() => handleDeleteTask(task.task_id)}>Usuń</button>
                   </td>
                 </tr>
               ))}
@@ -92,12 +116,7 @@ const TasksList: React.FC = () => {
         <TaskDetails task={selectedTask} onClose={handleBackToList} />
       )}
       {(view === 'edit' || view === 'add') && (
-        <TaskForm 
-          task={selectedTask} 
-          onSave={handleSaveTask} 
-          onCancel={handleBackToList} 
-          employeesList={employeesList}
-        />
+        <TaskForm task={selectedTask} onSave={handleSaveTask} onCancel={handleBackToList} employeesList={[]} />
       )}
     </div>
   );

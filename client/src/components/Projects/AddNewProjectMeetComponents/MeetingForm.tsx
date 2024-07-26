@@ -1,31 +1,97 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import styles from './MettingForm.module.css';
 
 interface MeetingFormProps {
-  meeting?: any;
+  meeting?: any; // Zastąp `any` bardziej szczegółowym typem, jeśli masz
+  projectId?: number; // Dodaj projekt_id
   onSave: (meeting: any) => void;
   onCancel: () => void;
 }
 
-const MeetingForm: React.FC<MeetingFormProps> = ({ meeting, onSave, onCancel }) => {
+const MeetingForm: React.FC<MeetingFormProps> = ({ meeting, projectId, onSave, onCancel }) => {
   const [formState, setFormState] = useState({
-    projectName: meeting?.projectName || '',
-    timeSpent: meeting?.timeSpent || '',
-    date: meeting?.date || '',
-    link: meeting?.link || '',
-    description: meeting?.description || ''
+    date: '',
+    timeSpent: '',
+    description: '',
+    outcomes: '',
+    link: ''
   });
+
+  useEffect(() => {
+    if (meeting) {
+      const date = new Date(meeting.date);
+      if (!isNaN(date.getTime())) {
+        const formattedDate = date.toISOString().slice(0, 19);
+        setFormState({
+          date: formattedDate,
+          timeSpent: meeting.time_spent || '',
+          description: meeting.meeting_description || '',
+          outcomes: meeting.meeting_outcomes || '',
+          link: meeting.meeting_link || ''
+        });
+      } else {
+        console.error('Invalid date value:', meeting.date);
+        setFormState({
+          date: '',
+          timeSpent: '',
+          description: '',
+          outcomes: '',
+          link: ''
+        });
+      }
+    } else {
+      setFormState({
+        date: '',
+        timeSpent: '',
+        description: '',
+        outcomes: '',
+        link: ''
+      });
+    }
+  }, [meeting]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormState((prevState) => ({
+    setFormState(prevState => ({
       ...prevState,
       [name]: value
     }));
   };
 
-  const handleSubmit = () => {
-    onSave({ ...formState, id: meeting?.id });
+  const handleSubmit = async () => {
+    try {
+      const formattedDate = new Date(formState.date).toISOString();
+      if (meeting) {
+        // Edytuj istniejące spotkanie
+        await axios.put(`http://localhost:3000/projects/meeting/${meeting.meeting_id}`, {
+          date: formattedDate,
+          time_spent: Number(formState.timeSpent),
+          meeting_description: formState.description,
+          meeting_outcomes: formState.outcomes,
+          meeting_link: formState.link
+        });
+        onSave({
+          ...meeting,
+          ...formState
+        });
+      } else if (projectId) {
+        // Dodaj nowe spotkanie
+        const response = await axios.post('http://localhost:3000/projects/meeting/new', {
+          date: formattedDate,
+          time_spent: Number(formState.timeSpent),
+          meeting_description: formState.description,
+          meeting_outcomes: formState.outcomes,
+          meeting_link: formState.link,
+          projectMeetings: { project_id: projectId }
+        });
+        onSave(response.data);
+      } else {
+        console.error('No project ID provided');
+      }
+    } catch (error) {
+      console.error('Error saving meeting:', error);
+    }
   };
 
   return (
@@ -33,24 +99,24 @@ const MeetingForm: React.FC<MeetingFormProps> = ({ meeting, onSave, onCancel }) 
       <h2>{meeting ? 'Edytuj Spotkanie' : 'Dodaj Spotkanie'}</h2>
       <div className={styles.meetingForm}>
         <label>
-          Nazwa spotkania:
-          <input type="text" name="projectName" value={formState.projectName} onChange={handleChange} />
+          Data:
+          <input type="datetime-local" name="date" value={formState.date} onChange={handleChange} />
         </label>
         <label>
           Czas spędzony:
-          <input type="text" name="timeSpent" value={formState.timeSpent} onChange={handleChange} />
-        </label>
-        <label>
-          Data:
-          <input type="date" name="date" value={formState.date} onChange={handleChange} />
-        </label>
-        <label>
-          Link do spotkania:
-          <input type="text" name="link" value={formState.link} onChange={handleChange} />
+          <input type="number" name="timeSpent" value={formState.timeSpent} onChange={handleChange} />
         </label>
         <label>
           Opis spotkania:
           <textarea name="description" value={formState.description} onChange={handleChange}></textarea>
+        </label>
+        <label>
+          Wyniki spotkania:
+          <textarea name="outcomes" value={formState.outcomes} onChange={handleChange}></textarea>
+        </label>
+        <label>
+          Link do spotkania:
+          <input type="text" name="link" value={formState.link} onChange={handleChange} />
         </label>
       </div>
       <div className={styles.formButtons}>

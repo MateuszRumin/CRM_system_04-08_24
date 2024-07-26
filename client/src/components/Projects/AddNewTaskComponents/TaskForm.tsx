@@ -1,30 +1,20 @@
-// TaskForm.tsx
 import React, { useState } from 'react';
 import styles from './TaskForm.module.css';
 
 interface TaskFormProps {
-  task?: Task;
-  onSave: (task: Task) => void;
+  task?: any;
+  onSave: (task: any) => void;
   onCancel: () => void;
   employeesList: string[];
 }
 
-interface Task {
-  id?: number;
-  taskName: string;
-  hours: string;
-  status: string;
-  date: string;
-  employees: string[];
-}
-
 const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, onCancel, employeesList }) => {
-  const [formState, setFormState] = useState<Task>({
-    taskName: task?.taskName || '',
-    hours: task?.hours || '',
+  const [formState, setFormState] = useState({
+    task_name: task?.task_name || '',
+    predicted_time: task?.predicted_time || '',
     status: task?.status || '',
-    date: task?.date || '',
-    employees: task?.employees || [],
+    deadline: task?.deadline || '',
+    assignedUsers: task?.assignedUsers || [],
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -38,18 +28,18 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, onCancel, employeesLi
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
     setFormState((prevState) => {
-      const newEmployees = checked 
-        ? [...prevState.employees, value]
-        : prevState.employees.filter(emp => emp !== value);
+      const newAssignedUsers = checked 
+        ? [...prevState.assignedUsers, value]
+        : prevState.assignedUsers.filter(emp => emp !== value);
       return {
         ...prevState,
-        employees: newEmployees,
+        assignedUsers: newAssignedUsers,
       };
     });
   };
 
   const handleSubmit = () => {
-    onSave({ ...formState, id: task?.id });
+    onSave(formState);
   };
 
   return (
@@ -58,15 +48,16 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, onCancel, employeesLi
       <div className={styles.taskForm}>
         <label>
           Nazwa zadania:
-          <input type="text" name="taskName" value={formState.taskName} onChange={handleChange} />
+          <input type="text" name="task_name" value={formState.task_name} onChange={handleChange} />
         </label>
         <label>
           Ilość godzin:
-          <input type="text" name="hours" value={formState.hours} onChange={handleChange} />
+          <input type="text" name="predicted_time" value={formState.predicted_time} onChange={handleChange} />
         </label>
         <label>
           Status:
           <select name="status" value={formState.status} onChange={handleChange}>
+            <option value="Nie zaczęty">Nie zaczęty</option>
             <option value="W trakcie">W trakcie</option>
             <option value="Zakończone">Zakończone</option>
             <option value="Opóźnione">Opóźnione</option>
@@ -74,7 +65,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, onCancel, employeesLi
         </label>
         <label>
           Termin wykonania:
-          <input type="date" name="date" value={formState.date} onChange={handleChange} />
+          <input type="date" name="deadline" value={formState.deadline} onChange={handleChange} />
         </label>
         <label>
           Pracownicy:
@@ -84,7 +75,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, onCancel, employeesLi
                 <input 
                   type="checkbox" 
                   value={emp} 
-                  checked={formState.employees.includes(emp)} 
+                  checked={formState.assignedUsers.includes(emp)} 
                   onChange={handleCheckboxChange} 
                 />
                 {emp}
@@ -92,10 +83,10 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, onCancel, employeesLi
             ))}
           </div>
         </label>
-      </div>
-      <div className={styles.formButtons}>
-        <button className={styles.submitButton} onClick={handleSubmit}>Zapisz</button>
-        <button className={styles.cancelButton} onClick={onCancel}>Anuluj</button>
+        <div className={styles.buttons}>
+          <button onClick={handleSubmit}>{task ? 'Zapisz' : 'Dodaj'}</button>
+          <button onClick={onCancel}>Anuluj</button>
+        </div>
       </div>
     </div>
   );
