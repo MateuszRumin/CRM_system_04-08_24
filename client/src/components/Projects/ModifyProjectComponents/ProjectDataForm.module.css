@@ -7,6 +7,7 @@
   border: 1px solid #E0E0E0;
   width: 100%;
   box-sizing: border-box;
+  background-color: #fff; /* Dodany biały kolor tła */
 }
 
 .form {
@@ -56,4 +57,23 @@
 .error {
   color: red;
   font-size: 0.875em;
+}
+
+/* Dodane style dla checkboxów */
+.checkboxContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }

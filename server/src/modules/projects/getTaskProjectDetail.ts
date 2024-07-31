@@ -9,7 +9,9 @@ export const getTaskProjectDetails = async (req: Request, res: Response) => {
     try {
         const taskDetails = await prisma.tasks.findUnique({
             where: { task_id: parseInt(task_id, 10) },
-            include: {
+            select: {
+                task_id: true,
+                predicted_time: true,
                 Status: true,
                 ProjectTask: {
                     include: {
@@ -46,32 +48,21 @@ export const getTaskProjectDetails = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Task not found' });
         }
 
-        // Eliminowanie duplikatów w odpowiedzi
-        const projectTaskMap = new Map();
-        taskDetails.ProjectTask.forEach((projectTask) => {
-            const projectId = projectTask.project_id;
-            if (!projectTaskMap.has(projectId)) {
-                projectTaskMap.set(projectId, {
-                    project_id: projectTask.Project.project_id,
-                    name: projectTask.Project.name,
-                    client_id: projectTask.Project.client_id,
-                    status_id: projectTask.Project.status_id,
-                    description: projectTask.Project.description,
-                    created_at: projectTask.Project.created_at,
-                    updated_at: projectTask.Project.updated_at,
-                    Status: projectTask.Project.Status,
-                    TaskAssignment: []
-                });
-            }
-
-            projectTask.TaskAssignment.forEach((taskAssignment) => {
-                projectTaskMap.get(projectId).TaskAssignment.push(taskAssignment);
-            });
-        });
-
+        // Tworzenie uproszczonej odpowiedzi bez eliminowania duplikatów
         const response = {
-            ...taskDetails,
-            ProjectTask: Array.from(projectTaskMap.values())
+            task_id: taskDetails.task_id,
+            predicted_time: taskDetails.predicted_time,
+            Status: taskDetails.Status,
+            ProjectTask: taskDetails.ProjectTask.map((projectTask) => ({
+                project_id: projectTask.Project.project_id,
+                name: projectTask.Project.name,
+                Status: projectTask.Project.Status,
+                TaskAssignment: projectTask.TaskAssignment.map((taskAssignment) => ({
+                    user_id: taskAssignment.User.user_id,
+                    username: taskAssignment.User.username,
+                    // position: taskAssignment.User.UserData.Position.name
+                }))
+            }))
         };
 
         res.status(200).json(response);

@@ -39,3 +39,47 @@
   font-size: 14px;
   margin-top: 5px;
 }
+
+/* Style for employee selection */
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  max-height: 150px; /* Set a maximum height for scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
+  background-color: #fff;
+  margin-top: 5px; /* Add some space above */
+}
+
+.checkboxGroup label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.checkboxGroup input[type="checkbox"] {
+  margin-right: 10px;
+  accent-color: #007bff; /* Change the color of the checkbox */
+  transform: scale(1.2); /* Make the checkbox larger */
+}
+
+/* Style for description textarea */
+.textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  min-height: 150px; /* Adjust height for better readability */
+  resize: vertical; /* Allow vertical resizing only */
+}
+
+.textarea:focus {
+  border-color: #007bff;
+  outline: none;
+}

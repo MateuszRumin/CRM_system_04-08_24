@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import styles from './ProjectDataForm.module.css';
 import { useProjectData } from '../../../contexts/ProjectDataContext';
@@ -6,16 +6,22 @@ import { useProjectData } from '../../../contexts/ProjectDataContext';
 interface ProjectDataFormProps {
   onSubmit: (data: any) => void;
   formId: string;
+  employees: any[];
+  statuses: any[];
+  clients: any[];
 }
 
 interface FormValues {
   name: string;
   endDate: string;
   client: string;
+  status: string;
+  cost: number;
+  description: string;
   employees: string[];
 }
 
-export function ProjectDataForm({ onSubmit, formId }: ProjectDataFormProps) {
+export function ProjectDataForm({ onSubmit, formId, employees, statuses, clients }: ProjectDataFormProps) {
   const { setProjectData, setValid } = useProjectData();
 
   const {
@@ -63,12 +69,12 @@ export function ProjectDataForm({ onSubmit, formId }: ProjectDataFormProps) {
         </div>
         <div className={styles.row}>
           <label className={styles.label}>
-            Przewidywana data końcowa
+            Data zakończenia
             <input
               className={styles.input}
               type="date"
               {...register('endDate', {
-                required: 'Przewidywana data końcowa jest wymagana.',
+                required: 'Data zakończenia jest wymagana.',
               })}
             />
             {errors.endDate && <span className={styles.error}>{errors.endDate.message}</span>}
@@ -84,9 +90,13 @@ export function ProjectDataForm({ onSubmit, formId }: ProjectDataFormProps) {
               render={({ field }) => (
                 <select className={styles.select} {...field}>
                   <option value="">Wybierz klienta</option>
-                  <option value="1">Klient A</option>
-                  <option value="2">Klient B</option>
-                  <option value="3">Klient C</option>
+                  {clients.map((client) => (
+                    <option key={client.client_id} value={client.client_id}>
+                      {client.company_name
+                        ? `${client.first_name} ${client.second_name} - ${client.company_name}`
+                        : `${client.first_name} ${client.second_name}`}
+                    </option>
+                  ))}
                 </select>
               )}
             />
@@ -95,18 +105,63 @@ export function ProjectDataForm({ onSubmit, formId }: ProjectDataFormProps) {
         </div>
         <div className={styles.row}>
           <label className={styles.label}>
+            Status projektu
+            <Controller
+              name="status"
+              control={control}
+              rules={{ required: 'Status projektu jest wymagany.' }}
+              render={({ field }) => (
+                <select className={styles.select} {...field}>
+                  <option value="">Wybierz status</option>
+                  {statuses.map((status) => (
+                    <option key={status.status_id} value={status.status_id}>
+                      {status.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            />
+            {errors.status && <span className={styles.error}>{errors.status.message}</span>}
+          </label>
+        </div>
+        <div className={styles.row}>
+          <label className={styles.label}>
+            Koszt
+            <input
+              className={styles.input}
+              type="number"
+              step="0.01"
+              {...register('cost', {
+                required: 'Koszt jest wymagany.',
+                min: { value: 0, message: 'Koszt musi być większy lub równy 0.' },
+              })}
+            />
+            {errors.cost && <span className={styles.error}>{errors.cost.message}</span>}
+          </label>
+        </div>
+        <div className={styles.row}>
+          <label className={styles.label}>
+            Opis projektu
+            <textarea
+              className={styles.textarea}
+              {...register('description')}
+            />
+          </label>
+        </div>
+        <div className={styles.row}>
+          <label className={styles.label}>
             Przypisani pracownicy
             <div className={styles.checkboxGroup}>
-              {['1', '2', '3'].map(value => (
-                <label key={value}>
+              {employees.map((employee) => (
+                <label key={employee.user_id}>
                   <input
                     type="checkbox"
-                    value={value}
+                    value={employee.user_id}
                     {...register('employees', {
                       validate: (value: string[]) => value.length > 0 || 'Przypisani pracownicy są wymagani.'
                     })}
                   />
-                  Pracownik {value}
+                  {employee.first_name} {employee.second_name}
                 </label>
               ))}
             </div>

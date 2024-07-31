@@ -1,4 +1,4 @@
-.documents {
+.documentationList {
   width: 100%;
   overflow-x: auto;
 }
@@ -19,7 +19,7 @@
   font-weight: bold;
 }
 
-.addButton {
+.addDocumentationButton {
   display: flex;
   height: 40px;
   padding: 16px;
@@ -32,7 +32,7 @@
   text-decoration: none;
 }
 
-.addButton:hover {
+.addDocumentationButton:hover {
   background-color: gray;
   cursor: pointer;
 }
@@ -44,8 +44,37 @@
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
+  margin-right: 5px;
 }
 
 .detailsButton:hover {
   background-color: gray;
 }
+
+.deleteButton {
+  background-color: #24304f;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.deleteButton:hover {
+  background-color: gray;
+}
+
+
+.addButton {
+  display: flex;
+  height: 40px;
+  padding: 16px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid #24304F;
+  background: #24304F;
+  color: white;
+  text-decoration: none;
+  margin-top: 10px;
+} 

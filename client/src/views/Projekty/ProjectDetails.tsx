@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
 import Drawer from '@mui/material/Drawer';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 import styles from './ProjectDetails.module.css';
 import { RepositoryModal } from '../../components/Projects/ProjectModalComponents/RepositoryModal';
 import { FigmaModal } from '../../components/Projects/ProjectModalComponents/FigmaModal';
+import { AssignedEmployeesModal } from '../../components/Projects/ProjectModalComponents/AssignedEmployeesModal'; // Importuj nowy komponent
 import MeetingsList from '../../components/Projects/ProjectDetailsComponents/MettingsList';
 import TasksList from '../../components/Projects/ProjectDetailsComponents/TaskList';
 import InvoicesList from '../../components/Projects/ProjectDetailsComponents/InvoicesList';
@@ -25,7 +26,7 @@ interface Project {
       email: string;
     }[];
     ClientPhone: {
-      phone: number;
+      tel_number: number;
     }[];
   };
   Status: {
@@ -34,11 +35,12 @@ interface Project {
   endDate: string;
   ProjectTask: any[];
   ProjectMeeting: any[];
+  ProjectDoc: any[];
 }
 
 export const ProjectDetails: React.FC = () => {
   const location = useLocation();
-  const projectId = location.state?.project?.project_id; // Use project_id from location state
+  const projectId = location.state?.project?.project_id;
 
   const [project, setProject] = useState<Project | null>(null);
   const [meetingsDrawerVisible, setMeetingsDrawerVisible] = useState(false);
@@ -93,17 +95,18 @@ export const ProjectDetails: React.FC = () => {
           <p>Imię i nazwisko: {project.Client.first_name} {project.Client.second_name}</p>
           <p>Adres: {project.Client.address}</p>
           <p>Adres e-mail: {project.Client.ClientEmail.map(email => email.email).join(', ')}</p>
-          <p>Numer telefonu: {project.Client.ClientPhone.map(phone => phone.phone).join(', ')}</p>
+          <p>Numer telefonu: {project.Client.ClientPhone.map(tel_number => tel_number.tel_number).join(', ')}</p>
         </div>
       </div>
       <div className={styles.projectLinks}>
         <RepositoryModal projectId={project.project_id} />
         <FigmaModal projectId={project.project_id} />
+        <AssignedEmployeesModal projectId={project.project_id} /> 
       </div>
       <div className={styles.additionalInfo}>
         <div className={styles.invoicesDocumentationContracts}>
           <InvoicesList />
-          <DocumentationList />
+          <DocumentationList projectId={project.project_id} />
           <ContractsList />
         </div>
       </div>

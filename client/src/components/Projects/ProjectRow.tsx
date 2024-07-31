@@ -47,9 +47,21 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({ project, onDelete }) => 
     setIsModalOpen(true);
   };
 
-  const confirmDelete = () => {
-    onDelete(project.project_id);
-    setIsModalOpen(false);
+  const confirmDelete = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/projects/${project.project_id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        onDelete(project.project_id);
+        setIsModalOpen(false);
+      } else {
+        console.error('Error deleting project');
+      }
+    } catch (error) {
+      console.error('Error deleting project', error);
+    }
   };
 
   const handleDetails = () => {
@@ -99,3 +111,5 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({ project, onDelete }) => 
     </>
   );
 };
+
+export default ProjectRow;

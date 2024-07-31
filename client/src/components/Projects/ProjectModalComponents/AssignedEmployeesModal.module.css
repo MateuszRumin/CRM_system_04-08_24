@@ -1,0 +1,26 @@
+.container {
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.employeeList {
+  list-style: none;
+  padding: 0;
+}
+
+.employeeItem {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.employeeItem p {
+  margin: 5px 0;
+}
