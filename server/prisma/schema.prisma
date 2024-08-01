@@ -209,8 +209,9 @@ model TaskTimes {
     user_id         Int
     task_id         Int
     time_spent      Float
+    day             DateTime
     added_at        DateTime  @default(now())
-    comments        String
+    comments        String    @default("brak")
 
     Task Tasks @relation(fields: [task_id],references: [task_id])
     User Users  @relation(fields: [user_id],references: [user_id])

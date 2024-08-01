@@ -24,6 +24,7 @@ export const getProjectDetailsById = async (req: Request, res: Response) => {
             select: {
                 project_id: true,
                 name: true,
+                description:true,
                 ProjectLink: {
                     select: {
                         link_id:true,
@@ -63,6 +64,7 @@ export const getProjectDetailsById = async (req: Request, res: Response) => {
                 ProjectDetail: {
                     select: {
                         deadline: true,
+                        cost:true,
                         // repo_link: true,
                         // figma_link: true
                     }
