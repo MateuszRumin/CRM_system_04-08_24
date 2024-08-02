@@ -267,7 +267,7 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
                 </button>
               </div>
             ))}
-            <button className={styles.button} type="button" onClick={handleAddEmail}>
+            <button className={styles.addEmailButton} type="button" onClick={handleAddEmail}>
               Dodaj email
             </button>
           </label>
@@ -290,7 +290,7 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
                 </button>
               </div>
             ))}
-            <button className={styles.button} type="button" onClick={handleAddPhone}>
+            <button className={styles.addPhoneButton} type="button" onClick={handleAddPhone}>
               Dodaj telefon
             </button>
           </label>

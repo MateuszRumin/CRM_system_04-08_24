@@ -83,14 +83,18 @@ h2 {
 }
 
 .addButton {
-  padding: 10px 20px;
-  margin-left: 5px;
-  margin-top: 5px;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  display: flex;
+  height: 40px;
+  padding: 16px;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 8px;
+  border: 1px solid #24304F;
+
+  background: #24304F;
+
+  color:white;
 }
 
 .button_container{

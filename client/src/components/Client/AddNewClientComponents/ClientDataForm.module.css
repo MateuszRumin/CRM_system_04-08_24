@@ -54,23 +54,34 @@
 
 
 .addEmailButton {
-  padding: 10px 20px;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  align-self: flex-end;
+  display: flex;
+  height: 40px;
+  padding: 16px;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 8px;
+  border: 1px solid #24304F;
+
+  background: #24304F;
+
+  color:white;
 }
 
+
 .addPhoneButton {
-  padding: 10px 20px;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  align-self: flex-end;
+  display: flex;
+  height: 40px;
+  padding: 16px;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 8px;
+  border: 1px solid #24304F;
+
+  background: #24304F;
+
+  color:white;
 }
 
 .button {
