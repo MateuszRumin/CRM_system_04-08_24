@@ -19,6 +19,16 @@ router.get('/settings', getAllSettings);
 router.put('/settings/update', updateAllSettings);
 router.put('/settings/add', updateAllSettings);
 
+const { initInvoiceSite } = require('../modules/invoices/initInvoiceTab');
+router.get("/init",initInvoiceSite)
+
+const { addInvocie } = require('../modules/invoices/addInvoice')
+router.post("/newInvoice",addInvocie) 
+
+//update
+router.post("/updateInvoice",addInvocie) 
+
+
 
 router.use('/', (req,res,next) =>{
     const logger = req.app.get('logger')

@@ -20,6 +20,8 @@ import { deleteLink } from '../modules/projects/deleteLink'
 import { addProjectDoc } from '../modules/projects/addProjectDocs'
 import { deleteProjectDoc } from '../modules/projects/deleteProjectDocs'
 import { getTaskProjectDetails } from '../modules/projects/getTaskProjectDetail'
+import { addWorkTimeTask } from '../modules/projects/addWorkTimeTask'
+import { getUserTimeSpentOnDay, getUserTimeSpentInMonth, getTotalTimeProjectInMonth, getTotalTimeProjectInDay,  } from '../modules/projects/getWorkTimesTask'
 
 const router = Router();
 
@@ -55,5 +57,16 @@ router.post('/doc', addProjectDoc);//
 
 router.delete('/link/:link_id', deleteLink);//
 router.delete('/doc/:doc_id', deleteProjectDoc);//
+
+//czasy pracy
+router.post('/task/:task_id/addTime', addWorkTimeTask);
+// router.get('/task/:task_id/getDay', getTimeSpentOnTaskInDay);
+// router.get('/task/:task_id/getMonth', getTimeSpentOnTaskInMonth);
+
+router.get('/users/getDay', getUserTimeSpentOnDay);//
+router.get('/users/getMonth', getUserTimeSpentInMonth);//
+
+router.get('/:project_id/getDay', getTotalTimeProjectInDay);//
+router.get('/:project_id/fullTime', getTotalTimeProjectInMonth);//
 
 module.exports = router

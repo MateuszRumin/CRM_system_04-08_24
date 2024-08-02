@@ -7,6 +7,7 @@ export const getTaskProjectDetails = async (req: Request, res: Response) => {
     const { task_id } = req.params;
 
     try {
+        // Pobieranie szczegółów zadania z powiązanymi danymi
         const taskDetails = await prisma.tasks.findUnique({
             where: { task_id: parseInt(task_id, 10) },
             select: {
@@ -48,24 +49,8 @@ export const getTaskProjectDetails = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Task not found' });
         }
 
-        // Tworzenie uproszczonej odpowiedzi bez eliminowania duplikatów
-        const response = {
-            task_id: taskDetails.task_id,
-            predicted_time: taskDetails.predicted_time,
-            Status: taskDetails.Status,
-            ProjectTask: taskDetails.ProjectTask.map((projectTask) => ({
-                project_id: projectTask.Project.project_id,
-                name: projectTask.Project.name,
-                Status: projectTask.Project.Status,
-                TaskAssignment: projectTask.TaskAssignment.map((taskAssignment) => ({
-                    user_id: taskAssignment.User.user_id,
-                    username: taskAssignment.User.username,
-                    // position: taskAssignment.User.UserData.Position.name
-                }))
-            }))
-        };
-
-        res.status(200).json(response);
+        // Zwracanie pełnych szczegółów zadania, w tym powiązanych danych
+        res.status(200).json(taskDetails);
     } catch (error) {
         console.error('Error retrieving task details:', error);
         res.status(500).json({ error: 'Internal Server Error' });

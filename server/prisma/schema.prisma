@@ -88,10 +88,6 @@ model Permissions {
   Role Roles @relation(fields: [role_id],references: [role_id])
 }
 
-enum clientTypeValues {
-  Prywatny
-  Firma
-}
 
 model Clients {
   client_id Int @id @default(autoincrement())
@@ -101,9 +97,9 @@ model Clients {
   registration_date DateTime @default(now())
   first_name String
   second_name String
-  regon String @default("brak") 
-  nip String @default("brak") 
-  krs String @default("brak") 
+  regon String @default("brak") @unique
+  nip String @default("brak") @unique
+  krs String @default("brak") @unique
   company_name String @default("brak")
   address String
   
@@ -116,6 +112,11 @@ model Clients {
   ClientEmail ClientEmails[]
   ClientPhone ClientPhones[]
   ClientMeeting ClientMeetings[]
+}
+
+enum clientTypeValues {
+  Prywatny @map("Prywatny")
+  Firma @map("Firma")
 }
 
 model ClientEmails {
@@ -209,8 +210,9 @@ model TaskTimes {
     user_id         Int
     task_id         Int
     time_spent      Float
+    day             DateTime
     added_at        DateTime  @default(now())
-    comments        String
+    comments        String    @default("brak")
 
     Task Tasks @relation(fields: [task_id],references: [task_id])
     User Users  @relation(fields: [user_id],references: [user_id])
@@ -227,23 +229,24 @@ model TaskAssignments {
 
 model Invoices {
   invoice_id Int  @id @default(autoincrement())
-  year Int
-  month Int
-  invoice_number String        @unique 
+  block Boolean @default(false)
+  year Int?
+  month Int?
+  invoice_number String?        
   status_id Int
   invoice_type_id Int
   client_id Int
-  issue_date     DateTime
-  due_date       DateTime
-  prize_netto Float
-  prize_brutto Float
-  tax_ammount Float
-  comments String
+  issue_date     DateTime?
+  due_date       DateTime?
+  prize_netto Float?
+  prize_brutto Float?
+  tax_ammount Float?
+  comments String?
 
-  Status     Statuses     @relation(fields: [status_id], references: [status_id])
   InvoiceType InvoiceTypes @relation(fields: [invoice_type_id], references: [invoice_type_id])
   Client     Clients      @relation(fields: [client_id], references: [client_id])
   InvoiceProduct InvoiceProducts[]
+  Status Statuses @relation(fields: [status_id],references: [status_id])
 }
 
 model InvoiceProducts {
@@ -261,24 +264,40 @@ model InvoiceProducts {
 }
 
 model InvoiceTypes {
-  invoice_type_id Int       @id @default(autoincrement())
-  invoice_type              String
-  numbering_format          numberingFormats  @default(FV_rok_miesiac_numer)    
-  enabled                   Boolean
-  current_number_sequence   Int
-  template                  String
+  invoice_type_id Int     @id @default(autoincrement())
+  invoice_type    invoiceTypeNames @unique
+  marker_id Int 
+  enabled Boolean
+  
+  
 
-
+  Marker Markers @relation(fields: [marker_id],references: [marker_id])
   Invoice Invoices[]
 }
 
-enum numberingFormats {
-  FV_rok_miesiac_numer @map("FV/{rok}/{miesiac}/{numer}")
-  FZ_rok_miesiac_numer @map("FZ/{rok}/{miesiac}/{numer}")
-  FK_rok_miesiac_numer @map("FK/{rok}/{miesiac}/{numer}")
-  PF_rok_miesiac_numer @map("PF/{rok}/{miesiac}/{numer}")
-  FO_rok_miesiac_numer @map("FO/{rok}/{miesiac}/{numer}")
+enum invoiceTypeNames {
+  Zaliczkowa 
+  Koncowa
+  Okresowa 
+  Vat 
 }
+
+model Markers {
+  marker_id Int     @id @default(autoincrement())
+  marker_name MarkerNames @unique
+  current_month_sequence Int
+  current_year_sequence Int
+  current_number_sequence   Int
+
+  InvoiceType InvoiceTypes[]
+}
+
+enum MarkerNames {
+  FV @map("FV")
+  FZ @map("FZ")
+}
+
+
 
 model CompanySettings {
   company_id Int @id @default(1)
@@ -317,7 +336,7 @@ model InvoiceSettings {
 }
 
 model InvoicePaymentSettings {
-  payment_setting_id Int     @id @default(autoincrement())
+  payment_setting_id Int     @id @default(1)
   advancement_rate   Int
   tax_rate           Int
   tax_type           String @default("brak")
