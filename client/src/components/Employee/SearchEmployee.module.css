@@ -1,0 +1,29 @@
+.search-employee {
+  border: 1px solid #ccc; 
+  border-radius: 4px;
+  padding: 10px; 
+  display: flex;
+  align-items: center;
+
+
+  width: 280px; 
+  height: 40px; 
+}
+
+.search-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.searchInput {
+  border: none;
+  padding-left: 12px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  width: 214px;
+  height: 24px;
+  
+}
+
+

@@ -40,7 +40,7 @@ export const getAllInvoices = async (req: Request, res: Response, next: NextFunc
       invoice_type: invoice.InvoiceType.invoice_type,
       issue_date: invoice.issue_date,
       due_date: invoice.due_date,
-      prize_brutto: invoice.tax_ammount + invoice.tax_ammount,
+      prize_brutto: invoice.tax_ammount,
       status: invoice.Status.name,
       //note: invoice.note
     }));

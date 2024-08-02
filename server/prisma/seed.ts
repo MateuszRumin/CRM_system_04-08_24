@@ -3,155 +3,150 @@ const prisma = new PrismaClient()
 async function main() {
 
   // Pobranie bieżącej daty
+  // Pobranie bieżącej daty
   const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1; // Miesiące w JavaScript są indeksowane od 0
+  const currentDay = currentDate.getDate();
   
-  //username: admin
-  //password: admin
+  const users = [
+    {
+      username:"Administrator",
+      email:"Administrator@gmail.com",
+      password:"administrator"
+    },
+    {
+      username:"Administrator2",
+      email:"Administrator2@gmail.com",
+      password:"administrator"
+    },
+    {
+      username:"Administrator3",
+      email:"Administrator3@gmail.com",
+      password:"administrator"
+    },
+    {
+      username:"Administrator4",
+      email:"Administrator4@gmail.com",
+      password:"administrator"
+    }      
+]
 
-  let admin = await prisma.users.create({
-    data:{
-        username:"admin",
-        email:"admin@weblance.com",
-        password:"$2a$10$0lZqJhfN7AtDbHK6VCxnU.8jmHWN6LQuVsqtV5Dp4KFhSs3gliKJm"
-    }  
+
+for (let userData  of users){
+  
+  await prisma.users.upsert({
+    where:{username:userData.username},
+    update:{},
+    create:userData
+    
   })
-  admin = await prisma.users.create({
-    data:{
-        username:"admin2",
-        email:"admin22@weblance.com",
-        password:"$2a$10$0lZqJhfN7AtDbHK6VCxnU.8jmHWN6LQuVsqtV5Dp4KFhSs3gliKJm"
-    }  
-  })  
-  let userRole = await prisma.userRoles.create({
-    data:{
-        user_id:1,
-        role_id:1,
-    }  
-  })
-  userRole = await prisma.userRoles.create({
-    data:{
-        user_id:2,
-        role_id:1,
-    }  
-  })
-  let Status = await prisma.statuses.create({
-    data:{
+  
+  const statusesClient = [
+    {name:'Niepodjety'},
+    {name:'W trakcie'},    
+    {name:'Zdobyty'},
+    {name:'Stracony'}     
+  ]
+  
+  for (let statusClient  of statusesClient){
+    
+    const existCheck = await prisma.statuses.findFirst({
+      where:{
         status_type:'Klient',
-        default:false,
-        name:'Nie podjety'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Klient',
-        default:false,
-        name:'W trakcie'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Klient',
-        default:false,
-        name:'Zdobyty'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Klient',
-        default:false,
-        name:'Stracony'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
+        default:true,
+        name:statusClient.name
+      }
+    })
+  
+  if (!existCheck){
+      await prisma.statuses.create({
+        data:{
+          status_type:'Klient',
+          default:true,
+          name:statusClient.name
+        }
+      })
+    }
+  
+  }
+  
+  
+  const statuseZadania =[
+    {name:'Nie zaczety'},
+    {name:'W trakcie'},
+    {name:'Zrobiony'},
+    {name:'Porażka'}        
+  ]
+  
+  
+  for (let statusZadanie  of statuseZadania){
+    
+    const existCheck = await prisma.statuses.findFirst({
+      where:{
         status_type:'Zadanie',
         default:true,
-        name:'Zaplanowane'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Zadanie',
-        default:false,
-        name:'W trakcie'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Zadanie',
-        default:false,
-        name:'Zrobiony'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Zadanie',
-        default:false,
-        name:'Porazka'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
+        name:statusZadanie.name
+      }
+    })
+  
+  if (!existCheck){
+      await prisma.statuses.create({
+        data:{
+          status_type:'Zadanie',
+          default:true,
+          name:statusZadanie.name
+        }
+      })
+    }
+  
+  }  
+  
+  const statusesInvoice = [
+    {name:'Nie wystawiona'},
+    {name:'Nie oplacona'},
+    {name:'Oplacona'},
+    {name:'Oczekuje na platnosc'},
+    {name:'Wystawiona'},
+    {name:'Zaksiegowana'}            
+  ]
+  
+  for (let statusInvoice  of statusesInvoice){
+    
+    const existCheck = await prisma.statuses.findFirst({
+      where:{
         status_type:'Faktura',
         default:true,
-        name:'Nie oplacona'
-    }  
+        name:statusInvoice.name
+      }
+    })
+  
+  if (!existCheck){
+      await prisma.statuses.create({
+        data:{
+          status_type:'Faktura',
+          default:true,
+          name:statusInvoice.name
+        }
+      })
+    }
+  
+  }
+  
+  const statusForClientNiepodjent = await prisma.statuses.findFirst({
+    where:{
+      status_type:'Klient',
+      default:true,
+      name:"Niepodjęty"
+    }
   })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Faktura',
-        default:false,
-        name:'Oplacona'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Faktura',
-        default:false,
-        name:'Oczekuje na platnosc'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Faktura',
-        default:false,
-        name:'Wystawiona'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Faktura',
-        default:false,
-        name:'Zapisana'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Projekt',
-        default:true,
-        name:'Nie rozpoczety'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Projekt',
-        default:false,
-        name:'W trakcie realizacji'
-    }  
-  })
-  Status = await prisma.statuses.create({
-    data:{
-        status_type:'Projekt',
-        default:false,
-        name:'Zakonczony'
-    }  
-  })
-  // Create Clients
-  let client = await prisma.clients.create({
-    data: {
-      status_id: 1,
-      user_id: 1,
-      client_type: 'Prywatny',
+  
+  
+  const clientCompanyDatas = [
+    {   
+      status_id: statusForClientNiepodjent? statusForClientNiepodjent.status_id : 1,
+      user_id:1,
+     
       first_name: 'John',
       second_name: 'Doe',
       regon: '123456789',
@@ -159,8 +154,89 @@ async function main() {
       krs: '1111111111',
       company_name: 'Doe Inc.',
       address: '456 Elm St',
-    },
-  });
+    }
+  ]
+  
+  for (let clientData  of clientCompanyDatas){
+              
+        const existCheck = await prisma.clients.findUnique({
+          where:{
+            nip:clientData.nip
+          }
+        })
+  
+        if(!existCheck){
+  
+          await prisma.clients.create({
+            data:{
+              ...clientData,
+              client_type:"Firma", 
+            }        
+           })
+        }        
+  }
+  
+  //znaczniki do faktór
+await prisma.markers.upsert({
+  where:{ marker_name:"FV"},
+  update:{},
+  create:{
+    marker_name:`FV`,
+    current_month_sequence:currentMonth, 
+    current_year_sequence:currentYear, 
+    current_number_sequence:1,
+  }
+})
+
+await prisma.markers.upsert({
+  where:{ marker_name:"FZ"},
+  update:{},
+  create:{
+    marker_name:`FZ`,
+    current_month_sequence:currentMonth, 
+    current_year_sequence:currentYear, 
+    current_number_sequence:1,
+  }
+})
+
+//typy faktur
+await prisma.invoiceTypes.upsert({
+where:{invoice_type:"Zaliczkowa"},
+update:{},
+create:{
+  invoice_type:"Zaliczkowa",
+  enabled:true,
+  Marker:{ connect:{marker_name:"FZ"}}
+}
+})
+await prisma.invoiceTypes.upsert({
+where:{invoice_type:"Vat"},
+update:{},
+create:{
+  invoice_type:"Vat",
+  enabled:true,
+  Marker:{ connect:{marker_name:"FV"}}
+}
+})
+await prisma.invoiceTypes.upsert({
+where:{invoice_type:"Okresowa"},
+update:{},
+create:{
+  invoice_type:"Okresowa",
+  enabled:true,
+  Marker:{ connect:{marker_name:"FV"}}
+}
+})
+await prisma.invoiceTypes.upsert({
+where:{invoice_type:"Koncowa"},
+update:{},
+create:{
+  invoice_type:"Koncowa",
+  enabled:true,
+  Marker:{ connect:{marker_name:"FV"}}
+}
+})
+
   let position = await prisma.companyPositions.create({
     data: {
       name: 'Programista',
@@ -241,6 +317,7 @@ async function main() {
   });
 }
 
+}
 main()
   .then(async () => {
     await prisma.$disconnect()
