@@ -1,32 +1,78 @@
-import { Outlet } from 'react-router-dom'
-import { Sidebar } from '../Sidebar/Sidebar'
-import { Topbar } from '../Topbar/Topbar'
-import { MainContent } from '../MainContent/MainContent'
-import { useEffect } from 'react'
-import { jwtDecode } from 'jwt-decode'
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
+import { MainContent } from '../MainContent/MainContent';
+import { Sidebar } from '../Sidebar/Sidebar';
+import { Topbar } from '../Topbar/Topbar';
+import { Outlet } from 'react-router-dom';
+import { useUser } from '../../contexts/UserContext';
+import axios from 'axios';
+
+interface DecodedToken {
+  userId: number;
+  role: string;
+}
+
+const verifyUserRole = async (userId: number, role: string) => {
+  try {
+    const response = await axios.get(`http://localhost:3000/employees/${userId}`);
+    const userRole = response.data.UserRole[0].Role.name;
+    return userRole === role;
+  } catch (error) {
+    console.error('Error verifying user role:', error);
+    return false;
+  }
+};
 
 export const Layout = () => {
-	// const [token, setToken] = useState(localStorage.getItem('token') || '')
+  const navigate = useNavigate();
+  const { setUser } = useUser();
+  const [isLoading, setIsLoading] = useState(true);
 
-	useEffect(() => {
-		const token = localStorage.getItem('token')
-		if (token) {
-			localStorage.setItem('token', token)
-			const decodedToken = jwtDecode(token)
-			const role = decodedToken.role
-			const userId = decodedToken.userId
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode<DecodedToken>(token);
+        const { userId, role } = decodedToken;
 
-			localStorage.setItem('USER', JSON.stringify({ role, userId }))
-		}
-	}, [])
+        const verifyAndSetUser = async () => {
+          const isValidRole = await verifyUserRole(userId, role);
+          if (!isValidRole) {
+            navigate('/login');
+            return;
+          }
 
-	return (
-		<>
-			<Sidebar />
-			<MainContent>
-				<Topbar />
-				<Outlet />
-			</MainContent>
-		</>
-	)
-}
+          setUser({ role });
+          localStorage.setItem('USER', JSON.stringify({ role, userId }));
+          setIsLoading(false);
+        };
+
+        verifyAndSetUser();
+      } catch (error) {
+        console.error('Invalid token:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('USER');
+        setIsLoading(false);
+        navigate('/login');
+      }
+    } else {
+      setIsLoading(false);
+      navigate('/login');
+    }
+  }, [navigate, setUser]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <>
+      <Sidebar />
+      <MainContent>
+        <Topbar />
+        <Outlet />
+      </MainContent>
+    </>
+  );
+};

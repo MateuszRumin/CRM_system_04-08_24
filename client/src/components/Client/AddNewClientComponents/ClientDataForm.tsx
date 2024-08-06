@@ -34,8 +34,43 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
     setValid(isValid);
   }, [isValid, setValid]);
 
-  const handleFetchData = () => {
-    console.log('Pobieranie danych z REGON:', watch('nip'));
+  const fetchDataFromAPI = async (nip: string) => {
+    try {
+      const response = await fetch('http://localhost:3000/client/fetch-regon-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nip }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return null;
+    }
+  };
+
+  const handleFetchData = async () => {
+    const nip = watch('nip');
+    if (!nip) {
+      console.error('NIP is required');
+      return;
+    }
+
+    const data = await fetchDataFromAPI(nip);
+
+    if (data) {
+      setValue('regon', data.regon);
+      setValue('krs', data.krs);
+      setValue('companyName', data.name);
+      setValue('companyAddress', data.address);
+    }
   };
 
   const handleAddEmail = () => {
@@ -66,7 +101,6 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
 
   const handleCompanyTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setShowPrivateAddress(event.target.value === 'Prywatny');
-    // Ustawiamy wartość pola companyType ręcznie
     setValue('companyType', event.target.value);
   };
 

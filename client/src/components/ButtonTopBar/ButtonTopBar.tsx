@@ -6,12 +6,16 @@ interface ButtonTopBarProps {
   src: string;
   alt: string;
   path: string;
+  onClick?: () => void; // Dodaj tę linię
 }
 
-export const ButtonTopBar: React.FC<ButtonTopBarProps> = ({ src, alt, path }) => {
+export const ButtonTopBar: React.FC<ButtonTopBarProps> = ({ src, alt, path, onClick }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
+    if (onClick) {
+      onClick(); // Wywołaj funkcję onClick, jeśli została przekazana
+    }
     navigate(path);
   };
 

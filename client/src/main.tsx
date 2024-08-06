@@ -2,10 +2,10 @@ import './styles/theme.css';
 import './styles/globals.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { DataProvider } from './contexts/DataContext.tsx'
-import { ProjectDataProvider  } from './contexts/ProjectDataContext.tsx'
+import { DataProvider } from './contexts/DataContext.tsx';
+import { ProjectDataProvider } from './contexts/ProjectDataContext.tsx';
+import { UserProvider } from './contexts/UserContext.tsx';
 import { Kreator } from './views/Kreator/Kreator.tsx';
 import { Faktury } from './views/Faktury/Faktury.tsx';
 import { Umowy } from './views/Umowy/Umowy.tsx';
@@ -15,19 +15,20 @@ import { Uprawnienia } from './views/Uprawnienia/Uprawnienia.tsx';
 import { Klienci } from './views/Klienci/Klienci.tsx';
 import { StronaGlowna } from './views/StronaGlowna/StronaGlowna.tsx';
 import { Layout } from './components/Layout/Layout.tsx';
-import { AddNewClient } from './views/Klienci/Dodaj_nowego_klienta/AddNewClient.tsx'
-import { EditClient } from './views/Klienci/Edytuj_klienta/EditClient.tsx'
+import { AddNewClient } from './views/Klienci/Dodaj_nowego_klienta/AddNewClient.tsx';
+import { EditClient } from './views/Klienci/Edytuj_klienta/EditClient.tsx';
 import { Logowanie } from './views/Logowanie/Logowanie.tsx';
-import { Ustawienia } from './views/Ustawienia/Ustawienia.tsx'; 
-import { NewContractForm } from './components/Contracts/NewContractForm.tsx'; import { AddNewEmployee } from './views/Pracownicy/Dodaj_nowego_pracownika/AddNewEmployee.tsx'
-import { EditEmployee } from './views/Pracownicy/Edytuj_pracownika/EditEmployee.tsx'
-import { EmployeeDetails } from './views/Pracownicy/EmployeeDetails.tsx'
-import { AssignProjectToEmployee } from './views/Pracownicy/Przypisz_projekt_do_pracownika/AssignProjectToEmployee.tsx'
-import { RemoveEmployee } from './views/Pracownicy/Usun_pracownika/RemoveEmployee.tsx'
-import { ProjectDetails } from './views/Projekty/ProjectDetails.tsx'
-import { AddNewProject } from './views/Projekty/Dodaj_nowy_projekt/AddNewProject.tsx'
-import { EditProject } from './views/Projekty/Edytuj_projekt/EditProject.tsx'
-
+import { Ustawienia } from './views/Ustawienia/Ustawienia.tsx';
+import { NewContractForm } from './components/Contracts/NewContractForm.tsx';
+import { AddNewEmployee } from './views/Pracownicy/Dodaj_nowego_pracownika/AddNewEmployee.tsx';
+import { EditEmployee } from './views/Pracownicy/Edytuj_pracownika/EditEmployee.tsx';
+import { EmployeeDetails } from './views/Pracownicy/EmployeeDetails.tsx';
+import { AssignProjectToEmployee } from './views/Pracownicy/Przypisz_projekt_do_pracownika/AssignProjectToEmployee.tsx';
+import { RemoveEmployee } from './views/Pracownicy/Usun_pracownika/RemoveEmployee.tsx';
+import { ProjectDetails } from './views/Projekty/ProjectDetails.tsx';
+import { AddNewProject } from './views/Projekty/Dodaj_nowy_projekt/AddNewProject.tsx';
+import { EditProject } from './views/Projekty/Edytuj_projekt/EditProject.tsx';
+import { AuthRoute } from './components/auth/auth.tsx'; // Popraw ścieżkę
 
 const router = createBrowserRouter([
   {
@@ -36,49 +37,45 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <StronaGlowna />,
+        element: <AuthRoute allowedRoles={['Admin', 'User', 'Moderator']}><StronaGlowna /></AuthRoute>,
       },
       {
         path: 'kreator',
-        element: <Kreator />,
+        element: <AuthRoute allowedRoles={['Admin']}><Kreator /></AuthRoute>,
       },
       {
         path: 'faktury',
-        element: <Faktury />,
+        element: <AuthRoute allowedRoles={['Admin']}><Faktury /></AuthRoute>,
       },
       {
-        path: '/umowy/new',
-        element: <NewContractForm/>,
+        path: 'umowy/new',
+        element: <AuthRoute allowedRoles={['Admin']}><NewContractForm /></AuthRoute>,
       },
       {
         path: 'umowy',
-        element: <Umowy />,
+        element: <AuthRoute allowedRoles={['Admin']}><Umowy /></AuthRoute>,
       },
       {
         path: 'projekty',
-        element: <Projekty />,
+        element: <AuthRoute allowedRoles={['Admin']}><Projekty /></AuthRoute>,
         children: [
           {
             path: 'details-project/:name',
-            element: <ProjectDetails />,
+            element: <AuthRoute allowedRoles={['Admin']}><ProjectDetails /></AuthRoute>,
           },
           {
             path: 'add-project',
-            element: <AddNewProject />,
+            element: <AuthRoute allowedRoles={['Admin']}><AddNewProject /></AuthRoute>,
           },
           {
             path: 'edit-project/:id',
-            element: <EditProject />,
+            element: <AuthRoute allowedRoles={['Admin']}><EditProject /></AuthRoute>,
           },
         ],
       },
-			{
-				path: 'projekty/details-project/:name',
-				element: <ProjectDetails />,
-			},
       {
-        path: '/pracownicy',
-        element: <Pracownicy />,
+        path: 'pracownicy',
+        element: <AuthRoute allowedRoles={['Admin']}><Pracownicy /></AuthRoute>,
         children: [
           {
             path: 'register',
@@ -86,49 +83,49 @@ const router = createBrowserRouter([
           },
           {
             path: 'add-employee',
-            element: <AddNewEmployee />,
+            element: <AuthRoute allowedRoles={['Admin']}><AddNewEmployee /></AuthRoute>,
           },
           {
             path: 'edit-employee/:id',
-            element: <EditEmployee />,
+            element: <AuthRoute allowedRoles={['Admin']}><EditEmployee /></AuthRoute>,
           },
           {
             path: 'details-employee/:id',
-            element: <EmployeeDetails />,
+            element: <AuthRoute allowedRoles={['Admin']}><EmployeeDetails /></AuthRoute>,
             children: [
               {
                 path: 'assign-project-to-employee',
-                element: <AssignProjectToEmployee />,
+                element: <AuthRoute allowedRoles={['Admin']}><AssignProjectToEmployee /></AuthRoute>,
               },
               {
                 path: 'remove-employee',
-                element: <RemoveEmployee />,
+                element: <AuthRoute allowedRoles={['Admin']}><RemoveEmployee /></AuthRoute>,
               },
             ],
           },
         ],
       },
       {
-        path: '/uprawnienia',
-        element: <Uprawnienia />,
+        path: 'uprawnienia',
+        element: <AuthRoute allowedRoles={['Admin']}><Uprawnienia /></AuthRoute>,
       },
       {
-        path: '/klienci',
-        element: <Klienci />,
+        path: 'klienci',
+        element: <AuthRoute allowedRoles={['Admin']}><Klienci /></AuthRoute>,
         children: [
           {
             path: 'add-client',
-            element: <AddNewClient />,
+            element: <AuthRoute allowedRoles={['Admin']}><AddNewClient /></AuthRoute>,
           },
           {
             path: 'edit-client/:id',
-            element: <EditClient />,
+            element: <AuthRoute allowedRoles={['Admin']}><EditClient /></AuthRoute>,
           },
         ],
       },
       {
-        path: '/ustawienia',
-        element: <Ustawienia />, 
+        path: 'ustawienia',
+        element: <AuthRoute allowedRoles={['Admin']}><Ustawienia /></AuthRoute>,
       },
     ],
   },
@@ -136,14 +133,17 @@ const router = createBrowserRouter([
     path: '/login',
     element: <Logowanie />,
   },
-])
+]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <DataProvider>
-      <ProjectDataProvider>
-        <RouterProvider router={router}></RouterProvider>
-      </ProjectDataProvider>
-    </DataProvider>
+    <UserProvider>
+      <DataProvider>
+        <ProjectDataProvider>
+          <RouterProvider router={router} />
+        </ProjectDataProvider>
+      </DataProvider>
+    </UserProvider>
   </React.StrictMode>
 );
+

@@ -17,12 +17,13 @@ const {getClientById} = require('../modules/addNewClient//getClientById')
 const {getClientNotes} = require('../modules/addNewNoteClient/getClientNotesById')
 const {updateClientNote} = require('../modules/addNewNoteClient/editClientNoteById')
 const {deleteClientNote} = require('../modules/addNewNoteClient/deleteClientNoteById')
+const { fetchRegonData } =  require('../modules/ClientRegon/clientController')
 
-router.post('/test', (req,res,next) =>{
-    res.status(200).json({error : "Witamy w kliencie"});
-})
+router.post('/test', (req, res, next) => {
+    res.status(200).json({ error: "Witamy w kliencie" });
+});
 
-// Dodanei klienta wraz z innymi danymi
+// Dodanie nowego klienta wraz z innymi danymi
 router.post('/new', addNewClient, addNewNoteClient, addNewTaskClient, addClientMailTel, (req, res) => {
     res.status(201).json({ message: 'Client, notes, tasks, and contacts added successfully' });
 });
@@ -48,10 +49,13 @@ router.get('/:client_id/tasks', getTasksClient);
 router.delete('/tasks/:task_id', deleteClientTask);
 router.post('/:client_id/tasks/', addNewTaskClientbyId);
 
-router.use('/', (req,res,next) =>{
-    const logger = req.app.get('logger')
-    logger.error(`Próba połączenia z nieobsługiwaną sciezką klient`);
-    res.status(404).json({error : "Nie obsługiwana ścieżka"});
-})
+// Nowy endpoint do pobierania danych z REGON
+router.post('/fetch-regon-data', fetchRegonData);
 
-module.exports = router
+router.use('/', (req, res, next) => {
+    const logger = req.app.get('logger');
+    logger.error(`Próba połączenia z nieobsługiwaną ścieżką klient`);
+    res.status(404).json({ error: "Nie obsługiwana ścieżka" });
+});
+
+module.exports = router;
