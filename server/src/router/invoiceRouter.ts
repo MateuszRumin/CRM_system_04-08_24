@@ -26,13 +26,13 @@ router.delete('/delete', deleteInvoice);
 const { initInvoiceSite } = require('../modules/invoices/initInvoiceTab');
 router.get("/init",initInvoiceSite);
 
-const { addInvoice } = require('../modules/invoices/addInvoice');
+const { addInvoice, updateInvoice } = require('../modules/invoices/addInvoice');
 router.post("/newInvoice",addInvoice);//
 router.post('/addInvoiceClientCheck', addInvocieClientCheck);// 
 router.post('/calculateProduct', caculateInvProducts);// 
 
 //update
-router.post("/updateInvoice", addInvoice); //
+router.post("/updateInvoice", updateInvoice); //
 
 
 

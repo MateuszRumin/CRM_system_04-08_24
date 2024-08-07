@@ -93,4 +93,74 @@ exports.addInvoice = async (req: Request, res: Response, next: NextFunction) => 
         error: error
       });
     }
-  };
+};
+
+exports.updateInvoice = async (req: Request, res: Response, next: NextFunction) => {
+  const prisma = req.app.get('prisma');
+
+  try {
+      const { main, client, summary } = req.body;
+
+      // Validate invoice_id
+      if (!main || !main.invoice_id) {
+          return res.status(400).json({
+              status: 'error',
+              message: 'invoice_id is required',
+          });
+      }
+
+      // Initialize updateData object
+      let updateData: any = {};
+
+      // Update main details
+      if (main) {
+          updateData = {
+              ...updateData,
+              ...{
+                  status_id: main.status_id,
+                  invoice_type_id: main.invoice_type_id,
+              },
+          };
+      }
+
+      // Update client details
+      if (client) {
+          // Here you may want to validate that client_id is provided and is a valid integer
+          updateData.client_id = client.client_id;
+      }
+
+      // Update summary details
+      if (summary) {
+          updateData = {
+              ...updateData,
+              ...{
+                  prize_netto: summary.prize_netto,
+                  prize_brutto: summary.prize_brutto,
+                  tax_ammount: summary.tax_ammount,
+                  comments: summary.comments,
+              },
+          };
+      }
+
+      // Perform update on Invoices table
+      const updatedInvoice = await prisma.Invoices.update({
+          where: { invoice_id: main.invoice_id },
+          data: updateData,
+      });
+
+      // Response with updated invoice data
+      res.status(200).json({
+          status: 'success',
+          message: 'Invoice updated successfully',
+          data: updatedInvoice,
+      });
+  } catch (error) {
+      console.error('Error updating invoice', error);
+
+      res.status(500).json({
+          status: 'error',
+          message: 'Error updating invoice',
+          error: error
+      });
+  }
+};
