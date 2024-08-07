@@ -7,7 +7,7 @@ const { getAllInvoices } = require('../modules/invoices/selectAllinvoices');
 const { getAllSettings } = require('../modules/invoices/getInvoiceSettings');
 const { updateAllSettings } = require('../modules/invoices/changeInvoiceSettings');
 const { updateInvoiceStatus } = require('../modules/invoices/updateInvoiceStatus');
-const { addInvocieClientCheck } = require ('../modules/invoices/addInvoiceProduckts');
+const { addInvoiceProducts } = require ('../modules/invoices/addInvoiceProduckts');
 const { caculateInvProducts } = require ('../modules/invoices/calculateInvProducts');
 const { deleteInvoice } = require ('../modules/invoices/delateInvoicebyId');
 
@@ -28,7 +28,7 @@ router.get("/init",initInvoiceSite);
 
 const { addInvoice, updateInvoice } = require('../modules/invoices/addInvoice');
 router.post("/newInvoice",addInvoice);//
-router.post('/addInvoiceClientCheck', addInvocieClientCheck);// 
+router.post('/addInvoiceProduct', addInvoiceProducts);// 
 router.post('/calculateProduct', caculateInvProducts);// 
 
 //update
