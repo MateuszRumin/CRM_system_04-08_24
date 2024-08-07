@@ -5,69 +5,40 @@ const prisma = new PrismaClient();
 
 export const getAllSettings = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // const invoiceSettings = await prisma.invoiceSettings.findMany({});
+      // Fetch all invoice types
+      const invoiceTypes = await prisma.invoiceTypes.findMany();
 
-    // const invoicePaymentSettings = await prisma.invoicePaymentSettings.findMany({
-    //   include: {
-    //     CompanySetting: {
-    //       select: {
-    //         name: true,
-    //         address: true,
-    //         regon: true,
-    //         nip: true,
-    //         krs: true
-    //       }
-    //     }
-    //   }
-    // });
+      // Fetch company settings
+      const companySettings = await prisma.companySettings.findFirst();
 
-    // const invoiceTypes = await prisma.invoiceTypes.findMany({
-    //   select: {
-    //     invoice_type_id: true,
-    //     invoice_type: true,
-    //     numbering_format: true,
-    //     enabled: true,
-    //     current_number_sequence: true,
-    //     template: true,
-    //   }
-    // });
+      // Fetch invoice settings
+      const invoiceSettings = await prisma.invoiceSettings.findFirst();
 
-    // const formattedSettings = {
-    //   invoiceSettings: invoiceSettings.map(setting => ({
-    //     id: setting.invoice_setting_id,
-    //     currency: setting.default_currency,
-    //     paymentTerm: setting.payment_term,
-    //     periodicAutoGenerate: setting.periodic_auto_generate,
-    //     periodicFrequency: setting.periodic_frequency,
-    //     emailNotification: setting.email_notification,
-    //     smsNotification: setting.sms_notification,
-    //     pushNotification: setting.push_notification,
-    //     unpaidReminder: setting.unpaid_reminder_enabled,
-    //     reminderFreq: setting.reminder_frequency,
-    //     reminderContent: setting.reminder_content
-    //   })),
-    //   invoicePaymentSettings: invoicePaymentSettings.map(setting => ({
-    //     id: setting.payment_setting_id,
-    //     advancementRate: setting.advancement_rate,
-    //     taxRate: setting.tax_rate,
-    //     taxType: setting.tax_type,
-    //     defaultVatAmount: setting.default_vat_amount,
-    //     company: setting.CompanySetting
-    //   })),
-    //   invoiceTypes: invoiceTypes.map(type => ({
-    //     id: type.invoice_type_id,
-    //     type: type.invoice_type,
-    //     numberingFormat: type.numbering_format,
-    //     enabled: type.enabled,                 
-    //     current_number: type.current_number_sequence,   
-    //     template: type.template                 
-    //   }))
-    // };
+      // Fetch invoice payment settings
+      const invoicePaymentSettings = await prisma.invoicePaymentSettings.findFirst();
 
-    // res.json(formattedSettings);
+      // Fetch invoice payment settings
+      const invoiceMarkers = await prisma.markers.findMany();
+
+      // Respond with all settings
+      res.status(200).json({
+          status: 'success',
+          data: {
+              invoiceTypes,
+              companySettings,
+              invoiceSettings,
+              invoicePaymentSettings,
+              invoiceMarkers
+          },
+      });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+      console.error('Error fetching settings', error);
+
+      res.status(500).json({
+          status: 'error',
+          message: 'Error fetching settings',
+          error: error,
+      });
   }
 };
 

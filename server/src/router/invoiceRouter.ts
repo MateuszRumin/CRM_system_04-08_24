@@ -7,26 +7,32 @@ const { getAllInvoices } = require('../modules/invoices/selectAllinvoices');
 const { getAllSettings } = require('../modules/invoices/getInvoiceSettings');
 const { updateAllSettings } = require('../modules/invoices/changeInvoiceSettings');
 const { updateInvoiceStatus } = require('../modules/invoices/updateInvoiceStatus');
-
+const { addInvocieClientCheck } = require ('../modules/invoices/addInvoiceProduckts');
+const { caculateInvProducts } = require ('../modules/invoices/calculateInvProducts');
+const { deleteInvoice } = require ('../modules/invoices/delateInvoicebyId');
 
 router.post('/test', (req,res,next) =>{
     res.status(200).json({error : "Witamy w fakturach"});
 })
 
-router.get('/', getAllInvoices);
-router.put('/status', updateInvoiceStatus);
+router.get('/', getAllInvoices);//
+router.put('/status', updateInvoiceStatus);//
 router.get('/settings', getAllSettings);
-router.put('/settings/update', updateAllSettings);
-router.put('/settings/add', updateAllSettings);
+router.put('/settings/update', updateAllSettings);//
+router.put('/settings/add', updateAllSettings);//
+router.delete('/delete', deleteInvoice);
+
 
 const { initInvoiceSite } = require('../modules/invoices/initInvoiceTab');
-router.get("/init",initInvoiceSite)
+router.get("/init",initInvoiceSite);
 
-const { addInvocie } = require('../modules/invoices/addInvoice')
-router.post("/newInvoice",addInvocie) 
+const { addInvoice } = require('../modules/invoices/addInvoice');
+router.post("/newInvoice",addInvoice);//
+router.post('/addInvoiceClientCheck', addInvocieClientCheck);// 
+router.post('/calculateProduct', caculateInvProducts);// 
 
 //update
-router.post("/updateInvoice",addInvocie) 
+router.post("/updateInvoice", addInvoice); //
 
 
 

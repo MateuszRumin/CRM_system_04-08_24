@@ -19,6 +19,7 @@ export const getClientById = async (req: Request, res: Response) => {
             include: {
                 Status: true,
                 User: true,
+                
                 ClientNote: {
                     include: {
                         Note: true

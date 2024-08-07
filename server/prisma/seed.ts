@@ -70,6 +70,34 @@ for (let userData  of users){
     }
   
   }
+
+  const statusesProject = [
+    {name:'Nie rozpoczęty'},
+    {name:'W trakcie realizacji'},    
+    {name:'Zakończony'},    
+  ]
+  
+  for (let statusProject  of statusesProject){
+    
+    const existCheck = await prisma.statuses.findFirst({
+      where:{
+        status_type:'Projekt',
+        default:true,
+        name:statusProject.name
+      }
+    })
+  
+  if (!existCheck){
+      await prisma.statuses.create({
+        data:{
+          status_type:'Projekt',
+          default:true,
+          name:statusProject.name
+        }
+      })
+    }
+  
+  }
   
   
   const statuseZadania =[
