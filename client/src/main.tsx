@@ -6,7 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { DataProvider } from './contexts/DataContext.tsx';
 import { ProjectDataProvider } from './contexts/ProjectDataContext.tsx';
 import { UserProvider } from './contexts/UserContext.tsx';
-import { Kreator } from './views/Kreator/Kreator.tsx';
+// import { Kreator } from './views/Kreator/Kreator.tsx';
 import { Faktury } from './views/Faktury/Faktury.tsx';
 import { Umowy } from './views/Umowy/Umowy.tsx';
 import { Projekty } from './views/Projekty/Projekty.tsx';
@@ -28,8 +28,9 @@ import { RemoveEmployee } from './views/Pracownicy/Usun_pracownika/RemoveEmploye
 import { ProjectDetails } from './views/Projekty/ProjectDetails.tsx';
 import { AddNewProject } from './views/Projekty/Dodaj_nowy_projekt/AddNewProject.tsx';
 import { EditProject } from './views/Projekty/Edytuj_projekt/EditProject.tsx';
-import { AuthRoute } from './components/auth/auth.tsx'; // Popraw ścieżkę
 import { InvoiceDetails } from './views/Faktury/InvoiceDetails.tsx';
+import { AuthRoute } from './components/auth/auth.tsx';
+import { DetailsClient } from './components/Client/ClientDetailsComponents/DetailsClient.tsx'
 
 const router = createBrowserRouter([
   {
@@ -40,10 +41,10 @@ const router = createBrowserRouter([
         path: '/',
         element: <AuthRoute allowedRoles={['Admin', 'User', 'Moderator']}><StronaGlowna /></AuthRoute>,
       },
-      {
-        path: 'kreator',
-        element: <AuthRoute allowedRoles={['Admin']}><Kreator /></AuthRoute>,
-      },
+      // {
+      //   path: 'kreator',
+      //   element: <AuthRoute allowedRoles={['Admin']}><Kreator /></AuthRoute>,
+      // },
       {
         path: 'faktury',
         element: <AuthRoute allowedRoles={['Admin']}><Faktury /></AuthRoute>,
@@ -127,6 +128,10 @@ const router = createBrowserRouter([
           {
             path: 'edit-client/:id',
             element: <AuthRoute allowedRoles={['Admin']}><EditClient /></AuthRoute>,
+          },
+          {
+            path: 'details-client/:id',
+            element: <AuthRoute allowedRoles={['Admin']}><DetailsClient /></AuthRoute>,
           },
         ],
       },

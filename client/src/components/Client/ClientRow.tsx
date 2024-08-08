@@ -52,6 +52,16 @@ export const ClientRow: React.FC<ClientRowProps> = ({ client, onDelete }) => {
     navigate(`/klienci/edit-client/${modifiedName}`, { state: { clientId, modifiedName } });
   };
 
+  const handleDetails = () => {
+    const clientId = client.id;
+    const modifiedName = client.name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-');
+
+    navigate(`/klienci/details-client/${modifiedName}`, { state: { clientId, modifiedName } });
+  };
+
   const handleDelete = () => {
     setIsModalOpen(true);
   };
@@ -92,6 +102,7 @@ export const ClientRow: React.FC<ClientRowProps> = ({ client, onDelete }) => {
             <div className={styles.contextMenu}>
               <div onClick={handleEdit}>Edytuj</div>
               <div onClick={handleDelete}>Usuń</div>
+              <div onClick={handleDetails}>Szczegóły</div>
             </div>
           )}
         </td>

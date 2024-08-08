@@ -1,0 +1,126 @@
+/* General container styling */
+.detailsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #E0E0E0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+/* Flexbox layout for top section */
+.topSection {
+  display: flex;
+  gap: 20px;
+}
+
+/* Styling for client data and notes blocks */
+.clientData, .notesContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #E0E0E0;
+  background-color: #f9f9f9;
+}
+
+/* Grid layout for client data */
+.clientDataGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.dataField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.nameFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.statusField {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+/* Separate sections for emails and phone numbers */
+.emailsSection, .phonesSection {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.emailItem, .phoneItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+/* Read-only input styling */
+.inputField,
+.selectField,
+.textAreaField {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #e9e9e9;
+  color: #666;
+}
+
+.inputField:focus,
+.selectField:focus,
+.textAreaField:focus {
+  outline: none;
+}
+
+/* Notes and tasks styling */
+.notesContainer, .tasksContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #E0E0E0;
+  background-color: #f9f9f9;
+}
+
+.note, .task {
+  padding: 10px;
+  border: 1px solid #E0E0E0;
+  border-radius: 5px;
+  background-color: #fff;
+  margin-bottom: 10px;
+}
+
+.note strong, .task strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Task block full width below top section */
+.tasksBlock {
+  width: 100%;
+}

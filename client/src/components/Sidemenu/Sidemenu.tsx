@@ -9,12 +9,12 @@ const menuItems = [
     icon: 'home.svg',
     roles: ['Admin', 'User'],
   },
-  {
-    name: 'Kreator',
-    path: '/kreator',
-    icon: 'Add_To_Queue.svg',
-    roles: ['Admin'],
-  },
+  // {
+  //   name: 'Kreator',
+  //   path: '/kreator',
+  //   icon: 'Add_To_Queue.svg',
+  //   roles: ['Admin'],
+  // },
   {
     name: 'Faktury',
     path: '/faktury',
