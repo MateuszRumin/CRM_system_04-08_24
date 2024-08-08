@@ -29,6 +29,7 @@ import { ProjectDetails } from './views/Projekty/ProjectDetails.tsx';
 import { AddNewProject } from './views/Projekty/Dodaj_nowy_projekt/AddNewProject.tsx';
 import { EditProject } from './views/Projekty/Edytuj_projekt/EditProject.tsx';
 import { AuthRoute } from './components/auth/auth.tsx'; // Popraw ścieżkę
+import { InvoiceDetails } from './views/Faktury/InvoiceDetails.tsx';
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,12 @@ const router = createBrowserRouter([
       {
         path: 'faktury',
         element: <AuthRoute allowedRoles={['Admin']}><Faktury /></AuthRoute>,
+        children: [
+          {
+            path: 'details-invoice/:invoice_id',
+            element: <AuthRoute allowedRoles={['Admin']}><InvoiceDetails /></AuthRoute>,
+          },
+        ],
       },
       {
         path: 'umowy/new',

@@ -8,6 +8,7 @@ export const getAllInvoices = async (req: Request, res: Response, next: NextFunc
   try {
     const invoices = await prisma.invoices.findMany({
       select: {
+        invoice_id:true,
         invoice_number: true,
         issue_date: true,
         due_date: true,
@@ -35,6 +36,7 @@ export const getAllInvoices = async (req: Request, res: Response, next: NextFunc
     });
 
     const formattedInvoices = invoices.map(invoice => ({
+      invoice_id:invoice.invoice_id,
       invoice_number: invoice.invoice_number,
       client_name: `${invoice.Client.first_name} ${invoice.Client.second_name} (${invoice.Client.company_name})`,
       invoice_type: invoice.InvoiceType.invoice_type,

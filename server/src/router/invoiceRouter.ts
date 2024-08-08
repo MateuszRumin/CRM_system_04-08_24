@@ -10,6 +10,7 @@ const { updateInvoiceStatus } = require('../modules/invoices/updateInvoiceStatus
 const { addInvoiceProducts } = require ('../modules/invoices/addInvoiceProduckts');
 const { caculateInvProducts } = require ('../modules/invoices/calculateInvProducts');
 const { deleteInvoice } = require ('../modules/invoices/delateInvoicebyId');
+const { getInvoiceDetails } = require ('../modules/invoices/getInvoiceDetailsById');
 
 router.post('/test', (req,res,next) =>{
     res.status(200).json({error : "Witamy w fakturach"});
@@ -20,7 +21,7 @@ router.put('/status', updateInvoiceStatus);//
 router.get('/settings', getAllSettings);
 router.put('/settings/update', updateAllSettings);//
 router.put('/settings/add', updateAllSettings);//
-router.delete('/delete', deleteInvoice);
+router.delete('/:invoice_id', deleteInvoice);
 
 
 const { initInvoiceSite } = require('../modules/invoices/initInvoiceTab');
@@ -30,6 +31,7 @@ const { addInvoice, updateInvoice } = require('../modules/invoices/addInvoice');
 router.post("/newInvoice",addInvoice);//
 router.post('/addInvoiceProduct', addInvoiceProducts);// 
 router.post('/calculateProduct', caculateInvProducts);// 
+router.get('/:invoice_id', getInvoiceDetails);//
 
 //update
 router.post("/updateInvoice", updateInvoice); //
