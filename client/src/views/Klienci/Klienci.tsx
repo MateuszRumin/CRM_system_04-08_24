@@ -13,10 +13,11 @@ export const Klienci = () => {
 
   const isAddClientRoute = location.pathname.includes('add-client');
   const isEditClientRoute = location.pathname.includes('edit-client');
+  const isDetailClientRoute = location.pathname.includes('details-client');
 
   return (
     <div>
-      {!isAddClientRoute && !isEditClientRoute && (
+      {!isAddClientRoute && !isEditClientRoute && !isDetailClientRoute && (
         <div className={styles.testowe1}>
           <div className={styles.testowe}>
             <h1>Klienci</h1>
