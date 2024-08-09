@@ -266,12 +266,22 @@ export const createUser = async (req: Request, res: Response) => {
       include: {
         UserRole: {
           include: {
-            Role: true
+            Role: {
+                            select: {
+                                role_id:true,
+                                name:true,
+                            }
+                        }
           },
         },
         UserData: {
           include: {
-            Position: true
+            Position: {
+                            select: {
+                                position_id:true,
+                                name:true,
+                            }
+                        }
           }
         }
       },
