@@ -5,7 +5,7 @@ export function AddNewInvoiceButton() {
   const navigate = useNavigate();
 
   const handleAddInvoiceClick = () => {
-    navigate('add-invoice'); // Route do dodania nowej fcktury
+    navigate('faktury/new'); // Route do dodania nowej fcktury
   };
 
 
