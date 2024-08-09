@@ -1,0 +1,83 @@
+.adminPageContainer {
+  padding: 20px;
+}
+
+.sessionsContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.sessionsSection {
+  width: 48%;
+}
+
+.activeSession {
+  background-color: #e0ffe0; /* Zielony dla aktywnych */
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.endedSession {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.endedSession p {
+  margin: 0;
+  flex-grow: 1; /* Allows paragraph to take up remaining space */
+}
+
+.deleteButton {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #dc3545;
+  color: white;
+  cursor: pointer;
+  flex-shrink: 0; /* Prevents the button from shrinking */
+}
+
+.deleteButton:hover {
+  background-color: #c82333;
+}
+
+.dateRangeContainer {
+  margin-bottom: 20px;
+}
+
+.dateRangeForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dateRangeForm label {
+  font-weight: bold;
+}
+
+.dateRangeForm select,
+.dateRangeForm input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.dateRangeForm button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  background-color: #24304f;
+  color: white;
+  cursor: pointer;
+}
+
+.dateRangeForm button:hover {
+  background-color: #24304f;
+}

@@ -483,11 +483,194 @@ export const loginUser = async (req: Request, res: Response) => {
         // Tworzymy token
         const token = createToken(user.user_id, user.username, userRole);
 
+        // Rozpocznij nową sesję
+        await prisma.workSessions.create({
+            data: {
+            user_id: user.user_id,
+            token: token,
+            startTime: new Date(),
+            active: true,
+            },
+        });
+
         // Zwracamy token
         res.status(200).json({ token });
 
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+export const logoutUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const token = req.headers['authorization']?.split(' ')[1]; // Pobierz token z nagłówka
+      
+      if (!token) {
+        res.status(400).json({ message: 'No token provided' });
+        return;
+      }
+
+    try {
+        jwt.verify(token, JWT_SECRET); // Użyj klucza do dekodowania JWT
+      } catch (error) {
+        res.status(400).json({ message: 'Invalid token' });
+        return;
+      }
+  
+      // Zakończ aktywną sesję
+      const session = await prisma.workSessions.findFirst({
+        where: {
+          token, // Użyj tokena do znalezienia odpowiedniej sesji
+          active: true,
+        },
+      });
+  
+      if (session) {
+        await prisma.workSessions.update({
+          where: { session_id: session.session_id },
+          data: {
+            endTime: new Date(),
+            active: false,
+          },
+        });
+      } else {
+        res.status(404).json({ message: 'Session not found' });
+        return;
+      }
+  
+      res.json({ message: 'Logged out successfully. Session ended. Token destroyed.' });
+    } catch (error) {
+      console.error('Error logging out:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const getWorkSessions = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const activeSessions = await prisma.workSessions.findMany({
+        where: { active: true },
+        include: { 
+            User: {
+                include: {
+                    UserRole:{
+                        include: {Role:true}
+                    }
+                }
+            }
+        }
+      });
+  
+      const endedSessions = await prisma.workSessions.findMany({
+        where: { active: false },
+        include: { 
+            User: {
+                include: {
+                    UserRole: {
+                        include: {Role:true}
+                    }
+                }
+            }
+        }
+      });
+  
+      res.json({
+        activeSessions,
+        endedSessions
+      });
+    } catch (error) {
+      console.error('Error fetching work sessions:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const deleteSessionById = async (req: Request, res: Response) => {
+    const { session_id } = req.params;
+
+    try {
+        // Sprawdzenie, czy session_id jest liczbą
+        const sessionId = Number(session_id);
+
+        // Sprawdzenie, czy sesja istnieje
+        const session = await prisma.workSessions.findUnique({
+            where: { session_id: sessionId }
+        });
+
+        if (!session) {
+            return res.status(404).json({ error: 'Session not found' });
+        }
+
+        // Usuń sesję
+        await prisma.workSessions.delete({
+            where: { session_id: sessionId }
+        });
+
+        res.status(200).json({ message: 'Session deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting session:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+export const deleteSessionsByMonth = async (req: Request, res: Response) => {
+    const { month, year } = req.body;
+
+    if (!month || !year) {
+        return res.status(400).json({ error: 'Month and year are required' });
+    }
+
+    try {
+        // Convert month and year into a date range
+        const startDate = new Date(`${year}-${month}-01T00:00:00Z`);
+        const endDate = new Date(startDate);
+        endDate.setMonth(endDate.getMonth() + 1);
+        endDate.setDate(0); // Set to last day of the month
+
+        // Delete sessions within the specified month
+        const deletedSessions = await prisma.workSessions.deleteMany({
+            where: {
+                endTime: {
+                    gte: startDate,
+                    lte: endDate,
+                },
+                active:false,
+            },
+        });
+
+        res.status(200).json({
+            message: 'Sessions deleted successfully',
+            deletedCount: deletedSessions.count,
+        });
+    } catch (error) {
+        console.error('Error deleting sessions by month:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+export const getWorkSessionsUser = async (req: Request, res: Response): Promise<void> => {
+    const { user_id } = req.params;
+
+    try {
+        // Pobierz wszystkie sesje pracy dla użytkownika
+        const workSessions = await prisma.workSessions.findMany({
+            where: { user_id: Number(user_id), 
+                    active:false,
+            },
+            include: {
+                User: {
+                    include: {
+                        UserRole: {
+                            include: { Role: true }
+                        }
+                    }
+                }
+            }
+        });
+
+        res.json(workSessions);
+    } catch (error) {
+        console.error('Error fetching work sessions:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };

@@ -13,12 +13,19 @@ import autoTable from 'jspdf-autotable';
 import SignatureCanvas from 'react-signature-canvas';
 import { PDFDocument } from 'pdf-lib';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Project {
   project_id: string;
   name: string;
   client_id: string;
   status_id: string;
   created_at: string;
+}
+
+interface WorkSession {
+  startTime: string;
+  endTime: string;
 }
 
 export function EmployeeDetails() {
@@ -29,6 +36,9 @@ export function EmployeeDetails() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [projects, setProjects] = useState<Project[]>([]);
+  const [workSessions, setWorkSessions] = useState<WorkSession[]>([]);
+  const [hoursWorkedOnDate, setHoursWorkedOnDate] = useState<string>('');
+  const [hoursWorkedInMonth, setHoursWorkedInMonth] = useState<string>('');
   const [openSignatureDialog, setOpenSignatureDialog] = useState(false);
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [signatureImage, setSignatureImage] = useState<string | null>(null);
@@ -36,9 +46,18 @@ export function EmployeeDetails() {
   const signatureRef = useRef<SignatureCanvas | null>(null);
 
   useEffect(() => {
+    const fetchWorkSessions = async () => {
+      try {
+        const response = await axios.get(`${apiServerUrl}/employees/session/${employee?.id}`);
+        setWorkSessions(response.data);
+      } catch (error) {
+        console.error('Error fetching work sessions:', error);
+      }
+    };
+
     const fetchProjects = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/projects/with/${employee?.id}`);
+        const response = await axios.get(`${apiServerUrl}/projects/with/${employee?.id}`);
         setProjects(response.data);
       } catch (error) {
         console.error('Error fetching projects:', error);
@@ -46,9 +65,52 @@ export function EmployeeDetails() {
     };
 
     if (employee) {
+      fetchWorkSessions();
       fetchProjects();
     }
   }, [employee]);
+
+  useEffect(() => {
+    if (selectedDate && workSessions.length) {
+      calculateWorkHours(selectedDate);
+    }
+  }, [selectedDate, workSessions]);
+
+  const calculateWorkHours = (date: Date) => {
+    if (!workSessions.length) return;
+
+    const selectedDay = format(date, 'yyyy-MM-dd');
+    const selectedMonth = format(date, 'yyyy-MM');
+
+    let totalHoursOnDate = 0;
+    let totalHoursInMonth = 0;
+
+    workSessions.forEach((session) => {
+      const startTime = new Date(session.startTime);
+      const endTime = new Date(session.endTime);
+
+      if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
+        console.warn('Invalid session time:', session);
+        return;
+      }
+
+      const sessionDate = format(startTime, 'yyyy-MM-dd');
+      const sessionMonth = format(startTime, 'yyyy-MM');
+
+      if (sessionDate === selectedDay) {
+        const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+        totalHoursOnDate += hours;
+      }
+
+      if (sessionMonth === selectedMonth) {
+        const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+        totalHoursInMonth += hours;
+      }
+    });
+
+    setHoursWorkedOnDate(totalHoursOnDate.toFixed(2) + ' h');
+    setHoursWorkedInMonth(totalHoursInMonth.toFixed(2) + ' h');
+  };
 
   if (!employee) {
     return <div>Nie znaleziono szczegółów pracownika</div>;
@@ -86,8 +148,6 @@ export function EmployeeDetails() {
 
     navigate(`/pracownicy/edit-employee/${modifiedName}`, { state: { employee } });
   };
-
-  type TableCellData = string | { content: string, type: 'image' };
 
   const generatePDF = () => {
     if (!selectedDate) {
@@ -198,6 +258,8 @@ export function EmployeeDetails() {
               <p><strong>Nazwisko:</strong> {employee.name.split(' ')[1]}</p>
               <p><strong>Umowa:</strong> {employee.contract}</p>
               <p><strong>Liczba przepracowanych godzin:</strong> {employee.hoursWorked}</p>
+              <p><strong>Przepracowane godziny w wybranym dniu ({selectedDate ? format(selectedDate, 'dd.MM.yyyy') : 'Nie wybrano daty'}):</strong> {hoursWorkedOnDate}</p>
+              <p><strong>Liczba przepracowanych godzin w całym miesiącu {selectedDate ? format(selectedDate, 'MM/yyyy') : 'nie wybrano daty'}:</strong> {hoursWorkedInMonth}</p>
             </div>
             <div className={styles.imageContainer}>
               <h2>Zdjęcie pracownika</h2>

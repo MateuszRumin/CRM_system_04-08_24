@@ -9,27 +9,21 @@ async function main() {
   const currentMonth = currentDate.getMonth() + 1; // Miesiące w JavaScript są indeksowane od 0
   const currentDay = currentDate.getDate();
   
+  // początkowe dane logowania admina:
+  // username: "admin" lub "admin2"
+  // password: "password"
+
   const users = [
     {
-      username:"Administrator",
-      email:"Administrator@gmail.com",
-      password:"administrator"
+      username:"admin",
+      email:"admin@weblance.com",
+      password:"$2a$10$n.cHm7FalQmL5fHkCCQ4KO790LlMtBzZqHIsXv.qePJ7yHbEYarHu"
     },
     {
-      username:"Administrator2",
-      email:"Administrator2@gmail.com",
-      password:"administrator"
-    },
-    {
-      username:"Administrator3",
-      email:"Administrator3@gmail.com",
-      password:"administrator"
-    },
-    {
-      username:"Administrator4",
-      email:"Administrator4@gmail.com",
-      password:"administrator"
-    }      
+      username:"admin2",
+      email:"admin2@weblance.com",
+      password:"$2a$10$d16Y5ZIK2HxE/pqLSMLFFOHZh5Tf4Itvlb17.vUikYHybbsT7aQhm"
+    },    
 ]
 
 

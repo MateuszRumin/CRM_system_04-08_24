@@ -28,6 +28,7 @@ model Users {
   ProjectAssignment ProjectAssignments[]
   TaskTime TaskTimes[]
   TaskAssignment TaskAssignments[]
+  WorkSession WorkSessions[]
 }
 
 model UserDatas {
@@ -462,4 +463,18 @@ model Contracts {
   project_id  Int
 
   Project Projects @relation(fields: [project_id], references: [project_id])
+}
+
+model WorkSessions {
+  session_id   Int      @id @default(autoincrement())
+  user_id      Int
+  token        String   @default("no token")
+  startTime    DateTime
+  endTime      DateTime?
+  active       Boolean  @default(true)
+  updatedAt    DateTime @default(now())
+
+  User         Users     @relation(fields: [user_id], references: [user_id])
+
+  @@index([user_id])
 }

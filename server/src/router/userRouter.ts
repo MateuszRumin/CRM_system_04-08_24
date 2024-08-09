@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { createUser, getAllUsers, getUserById, updateUser, deleteUser, loginUser, selectAllCompanyPositions, assignUserToProject, removeUserFromProject } from '../modules/users/usersController';
+import { createUser, getAllUsers, getUserById, updateUser, deleteUser, loginUser, logoutUser, getWorkSessionsUser, getWorkSessions, deleteSessionsByMonth, deleteSessionById, selectAllCompanyPositions, assignUserToProject, removeUserFromProject } from '../modules/users/usersController';
 import {authenticateToken} from '../middleware/authenticateToken';
 import {authorizePermission} from '../middleware/authorizePermission';
 
 const router = Router();
 
 router.post('/login', loginUser);
+router.post('/logout', logoutUser);
 router.post('/register', createUser);
 router.get('/position', selectAllCompanyPositions);
 router.get('/', getAllUsers);
@@ -14,6 +15,10 @@ router.get('/:id', getUserById);
 router.put('/:id', updateUser);
 router.delete('/:user_id/project/remove', removeUserFromProject);
 router.delete('/:id', deleteUser);
+router.get('/session/workSessions', getWorkSessions);
+router.delete('/session/deleteByMonth', deleteSessionsByMonth);
+router.get('/session/:user_id', getWorkSessionsUser);
+router.delete('/session/:session_id', deleteSessionById);
 
 //zakomentowane do pozniejszego wdrozenia autoryzacji
 

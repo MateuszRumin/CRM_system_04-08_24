@@ -7,22 +7,30 @@ export const Logout = () => {
   const navigate = useNavigate();
   const { setUser } = useUser();
 
-  const handleLogout = () => {
-    console.log('Handling logout...');
-    
-    // Usuń dane z localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('USER');
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/employees/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Dodaj token do nagłówka
+        },
+      });
 
-    console.log('Removed token and USER from localStorage');
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
 
-    // Zaktualizuj kontekst użytkownika
-    setUser(null);
-    console.log('User context set to null');
+      // Usuń dane z localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('USER');
 
-    // Przekieruj na stronę logowania
-    navigate('/login');
-    console.log('Redirected to /login');
+      // Zaktualizuj kontekst użytkownika
+      setUser(null);
+      navigate('/login');
+    } catch (error: any) {
+      console.error('Error during logout:', error);
+    }
   };
 
   return (
