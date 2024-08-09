@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Faktury.module.css';
+import { Link } from 'react-router-dom';
 import invoices from '../../data/invoices';
 import ThreeDotIcon from '../../../public/icons/3dot.svg';
 import SortIcon from '../../../public/icons/bxs_sort-alt.svg';
@@ -225,9 +226,7 @@ export const Faktury = () => {
 
   return (
     <div className={styles.body}>
-      {isNewInvoiceFormOpen ? (
-        <NewInvoiceForm onClose={closeNewInvoiceForm} /> // Renderowanie nowego komponentu faktury
-      ) : (
+      
         <div>
           {/* Topbar */}
           <div className={styles.topbar}>
@@ -254,9 +253,9 @@ export const Faktury = () => {
           <img src="/icons/filter.svg" alt="Filter" className={styles.icon} />
           <div className={styles.filter_text}>Filtruj</div>
         </button>
-          <button className={styles.create_button}onClick={handleNewInvoiceClick}>
-            <div className={styles.create_text}>Stwórz nową Fakturę</div>
-          </button>
+        <Link to="/faktury/new" className={styles.create_button}>
+            `<div className={styles.create_text}>Stwórz nową Fakturę</div>
+            </Link>
         </div>
       </div>
 
@@ -383,7 +382,7 @@ export const Faktury = () => {
           {isModalOpen && <FilterSettingsModal onClose={closeModal} />}
 
         </div>
-      )}
+      
     </div>
   );
 };
