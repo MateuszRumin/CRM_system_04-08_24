@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../contexts/UserContext';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 export const Login: React.FC = () => {
   const [isRegister, setIsRegister] = useState<boolean>(false);
   const [submitErrors, setSubmitErrors] = useState<string>('');
@@ -22,7 +24,7 @@ export const Login: React.FC = () => {
   const onSubmit = async (data: Object): Promise<void> => {
     setSubmitErrors('');
     try {
-      const response = await fetch('http://localhost:3000/employees/login', {
+      const response = await fetch(`${apiServerUrl}/employees/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

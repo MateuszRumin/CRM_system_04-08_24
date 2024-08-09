@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './AssignedEmployeesModal.module.css';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface AssignedEmployeesModalProps {
   projectId: number;
 }
@@ -22,7 +24,7 @@ export const AssignedEmployeesModal: React.FC<AssignedEmployeesModalProps> = ({ 
   const [employees, setEmployees] = useState<Employee[]>([]);
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/projects/${projectId}/users`)
+    axios.get(`${apiServerUrl}/projects/${projectId}/users`)
       .then(response => {
         setEmployees(response.data);
       })

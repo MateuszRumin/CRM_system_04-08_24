@@ -10,6 +10,8 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface LocationState {
   clientId: string;
   modifiedName: string;
@@ -56,7 +58,7 @@ export const EditClient: React.FC = () => {
   useEffect(() => {
     setClientId(state.clientId);
 
-    axios.get(`http://localhost:3000/client/${state.clientId}/get`)
+    axios.get(`${apiServerUrl}/client/${state.clientId}/get`)
       .then(response => {
         const data = response.data;
         setClient({
@@ -129,7 +131,7 @@ export const EditClient: React.FC = () => {
     <div className={styles.pageContainer}>
       <div className={styles.headerContainer}>
         <h1>Edycja klienta: {modifiedName}</h1>
-        <p>Walidacja: {isValid && isValidTasks && isValidNotes ? 'true' : 'false'}</p>
+        {/* <p> Walidacja: {isValid && isValidTasks && isValidNotes ? 'true' : 'false'}</p> */}
         <BlueButton
           buttonText='Zapisz zmiany'
           buttonStyle={styles.blueButton}

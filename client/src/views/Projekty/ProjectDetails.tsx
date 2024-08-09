@@ -15,6 +15,8 @@ import ContractsList from '../../components/Projects/ProjectDetailsComponents/Co
 import MettingListButtonDrawer from '../../assets/ProjectPage/meeting_icon.svg';
 import TaskListButtonDrawer from '../../assets/ProjectPage/task-square-svgrepo-com.svg';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Project {
   project_id: number;
   name: string;
@@ -48,7 +50,7 @@ export const ProjectDetails: React.FC = () => {
 
   useEffect(() => {
     if (projectId) {
-      axios.get(`http://localhost:3000/projects/${projectId}`)
+      axios.get(`${apiServerUrl}/projects/${projectId}`)
         .then(response => {
           setProject(response.data);
         })

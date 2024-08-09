@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './RepositoryModal.module.css';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface RepositoryModalProps {
   projectId: number;
 }
@@ -18,7 +20,7 @@ export const RepositoryModal: React.FC<RepositoryModalProps> = ({ projectId }) =
   const [newLink, setNewLink] = useState<string>('');
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/projects/${projectId}`)
+    axios.get(`${apiServerUrl}/projects/${projectId}`)
       .then(response => {
         const projectLinks = response.data.ProjectLink.filter((link: ProjectLink) => link.link_type === 'Repository');
         console.log('Załadowane linki:', projectLinks); // Log załadowanych linków
@@ -31,7 +33,7 @@ export const RepositoryModal: React.FC<RepositoryModalProps> = ({ projectId }) =
 
   const handleAddLink = () => {
     if (newLink) {
-      axios.post('http://localhost:3000/projects/link/repo', {
+      axios.post(`${apiServerUrl}/projects/link/repo`, {
         project_id: projectId,
         link: newLink,
         name: 'Repozytorium'
@@ -55,7 +57,7 @@ export const RepositoryModal: React.FC<RepositoryModalProps> = ({ projectId }) =
   const handleSaveLink = (index: number) => {
     const linkToUpdate = repositoryLinks[index];
     if (linkToUpdate.link_id) {
-      axios.put(`http://localhost:3000/projects/link/${linkToUpdate.link_id}`, linkToUpdate)
+      axios.put(`${apiServerUrl}/projects/link/${linkToUpdate.link_id}`, linkToUpdate)
       .then(() => {
         alert('Link zapisany!');
       })
@@ -69,7 +71,7 @@ export const RepositoryModal: React.FC<RepositoryModalProps> = ({ projectId }) =
     const linkToRemove = repositoryLinks[index];
     if (linkToRemove.link_id) {
       console.log(`Usuwanie linku o ID: ${linkToRemove.link_id}`);
-      axios.delete(`http://localhost:3000/projects/link/${linkToRemove.link_id}`)
+      axios.delete(`${apiServerUrl}/projects/link/${linkToRemove.link_id}`)
       .then(() => {
         setRepositoryLinks(repositoryLinks.filter((_, i) => i !== index));
         console.log(`Link o ID: ${linkToRemove.link_id} został usunięty`);

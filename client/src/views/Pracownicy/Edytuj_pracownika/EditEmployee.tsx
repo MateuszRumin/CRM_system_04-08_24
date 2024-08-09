@@ -5,6 +5,8 @@ import EmployeeDataForm from '../../../components/Employee/EditNewEmployeeCompon
 import styles from './EditEmployee.module.css';
 import BlueButton from '../../../components/Buttons/BlueButton';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Position {
   position_id: number;
   name: string;
@@ -29,8 +31,8 @@ export function EditEmployee() {
     const fetchPositionsAndRoles = async () => {
       try {
         const [positionsResponse, rolesResponse] = await Promise.all([
-          axios.get('http://localhost:3000/employees/position'),
-          axios.get('http://localhost:3000/permissions/role')
+          axios.get(`${apiServerUrl}/employees/position`),
+          axios.get(`${apiServerUrl}/permissions/role`)
         ]);
         setPositions(positionsResponse.data);
         setRoles(rolesResponse.data);
@@ -65,7 +67,7 @@ export function EditEmployee() {
       ]
     };
   
-    axios.put(`http://localhost:3000/employees/${updatedEmployee.id}`, payload)
+    axios.put(`${apiServerUrl}/employees/${updatedEmployee.id}`, payload)
       .then(response => {
         console.log('Zaktualizowano dane pracownika:', response.data);
         navigate('/pracownicy');

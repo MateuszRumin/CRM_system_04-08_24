@@ -4,6 +4,8 @@ import styles from './EmployeeDataForm.module.css';
 import { useData } from '../../../contexts/DataContext';
 import axios from 'axios';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface EmployeeDataFormProps {
   onSubmit: (data: any) => void;
   formId: string;
@@ -19,7 +21,16 @@ interface EmployeeData {
   startDate: string;
   contractType: string;
   role: string;
+  username?: string;
 }
+
+const generateRandomDigits = (length: number) => {
+  return Array.from({ length }, () => Math.floor(Math.random() * 10)).join('');
+};
+
+const generateUsername = (firstName: string, lastName: string) => {
+  return `${firstName.slice(0, 1).toUpperCase()}${firstName.slice(1).toLowerCase()}${lastName.slice(0, 2).toUpperCase()}${generateRandomDigits(3)}`;
+};
 
 export function EmployeeDataForm({ onSubmit, formId }: EmployeeDataFormProps) {
   const { setEmployeeData, setValid, employeeData } = useData();
@@ -30,18 +41,22 @@ export function EmployeeDataForm({ onSubmit, formId }: EmployeeDataFormProps) {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isValid },
   } = useForm<EmployeeData>({
     mode: 'onChange',
     defaultValues: employeeData,
   });
 
+  const firstName = watch('firstName') || '';
+  const lastName = watch('lastName') || '';
+
   useEffect(() => {
-    setEmployeeData((prevData: EmployeeData) => ({
-      ...prevData,
-      ...watch(),
-    }));
-  }, [watch, setEmployeeData]);
+    if (!employeeData.username) {
+      const generatedUsername = generateUsername(firstName, lastName);
+      setValue('username', generatedUsername);
+    }
+  }, [firstName, lastName, setValue, employeeData.username]);
 
   useEffect(() => {
     setValid(isValid);
@@ -51,8 +66,8 @@ export function EmployeeDataForm({ onSubmit, formId }: EmployeeDataFormProps) {
     const fetchPositionsAndRoles = async () => {
       try {
         const [positionsResponse, rolesResponse] = await Promise.all([
-          axios.get('http://localhost:3000/employees/position'),
-          axios.get('http://localhost:3000/permissions/role')
+          axios.get(`${apiServerUrl}/employees/position`),
+          axios.get(`${apiServerUrl}/permissions/role`)
         ]);
 
         setPositions(positionsResponse.data);
@@ -199,6 +214,20 @@ export function EmployeeDataForm({ onSubmit, formId }: EmployeeDataFormProps) {
               ))}
             </select>
             {errors.role && <span className={styles.error}>{errors.role.message as string}</span>}
+          </label>
+        </div>
+        <div className={styles.row}>
+          <label className={styles.label}>
+            Nazwa użytkownika
+            <input
+              className={styles.input}
+              type="text"
+              {...register('username', {
+                required: 'Nazwa użytkownika jest wymagana.',
+                minLength: { value: 4, message: 'Nazwa użytkownika musi mieć co najmniej 4 znaki.' },
+              })}
+            />
+            {errors.username && <span className={styles.error}>{errors.username.message as string}</span>}
           </label>
         </div>
         <button type="submit" style={{ display: 'none' }}>Ukryty przycisk</button>

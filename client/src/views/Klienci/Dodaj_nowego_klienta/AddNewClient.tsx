@@ -7,6 +7,8 @@ import axios from 'axios';
 import { useData } from '../../../contexts/DataContext';
 import { useNavigate } from 'react-router-dom';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 export function AddNewClient() {
   const { isValid, isValidNotes, isValidTasks } = useData();
   const { notes, tasks, setNotes, setAddedNotes, setTasks, setAddedTasks } = useData();
@@ -18,7 +20,7 @@ export function AddNewClient() {
     console.log('Submitted tasks:', tasks);
 
     try {
-      const endpointUrl = 'http://localhost:3000/client/new';
+      const endpointUrl = `${apiServerUrl}/client/new`;
 
       const requestData = {
         client: {
@@ -76,7 +78,7 @@ export function AddNewClient() {
     <div className={styles.pageContainer}>
       <div className={styles.headerContainer}>
         <h1>Dodaj klienta</h1>
-        <p>Walidacja: {isValid && isValidNotes && isValidTasks ? 'true' : 'false'}</p>
+        {/* <p>Walidacja: {isValid && isValidNotes && isValidTasks ? 'true' : 'false'}</p> */}
         <BlueButton
           className={`${styles.sdsds} ${!isValid || !isValidNotes || !isValidTasks ? styles.disabled : ''}`}
           disabled={!isValid || !isValidNotes || !isValidTasks}

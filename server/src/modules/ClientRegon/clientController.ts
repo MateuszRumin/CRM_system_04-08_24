@@ -83,7 +83,7 @@ export const fetchRegonData = async (req: Request, res: Response) => {
 
             // Przygotowanie danych
             const regon = companyData.Regon[0] || 'Brak danych REGON';
-            const krs = companyData.Krs ? companyData.Krs[0] : 'Brak danych KRS'; // Upewnij się, że numer KRS jest dostępny
+            const krs = companyData.Krs ? companyData.Krs[0] : ''; // Upewnij się, że numer KRS jest dostępny
             const name = companyData.Nazwa[0] || 'Brak danych nazwy';
             const street = companyData.Ulica[0] || '';
             const number = companyData.NrNieruchomosci[0] || '';

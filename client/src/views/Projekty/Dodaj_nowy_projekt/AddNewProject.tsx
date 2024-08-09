@@ -6,6 +6,8 @@ import { ProjectNotes } from '../../../components/Projects/AddNewProjectComponen
 import BlueButton from '../../../components/Buttons/BlueButton';
 import { useProjectData } from '../../../contexts/ProjectDataContext';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 export function AddNewProject() {
   const { projectData, isValid, isValidNotes, notes, setNotes, setAddedNotes } = useProjectData();
   const [employees, setEmployees] = useState<any[]>([]);
@@ -16,9 +18,9 @@ export function AddNewProject() {
     const fetchData = async () => {
       try {
         const [employeesResponse, statusesResponse, clientsResponse] = await Promise.all([
-          axios.get('http://localhost:3000/employees'),
-          axios.get('http://localhost:3000/statuses/project'),
-          axios.get('http://localhost:3000/client/')
+          axios.get(`${apiServerUrl}/employees`),
+          axios.get(`${apiServerUrl}/statuses/project`),
+          axios.get(`${apiServerUrl}/client/`)
         ]);
 
         // Przetwarzanie pracowników i dodanie UserData
@@ -47,7 +49,7 @@ export function AddNewProject() {
     console.log('Submitted notes:', notes);
 
     try {
-      const endpointUrl = 'http://localhost:3000/projects/new';
+      const endpointUrl = `${apiServerUrl}/projects/new`;
 
       // Konwertowanie cost na Float
       const cost = parseFloat(data.cost || '0');

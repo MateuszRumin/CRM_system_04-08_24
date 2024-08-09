@@ -4,6 +4,8 @@ import styles from './ProjectTable.module.css';
 import { ProjectRow } from './ProjectRow';
 import Pagination from '../Client/Pagination';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Note {
   note_id: string;
   note_text: string;
@@ -40,7 +42,7 @@ export const ProjectTable: React.FC<ProjectTableProps> = ({ searchTerm, filterOp
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/projects/');
+        const response = await axios.get(`${apiServerUrl}/projects/`);
         const projectsWithDates = response.data.map((project: any) => ({
           ...project,
           startDate: project.startDate || '2023-01-01',

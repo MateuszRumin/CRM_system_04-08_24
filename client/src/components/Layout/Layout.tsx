@@ -8,6 +8,8 @@ import { Outlet } from 'react-router-dom';
 import { useUser } from '../../contexts/UserContext';
 import axios from 'axios';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface DecodedToken {
   userId: number;
   role: string;
@@ -15,7 +17,7 @@ interface DecodedToken {
 
 const verifyUserRole = async (userId: number, role: string) => {
   try {
-    const response = await axios.get(`http://localhost:3000/employees/${userId}`);
+    const response = await axios.get(`${apiServerUrl}/employees/${userId}`);
     const userRole = response.data.UserRole[0].Role.name;
     return userRole === role;
   } catch (error) {

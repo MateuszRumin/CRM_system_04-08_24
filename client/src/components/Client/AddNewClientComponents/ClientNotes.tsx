@@ -55,10 +55,10 @@ export function ClientNotes() {
           <div key={index} className={styles.note}>
             <p className={styles.noteContent}>{note.note_text}</p>
             <div className={styles.noteFooter}>
-              <img src="/path/to/admin_avatar.png" alt="Admin Avatar" className={styles.avatar} />
-              <div className={styles.noteAuthor}>
+              {/* <img src="/path/to/admin_avatar.png" alt="Admin Avatar" className={styles.avatar} /> */}
+              {/* <div className={styles.noteAuthor}>
                 Jan Kowalski<br />{note.timestamp}
-              </div>
+              </div> */}
             </div>
           </div>
         ))}

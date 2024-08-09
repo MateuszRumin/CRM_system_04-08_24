@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction, useEffect } from 'react';
 import axios from 'axios';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Note {
   note_id: number;
   note_text: string;
@@ -200,7 +202,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                     note_text: note.note_text
                 }))
             };
-            const response = await axios.post(`http://localhost:3000/client/${clientId}/notes`, dataToAdd);
+            const response = await axios.post(`${apiServerUrl}/client/${clientId}/notes`, dataToAdd);
             console.log('Dodano nowe notatki:', response.data);
         } else {
             console.log('Nie ma notatek do dodania.');
@@ -213,7 +215,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     if (deletedNotes.length > 0) {
         try {
             for (const noteId of deletedNotes) {
-                const url = `http://localhost:3000/client/notes/${noteId}`;
+                const url = `${apiServerUrl}/client/notes/${noteId}`;
                 await axios.delete(url);
             }
             console.log('Notatki zostały usunięte:', deletedNotes);
@@ -228,7 +230,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     if (deletedTasks.length > 0) {
         try {
             for (const taskId of deletedTasks) {
-                const url = `http://localhost:3000/client/tasks/${taskId}`;
+                const url = `${apiServerUrl}/client/tasks/${taskId}`;
                 await axios.delete(url);
             }
             console.log('Zadania zostały usunięte:', deletedTasks);
@@ -241,7 +243,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
     // Aktualizacja danych klienta
     try {
-        const updatedClientUrl = `http://localhost:3000/client/${clientId}/update`;
+        const updatedClientUrl = `${apiServerUrl}/client/${clientId}/update`;
         const response = await axios.put(updatedClientUrl, {
             client_id: clientId,
             status_id: parseInt(updatedClientData.status),
@@ -270,7 +272,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         if (updatedTasks.length > 0) {
             for (const task of updatedTasks) {
                 const { task_id, task_title, task_description, task_deadline, task_status } = task;
-                const url = `http://localhost:3000/client/tasks/${task_id}`;
+                const url = `${apiServerUrl}/client/tasks/${task_id}`;
                 const isoDeadline = new Date(task_deadline).toISOString();
                 const statusId = parseInt(task_status);
 
@@ -294,7 +296,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         if (updatedNotes.length > 0) {
             for (const note of updatedNotes) {
                 const { note_id, note_text } = note;
-                const url = `http://localhost:3000/client/notes/${note_id}`;
+                const url = `${apiServerUrl}/client/notes/${note_id}`;
                 const response = await axios.put(url, {
                     note_text: note_text
                 });
@@ -322,7 +324,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                     deadline: new Date(task.task_deadline).toISOString()
                 }))
             };
-            const response = await axios.post(`http://localhost:3000/client/${clientId}/tasks`, dataToAdd);
+            const response = await axios.post(`${apiServerUrl}/client/${clientId}/tasks`, dataToAdd);
             console.log('Dodano nowe zadania:', response.data);
         } else {
             console.log('Nie ma zadań do dodania.');
@@ -338,7 +340,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
             emails: updatedClientData.emails,
             phones: updatedClientData.phones
         };
-        const response = await axios.post(`http://localhost:3000/client/${clientId}/contact`, dataToAdd);
+        const response = await axios.post(`${apiServerUrl}/client/${clientId}/contact`, dataToAdd);
         console.log('Dodano nowe kontakty:', response.data);
     } catch (error) {
         console.error('Błąd podczas dodawania kontaktów:', error);

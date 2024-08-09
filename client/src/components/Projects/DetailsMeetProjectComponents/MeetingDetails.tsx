@@ -2,6 +2,8 @@ import React from 'react';
 import axios from 'axios';
 import styles from './MeetingDetails.module.css';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface MeetingDetailsProps {
   meetingId: number;
   onClose: () => void;
@@ -15,7 +17,7 @@ const MeetingDetails: React.FC<MeetingDetailsProps> = ({ meetingId, onClose }) =
   React.useEffect(() => {
     const fetchMeetingDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/projects/meeting/${meetingId}`);
+        const response = await axios.get(`${apiServerUrl}/projects/meeting/${meetingId}`);
         setMeetingDetails(response.data);
       } catch (err) {
         setError('Failed to fetch meeting details');
@@ -29,7 +31,7 @@ const MeetingDetails: React.FC<MeetingDetailsProps> = ({ meetingId, onClose }) =
 
   const handleDelete = async () => {
     try {
-      const response = await axios.delete(`http://localhost:3000/projects/meeting/${meetingId}`);
+      const response = await axios.delete(`${apiServerUrl}/projects/meeting/${meetingId}`);
       console.log(response.data.message); // Potwierdzenie usunięcia
       onClose(); // Zamknięcie szczegółów po usunięciu
     } catch (err) {
