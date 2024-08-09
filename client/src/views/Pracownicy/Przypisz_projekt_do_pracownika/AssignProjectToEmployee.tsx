@@ -6,6 +6,7 @@ import Pagination from '../../../components/Employee/Pagination';
 import styles from './AssignProjectToEmployee.module.css';
 import BlueButton from '../../../components/Buttons/BlueButton';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
 
 interface Project {
   project_id: string;
@@ -28,7 +29,7 @@ export function AssignProjectToEmployee() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/projects/without/${employee?.id}`);
+        const response = await axios.get(`${apiServerUrl}/projects/without/${employee?.id}`);
         const projectsData = response.data;
         setProjects(projectsData);
       } catch (error) {
@@ -64,7 +65,7 @@ export function AssignProjectToEmployee() {
     try {
       const projectsData = selectedProjects.map(id => ({ project_id: parseInt(id, 10) }));
       for (const project of projectsData) {
-        await axios.post(`http://localhost:3000/employees/${employee?.id}/project/assign`, project);
+        await axios.post(`${apiServerUrl}/employees/${employee?.id}/project/assign`, project);
       }
   
       navigate(`/pracownicy`);

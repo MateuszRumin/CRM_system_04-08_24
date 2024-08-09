@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import styles from './ClientDataForm.module.css';
 import { useData } from '../../../contexts/DataContext';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface ClientDataFormProps {
   clientData: any;
   onSubmit: (data: any) => void;
@@ -23,19 +25,61 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
   });
 
   const [showPrivateAddress, setShowPrivateAddress] = useState(false);
+  const [isCompanyType, setIsCompanyType] = useState(true); // Assume default is 'Firma'
 
   useEffect(() => {
     Object.keys(clientData).forEach((key) => {
       setValue(key, clientData[key]);
     });
+
+    const initialCompanyType = clientData.companyType;
+    if (initialCompanyType) {
+      setShowPrivateAddress(initialCompanyType === 'Prywatny');
+      setIsCompanyType(initialCompanyType === 'Firma');
+    }
   }, [clientData, setValue]);
 
   useEffect(() => {
     setValid(formIsValid);
   }, [formIsValid, setValid]);
 
-  const handleFetchData = () => {
-    console.log('Pobieranie danych z REGON:', watch('nip'));
+  const fetchDataFromAPI = async (nip: string) => {
+    try {
+      const response = await fetch(`${apiServerUrl}/client/fetch-regon-data`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nip }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return null;
+    }
+  };
+
+  const handleFetchData = async () => {
+    const nip = watch('nip');
+    if (!nip) {
+      console.error('NIP is required');
+      return;
+    }
+
+    const data = await fetchDataFromAPI(nip);
+
+    if (data) {
+      setValue('regon', data.regon);
+      setValue('krs', data.krs);
+      setValue('companyName', data.name);
+      setValue('companyAddress', data.address);
+    }
   };
 
   const handleAddEmail = () => {
@@ -67,13 +111,29 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
   const handleCompanyTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedType = event.target.value;
     setShowPrivateAddress(selectedType === 'Prywatny');
+    setIsCompanyType(selectedType === 'Firma'); // Update state based on company type
     setValue('companyType', selectedType);
+  
+    // If "Osoba prywatna" is selected, clear company-related fields
+    if (selectedType === 'Prywatny') {
+      setValue('nip', 'brak');
+      setValue('regon', 'brak');
+      setValue('krs', 'brak');
+      setValue('companyName', 'brak');
+      setValue('companyAddress', 'brak');
+    }
   };
+
+  // Register the field without any validation rules
+  useEffect(() => {
+    register('krs', { required: false }); // Disable validation
+  }, [register]);
 
   return (
     <div className={styles.formContainer}>
       <h2>Dane klienta</h2>
       <form id={formId} className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        {/* Form content */}
         <div className={styles.row}>
           <label className={styles.label}>
             Status
@@ -84,15 +144,6 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
               <option value="4">Stracony</option>
             </select>
             {errors.status && <span className={styles.error}>{errors.status.message as string}</span>}
-          </label>
-          <label className={styles.label}>
-            Przypisany pracownik
-            <select className={styles.select} {...register('assignedEmployee', { required: 'Przypisany pracownik jest wymagany.' })}>
-              <option value="">Wybierz pracownika</option>
-              <option value="test">Brak API zaznacz cokolwiek</option>
-              <option value="other">Inny pracownik</option>
-            </select>
-            {errors.assignedEmployee && <span className={styles.error}>{errors.assignedEmployee.message as string}</span>}
           </label>
         </div>
         <div className={styles.row}>
@@ -186,7 +237,7 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
                 />
                 {errors.nip && <span className={styles.error}>{errors.nip.message as string}</span>}
               </label>
-              <button className={styles.button} type="button" onClick={handleFetchData}>
+              <button className={styles.addPhoneButton} type="button" onClick={handleFetchData}>
                 Pobierz dane z REGON
               </button>
             </div>
@@ -213,14 +264,7 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
                 <input
                   className={styles.input}
                   type="text"
-                  {...register('krs', {
-                    minLength: { value: 9, message: 'KRS musi mieć co najmniej 9 znaków.' },
-                    maxLength: { value: 14, message: 'KRS musi mieć maksymalnie 14 znaków.' },
-                    pattern: {
-                      value: /^[0-9]+$/,
-                      message: 'KRS może zawierać tylko cyfry.',
-                    },
-                  })}
+                  {...register('krs', { required: false })} // Disable validation
                 />
                 {errors.krs && <span className={styles.error}>{errors.krs.message as string}</span>}
               </label>
@@ -249,9 +293,9 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
             </div>
           </>
         )}
-        <div className={styles.row}>
-          <label className={styles.label}>
-            E-maile
+        <div className={styles.emailPhoneContainer}>
+          <div className={styles.emailSection}>
+            <h3>Emaile:</h3>
             {watch('emails', []).map((email: string, index: number) => (
               <div key={index} className={styles.emailRow}>
                 <input
@@ -262,7 +306,7 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
                     pattern: { value: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/, message: 'Nieprawidłowy format email.' },
                   })}
                 />
-                <button className={styles.button} type="button" onClick={() => handleRemoveEmail(index)}>
+                <button className={styles.addPhoneButton} type="button" onClick={() => handleRemoveEmail(index)}>
                   Usuń
                 </button>
               </div>
@@ -270,11 +314,9 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
             <button className={styles.addEmailButton} type="button" onClick={handleAddEmail}>
               Dodaj email
             </button>
-          </label>
-        </div>
-        <div className={styles.row}>
-          <label className={styles.label}>
-            Telefony
+          </div>
+          <div className={styles.phoneSection}>
+            <h3>Numery telefonów:</h3>
             {watch('phones', []).map((phone: string, index: number) => (
               <div key={index} className={styles.phoneRow}>
                 <input
@@ -285,7 +327,7 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
                     pattern: { value: /^[0-9]+$/, message: 'Numer telefonu może zawierać tylko cyfry.' },
                   })}
                 />
-                <button className={styles.button} type="button" onClick={() => handleRemovePhone(index)}>
+                <button className={styles.addPhoneButton} type="button" onClick={() => handleRemovePhone(index)}>
                   Usuń
                 </button>
               </div>
@@ -293,7 +335,7 @@ export function ClientDataForm({ clientData, onSubmit, formId }: ClientDataFormP
             <button className={styles.addPhoneButton} type="button" onClick={handleAddPhone}>
               Dodaj telefon
             </button>
-          </label>
+          </div>
         </div>
         <button type="submit" style={{ display: 'none' }}>Ukryty przycisk</button>
       </form>

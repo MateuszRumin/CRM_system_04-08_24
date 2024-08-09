@@ -29,6 +29,7 @@ import { RemoveEmployee } from './views/Pracownicy/Usun_pracownika/RemoveEmploye
 import { ProjectDetails } from './views/Projekty/ProjectDetails.tsx';
 import { AddNewProject } from './views/Projekty/Dodaj_nowy_projekt/AddNewProject.tsx';
 import { EditProject } from './views/Projekty/Edytuj_projekt/EditProject.tsx';
+import { InvoiceDetails } from './views/Faktury/InvoiceDetails.tsx';
 import { AuthRoute } from './components/auth/auth.tsx';
 import { DetailsClient } from './components/Client/ClientDetailsComponents/DetailsClient.tsx'
 
@@ -48,6 +49,12 @@ const router = createBrowserRouter([
       {
         path: 'faktury',
         element: <AuthRoute allowedRoles={['Admin']}><Faktury /></AuthRoute>,
+        children: [
+          {
+            path: 'details-invoice/:invoice_id',
+            element: <AuthRoute allowedRoles={['Admin']}><InvoiceDetails /></AuthRoute>,
+          },
+        ],
       },
       {
         path: 'faktury/new',

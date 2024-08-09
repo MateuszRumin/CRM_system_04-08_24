@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ClientTable } from '../../components/Client/ClientTable';
 import { SearchClient } from '../../components/Client/SearchClient';
 import { FilterClient } from '../../components/Client/FilterClient';
@@ -10,10 +10,17 @@ export const Klienci = () => {
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filterOptions, setFilterOptions] = useState<{ [key: string]: string }>({});
+  const [refresh, setRefresh] = useState<boolean>(false); // Dodaj stan do zarządzania odświeżaniem
 
   const isAddClientRoute = location.pathname.includes('add-client');
   const isEditClientRoute = location.pathname.includes('edit-client');
   const isDetailClientRoute = location.pathname.includes('details-client');
+
+  useEffect(() => {
+    if (!isAddClientRoute && !isEditClientRoute && !isDetailClientRoute) {
+      setRefresh(prev => !prev); // Przełącz stan odświeżania
+    }
+  }, [location.pathname]);
 
   return (
     <div>
@@ -27,7 +34,11 @@ export const Klienci = () => {
               <AddNewClientButton />
             </div>
           </div>
-          <ClientTable searchTerm={searchTerm} filterOptions={filterOptions} />
+          <ClientTable 
+            searchTerm={searchTerm} 
+            filterOptions={filterOptions} 
+            refresh={refresh} // Przekaż stan odświeżania
+          />
         </div>
       )}
       <Outlet />

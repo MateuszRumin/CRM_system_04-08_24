@@ -6,6 +6,8 @@ import Pagination from '../../../components/Employee/Pagination';
 import styles from './RemoveEmployee.module.css';
 import BlueButton from '../../../components/Buttons/BlueButton';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 // Definiowanie interfejsu Project lokalnie
 interface Project {
   project_id: string;
@@ -28,7 +30,8 @@ export function RemoveEmployee() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/projects/with/${employee?.id}`);
+        const response = await axios.get(`${apiServerUrl}
+/projects/with/${employee?.id}`);
         setProjects(response.data);
       } catch (error) {
         console.error('Error fetching projects:', error);
@@ -61,7 +64,8 @@ export function RemoveEmployee() {
   const handleRemoveClick = async () => {
     try {
       for (const projectId of selectedProjects) {
-        await axios.delete(`http://localhost:3000/employees/${employee?.id}/project/remove`, {
+        await axios.delete(`${apiServerUrl}
+/employees/${employee?.id}/project/remove`, {
           data: { project_id: parseInt(projectId, 10) }
         });
       }

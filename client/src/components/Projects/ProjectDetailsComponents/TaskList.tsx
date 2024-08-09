@@ -3,6 +3,8 @@ import styles from './TaskList.module.css';
 import TaskForm from '../AddNewTaskComponents/TaskForm';
 import TaskDetails from '../DetailsTaskProjectComponents/TaskDetails';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Task {
   task_id: number;
   task_name: string;
@@ -31,7 +33,7 @@ const TasksList: React.FC<{ projectId: number }> = ({ projectId }) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/projects/${projectId}`)
+    fetch(`${apiServerUrl}/projects/${projectId}`)
       .then(response => response.json())
       .then(data => {
         if (data && data.ProjectTask) {
@@ -62,7 +64,7 @@ const TasksList: React.FC<{ projectId: number }> = ({ projectId }) => {
   }, [projectId]);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/employees`)
+    fetch(`${apiServerUrl}/employees`)
       .then(response => response.json())
       .then(data => setEmployees(data))
       .catch(error => {
@@ -87,7 +89,7 @@ const TasksList: React.FC<{ projectId: number }> = ({ projectId }) => {
   };
 
   const handleDeleteTask = (taskId: number) => {
-    fetch(`http://localhost:3000/projects/task/${taskId}`, { method: 'DELETE' })
+    fetch(`${apiServerUrl}/projects/task/${taskId}`, { method: 'DELETE' })
       .then(response => response.json())
       .then(() => setTasks(tasks.filter(task => task.task_id !== taskId)))
       .catch(error => console.error('Error:', error));
@@ -97,8 +99,8 @@ const TasksList: React.FC<{ projectId: number }> = ({ projectId }) => {
   const handleSaveTask = (task: any) => {
     const method = selectedTask ? 'PUT' : 'POST';
     const url = selectedTask
-      ? `http://localhost:3000/projects/task/${selectedTask.task_id}`
-      : `http://localhost:3000/projects/task/new`;
+      ? `${apiServerUrl}/projects/task/${selectedTask.task_id}`
+      : `${apiServerUrl}/projects/task/new`;
 
     fetch(url, {
       method,

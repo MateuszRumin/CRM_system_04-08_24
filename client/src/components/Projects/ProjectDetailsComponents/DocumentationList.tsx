@@ -5,6 +5,8 @@ import { DocumentationModal } from '../DocumentationModalComponents/Documentatio
 import { AddDocumentationModal } from '../DocumentationModalComponents/AddDocumentationModal';
 import { DeleteDocumentationModal } from '../DocumentationModalComponents/DeleteDocumentationModal';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 const DocumentationList: React.FC<{ projectId: number }> = ({ projectId }) => {
   const [documents, setDocuments] = useState<any[]>([]);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
@@ -14,7 +16,7 @@ const DocumentationList: React.FC<{ projectId: number }> = ({ projectId }) => {
   const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/projects/${projectId}`)
+    axios.get(`${apiServerUrl}/projects/${projectId}`)
       .then(response => {
         setDocuments(response.data.ProjectDoc);
       })
@@ -34,7 +36,7 @@ const DocumentationList: React.FC<{ projectId: number }> = ({ projectId }) => {
   };
 
   const refreshDocuments = () => {
-    axios.get(`http://localhost:3000/projects/${projectId}`)
+    axios.get(`${apiServerUrl}/projects/${projectId}`)
       .then(response => {
         setDocuments(response.data.ProjectDoc);
       })

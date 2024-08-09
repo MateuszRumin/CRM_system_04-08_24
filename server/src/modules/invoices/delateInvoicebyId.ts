@@ -6,12 +6,13 @@ const prisma = new PrismaClient();
 
 
 exports.deleteInvoice = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const invoiceId = req.body.main.invoice_id;
+  const { invoice_id } = req.params;  
+  
+  try {
   
       // Pobranie faktury z bazy danych
       const invoice = await prisma.invoices.findUnique({
-        where: { invoice_id: invoiceId },
+        where: { invoice_id: parseInt(invoice_id) },
         include: { Status: true }  // Pobranie powiązanego statusu
       });
   
@@ -41,12 +42,12 @@ exports.deleteInvoice = async (req: Request, res: Response, next: NextFunction) 
   
       // Usunięcie powiązanych rekordów w InvoiceProducts
       await prisma.invoiceProducts.deleteMany({
-        where: { invoice_id: invoiceId },
+        where: { invoice_id: parseInt(invoice_id) },
       });
   
       // Usunięcie faktury
       await prisma.invoices.delete({
-        where: { invoice_id: invoiceId },
+        where: { invoice_id: parseInt(invoice_id) },
       });
   
       const response: IResponse = {

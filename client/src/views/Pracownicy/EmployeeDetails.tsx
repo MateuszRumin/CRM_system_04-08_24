@@ -13,6 +13,8 @@ import autoTable from 'jspdf-autotable';
 import SignatureCanvas from 'react-signature-canvas';
 import { PDFDocument } from 'pdf-lib';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Project {
   project_id: string;
   name: string;
@@ -38,7 +40,7 @@ export function EmployeeDetails() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/projects/with/${employee?.id}`);
+        const response = await axios.get(`${apiServerUrl}/projects/with/${employee?.id}`);
         setProjects(response.data);
       } catch (error) {
         console.error('Error fetching projects:', error);

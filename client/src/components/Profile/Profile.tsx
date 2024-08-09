@@ -5,6 +5,8 @@ import styles from './Profile.module.css'
 import { ChangeDataProfile } from './ChangeDataProfile/ChangeDataProfile'
 import { jwtDecode } from 'jwt-decode'
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface DecodedToken {
   userId: number;
   role: string;
@@ -28,7 +30,7 @@ export const Profile = () => {
         const userId = decodedToken.userId
 
         // Pobranie danych użytkownika za pomocą axios
-        axios.get(`http://localhost:3000/employees/${userId}`)
+        axios.get(`${apiServerUrl}/employees/${userId}`)
           .then(response => {
             const data = response.data
 

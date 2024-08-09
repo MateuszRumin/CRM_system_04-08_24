@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styles from './StronGlowna.module.css';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
+// ${apiServerUrl}
+
 interface Project {
   project_id: number;
   name: string;
@@ -117,11 +121,11 @@ export const StronaGlowna = () => {
     if (userId) {
       async function fetchProjects() {
         try {
-          const response = await axios.get(`http://localhost:3000/employees/${userId}`);
+          const response = await axios.get(`${apiServerUrl}/employees/${userId}`);
           const projectAssignments = response.data.ProjectAssignment;
           const projectIds = projectAssignments.map((assignment: any) => assignment.project_id);
 
-          const projectDetailsPromises = projectIds.map((id: number) => axios.get(`http://localhost:3000/projects/${id}`));
+          const projectDetailsPromises = projectIds.map((id: number) => axios.get(`${apiServerUrl}/projects/${id}`));
           const projectDetailsResponses = await Promise.all(projectDetailsPromises);
 
           const fetchedProjects = projectDetailsResponses.map((res) => res.data);
@@ -148,7 +152,7 @@ export const StronaGlowna = () => {
 
     async function fetchMeetingDetails(projectId: number) {
       try {
-        const response = await axios.get(`http://localhost:3000/projects/meeting/${projectId}`);
+        const response = await axios.get(`${apiServerUrl}/projects/meeting/${projectId}`);
         if (response.data && response.data.meeting_id) {
           setMeetingDetails(response.data);
         } else {

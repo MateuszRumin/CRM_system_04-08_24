@@ -4,6 +4,8 @@ import styles from './ClientRow.module.css';
 import ThreeDotsSettings from '../../assets/ClientPage/three_dots_settings.svg';
 import axios from 'axios';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Client {
   id: number;
   name: string;
@@ -70,7 +72,7 @@ export const ClientRow: React.FC<ClientRowProps> = ({ client, onDelete }) => {
     try {
       const clientId = client.id;
 
-      const response = await axios.delete(`http://localhost:3000/client/${clientId}/delete`);
+      const response = await axios.delete(`${apiServerUrl}/client/${clientId}/delete`);
 
       if (response.status === 200) {
         console.log('Klient został usunięty pomyślnie');

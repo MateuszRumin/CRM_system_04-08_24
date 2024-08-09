@@ -1,8 +1,8 @@
-// DeleteDocumentationModal.tsx
-
 import React from 'react';
 import axios from 'axios';
 import styles from './DeleteDocumentationModal.module.css';
+
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
 
 interface DeleteDocumentationModalProps {
   documentId: number;
@@ -13,7 +13,7 @@ interface DeleteDocumentationModalProps {
 
 export const DeleteDocumentationModal: React.FC<DeleteDocumentationModalProps> = ({ documentId, projectId, onClose, onDelete }) => {
   const handleDelete = () => {
-    axios.delete(`http://localhost:3000/projects/doc/${documentId}`)
+    axios.delete(`${apiServerUrl}/projects/doc/${documentId}`)
       .then(() => {
         onDelete();
       })

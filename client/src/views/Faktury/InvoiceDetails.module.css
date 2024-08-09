@@ -1,0 +1,87 @@
+/* InvoiceDetails.module.css */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.section {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.section h2 {
+  font-size: 1.5em;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.section p {
+  font-size: 1em;
+  line-height: 1.6;
+  color: #555;
+  margin: 5px 0;
+}
+
+.section p strong {
+  color: #333;
+}
+
+.productSection {
+  grid-column: span 2;
+}
+
+.product {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.product h3 {
+  font-size: 1.2em;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.product p {
+  font-size: 1em;
+  line-height: 1.5;
+  color: #555;
+  margin: 5px 0;
+}
+
+.product hr {
+  border: 0;
+  border-top: 1px solid #ddd;
+  margin: 10px 0;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.loading {
+  font-size: 1.2em;
+  color: #999;
+  margin-top: 20px;
+}

@@ -6,6 +6,8 @@ import { useProjectData } from '../../../contexts/ProjectDataContext';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 export function EditProject() {
   const { id } = useParams<{ id: string }>();
   const { setProjectData, isValid, setValid } = useProjectData();
@@ -22,14 +24,14 @@ export function EditProject() {
       }
 
       try {
-        const projectResponse = await axios.get(`http://localhost:3000/projects/${id}`);
+        const projectResponse = await axios.get(`${apiServerUrl}/projects/${id}`);
         setProject(projectResponse.data);
         setProjectData(projectResponse.data);
 
-        const statusesResponse = await axios.get('http://localhost:3000/statuses/project');
+        const statusesResponse = await axios.get(`${apiServerUrl}/statuses/project`);
         setStatuses(statusesResponse.data);
 
-        const employeesResponse = await axios.get('http://localhost:3000/employees');
+        const employeesResponse = await axios.get(`${apiServerUrl}/employees`);
         setEmployees(employeesResponse.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -66,7 +68,7 @@ export function EditProject() {
         assignedUsers: data.assignedUsers || [],
       };
   
-      await axios.put(`http://localhost:3000/projects/${id}`, updatedProject);
+      await axios.put(`${apiServerUrl}/projects/${id}`, updatedProject);
       console.log('Project updated successfully');
     } catch (error) {
       console.error('Error updating project:', error);
