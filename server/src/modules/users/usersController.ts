@@ -17,7 +17,7 @@ const createToken = (userId: number, username: string, role: string) => {
         role
     };
 
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: '3h' });
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -490,6 +490,7 @@ export const loginUser = async (req: Request, res: Response) => {
             token: token,
             startTime: new Date(),
             active: true,
+            expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000), //waznosc do 8h od zalogowania
             },
         });
 

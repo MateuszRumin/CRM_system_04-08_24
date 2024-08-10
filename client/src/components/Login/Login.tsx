@@ -19,6 +19,50 @@ export const Login: React.FC = () => {
     reset,
   } = useForm({ mode: 'onBlur' });
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/employees/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Dodaj token do nagłówka
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+
+      // Usuń dane z localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('USER');
+
+      // Zaktualizuj kontekst użytkownika
+      setUser(null);
+      navigate('/login');
+    } catch (error: any) {
+      console.error('Error during logout:', error);
+    }
+  };
+  
+  // const AUTO_LOGOUT_TIME = 10 * 1000; // 10 sekund, zmień na 8 godzin w produkcji
+  const AUTO_LOGOUT_TIME = 8 * 60 * 60 * 1000; // 8 godzin w milisekundach
+
+  const startAutoLogoutTimer = () => {
+    const loginTime = localStorage.getItem('loginTime');
+    if (loginTime) {
+      const expirationTime = new Date(new Date(loginTime).getTime() + AUTO_LOGOUT_TIME).getTime();
+      const currentTime = new Date().getTime();
+      const timeLeft = expirationTime - currentTime;
+
+      if (timeLeft > 0) {
+        setTimeout(() => {
+          handleLogout();
+        }, timeLeft);
+      }
+    }
+  };
+
   const onSubmit = async (data: Object): Promise<void> => {
     setSubmitErrors('');
     try {
@@ -41,10 +85,15 @@ export const Login: React.FC = () => {
       console.log('Login response:', result); // Debugging statement
 
       localStorage.setItem('token', token);
+      localStorage.setItem('loginTime', new Date().toISOString());
       setUser(userData);
-  
+      // await checkSession(); // Ensure session is active
+
       reset();
       navigate('/');
+
+      startAutoLogoutTimer(); // Uruchom timer wylogowywania
+
     } catch (error: any) {
       if (error.message === '1') {
         setSubmitErrors(() => 'Nieprawidłowy login lub hasło');
@@ -53,7 +102,7 @@ export const Login: React.FC = () => {
       }
     }
   };
-  
+
   return (
     <section className={styles.loginContainer}>
       <div className={styles.login}>

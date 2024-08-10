@@ -472,6 +472,7 @@ model WorkSessions {
   startTime    DateTime
   endTime      DateTime?
   active       Boolean  @default(true)
+  expires_at   DateTime
   updatedAt    DateTime @default(now())
 
   User         Users     @relation(fields: [user_id], references: [user_id])

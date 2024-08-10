@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styles from './AdminPage.module.css';
-// import { Roles } from '../../components/Roles/Roles';
 import Pagination from './Pagination';
 
 interface WorkSession {
@@ -48,8 +47,10 @@ const calculateTimeWorked = (startTime: string, endTime?: string) => {
 export const AdminPage = () => {
     const [activeSessions, setActiveSessions] = useState<WorkSession[]>([]);
     const [endedSessions, setEndedSessions] = useState<WorkSession[]>([]);
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [itemsPerPage, setItemsPerPage] = useState<number>(ITEMS_PER_PAGE_OPTIONS[0]);
+    const [currentPageActive, setCurrentPageActive] = useState<number>(1);
+    const [itemsPerPageActive, setItemsPerPageActive] = useState<number>(ITEMS_PER_PAGE_OPTIONS[0]);
+    const [currentPageEnded, setCurrentPageEnded] = useState<number>(1);
+    const [itemsPerPageEnded, setItemsPerPageEnded] = useState<number>(ITEMS_PER_PAGE_OPTIONS[0]);
     const [selectedMonthYear, setSelectedMonthYear] = useState<string>('');
     const [monthsAndYears, setMonthsAndYears] = useState<MonthYear[]>([]);
 
@@ -92,7 +93,7 @@ export const AdminPage = () => {
                     timeWorked: calculateTimeWorked(session.startTime)
                 }))
             );
-        }, 1 * 60 * 1000); // 1 minutes
+        }, 1 * 60 * 1000); // 1 minute
 
         // Clean up interval on component unmount
         return () => clearInterval(intervalId);
@@ -102,16 +103,22 @@ export const AdminPage = () => {
         return userRole.length > 0 ? userRole[0].Role.name : 'Unknown';
     };
 
-    const indexOfLastSession = currentPage * itemsPerPage;
-    const indexOfFirstSession = indexOfLastSession - itemsPerPage;
-    const currentActiveSessions = activeSessions.slice(indexOfFirstSession, indexOfLastSession);
-    const currentEndedSessions = endedSessions.slice(indexOfFirstSession, indexOfLastSession);
+    const indexOfLastSessionActive = currentPageActive * itemsPerPageActive;
+    const indexOfFirstSessionActive = indexOfLastSessionActive - itemsPerPageActive;
+    const currentActiveSessions = activeSessions.slice(indexOfFirstSessionActive, indexOfLastSessionActive);
+
+    const indexOfLastSessionEnded = currentPageEnded * itemsPerPageEnded;
+    const indexOfFirstSessionEnded = indexOfLastSessionEnded - itemsPerPageEnded;
+    const currentEndedSessions = endedSessions.slice(indexOfFirstSessionEnded, indexOfLastSessionEnded);
 
     const totalActiveSessions = activeSessions.length;
     const totalEndedSessions = endedSessions.length;
 
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-    const changeItemsPerPage = (newItemsPerPage: number) => setItemsPerPage(newItemsPerPage);
+    const paginateActive = (pageNumber: number) => setCurrentPageActive(pageNumber);
+    const changeItemsPerPageActive = (newItemsPerPage: number) => setItemsPerPageActive(newItemsPerPage);
+
+    const paginateEnded = (pageNumber: number) => setCurrentPageEnded(pageNumber);
+    const changeItemsPerPageEnded = (newItemsPerPage: number) => setItemsPerPageEnded(newItemsPerPage);
 
     const handleDeleteSession = async (sessionId: number) => {
         try {
@@ -197,11 +204,11 @@ export const AdminPage = () => {
                     )}
                     <Pagination
                         itemsPerPageOptions={ITEMS_PER_PAGE_OPTIONS}
-                        itemsPerPage={itemsPerPage}
+                        itemsPerPage={itemsPerPageActive}
                         totalItems={totalActiveSessions}
-                        currentPage={currentPage}
-                        paginate={paginate}
-                        changeItemsPerPage={changeItemsPerPage}
+                        currentPage={currentPageActive}
+                        paginate={paginateActive}
+                        changeItemsPerPage={changeItemsPerPageActive}
                     />
                 </div>
 
@@ -227,11 +234,11 @@ export const AdminPage = () => {
                     )}
                     <Pagination
                         itemsPerPageOptions={ITEMS_PER_PAGE_OPTIONS}
-                        itemsPerPage={itemsPerPage}
+                        itemsPerPage={itemsPerPageEnded}
                         totalItems={totalEndedSessions}
-                        currentPage={currentPage}
-                        paginate={paginate}
-                        changeItemsPerPage={changeItemsPerPage}
+                        currentPage={currentPageEnded}
+                        paginate={paginateEnded}
+                        changeItemsPerPage={changeItemsPerPageEnded}
                     />
                 </div>
             </div>
