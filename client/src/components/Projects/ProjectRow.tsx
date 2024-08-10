@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import styles from './ProjectRow.module.css';
 import ThreeDotsSettings from '../../assets/ClientPage/three_dots_settings.svg';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface ProjectRowProps {
   project: {
     project_id: number;
@@ -49,7 +51,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({ project, onDelete }) => 
 
   const confirmDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/projects/${project.project_id}`, {
+      const response = await fetch(`${apiServerUrl}/projects/${project.project_id}`, {
         method: 'DELETE',
       });
 

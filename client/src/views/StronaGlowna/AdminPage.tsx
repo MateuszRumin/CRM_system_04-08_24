@@ -85,7 +85,7 @@ export const AdminPage = () => {
 
         fetchSessions();
 
-        // Update time every 5 minutes
+        // Update time every minute
         const intervalId = setInterval(() => {
             setActiveSessions(prevSessions => 
                 prevSessions.map(session => ({
@@ -119,6 +119,19 @@ export const AdminPage = () => {
 
     const paginateEnded = (pageNumber: number) => setCurrentPageEnded(pageNumber);
     const changeItemsPerPageEnded = (newItemsPerPage: number) => setItemsPerPageEnded(newItemsPerPage);
+
+    const handleEndSession = async (sessionId: number) => {
+        try {
+            await axios.post(`http://localhost:3000/employees/session/${sessionId}`);
+            // Refresh sessions after ending
+            const response = await axios.get('http://localhost:3000/employees/session/workSessions');
+            const { activeSessions, endedSessions } = response.data;
+            setActiveSessions(activeSessions);
+            setEndedSessions(endedSessions);
+        } catch (error) {
+            console.error('Error ending session:', error);
+        }
+    };
 
     const handleDeleteSession = async (sessionId: number) => {
         try {
@@ -196,6 +209,9 @@ export const AdminPage = () => {
                                     <p><strong>Rola:</strong> {getRoleName(session.User.UserRole)}</p>
                                     <p><strong>Start:</strong> {new Date(session.startTime).toLocaleString()}</p>
                                     <p><strong>Czas pracy:</strong> {calculateTimeWorked(session.startTime)}</p>
+                                    <button onClick={() => handleEndSession(session.session_id)} className={styles.endButton}>
+                                        Zakończ sesję
+                                    </button>
                                 </li>
                             ))}
                         </ul>

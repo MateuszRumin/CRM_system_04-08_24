@@ -4,6 +4,8 @@ import styles from './EmployeeRow.module.css';
 import ThreeDotsSettings from '../../assets/ClientPage/three_dots_settings.svg';
 import axios from 'axios';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Employee {
   id: number;
   name: string;
@@ -59,7 +61,7 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({ employee, onDelete }) 
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/employees/${employee.id}`);
+      await axios.delete(`${apiServerUrl}/employees/${employee.id}`);
       onDelete(employee.id); // Notify the parent component
     } catch (error) {
       console.error('There was a problem deleting the employee:', error);

@@ -4,6 +4,8 @@ import styles from './EmployeeTable.module.css';
 import Pagination from './Pagination';
 import { EmployeeRow } from './EmployeeRow';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Employee {
   id: number;
   name: string;
@@ -28,7 +30,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({ searchTerm, filter
   const itemsPerPageOptions: number[] = [10, 20, 30, 50];
 
   useEffect(() => {
-    axios.get('http://localhost:3000/employees')
+    axios.get(`${apiServerUrl}/employees`)
       .then(response => {
         const apiEmployees = response.data.map((user: any) => {
           const userData = user.UserData[0] || {};

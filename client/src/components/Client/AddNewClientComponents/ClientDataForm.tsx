@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import styles from './ClientDataForm.module.css';
 import { useData } from '../../../contexts/DataContext';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface ClientDataFormProps {
   onSubmit: (data: any) => void;
   formId: string;
@@ -36,7 +38,7 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
 
   const fetchDataFromAPI = async (nip: string) => {
     try {
-      const response = await fetch('http://localhost:3000/client/fetch-regon-data', {
+      const response = await fetch(`${apiServerUrl}/client/fetch-regon-data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -122,7 +124,7 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
             </select>
             {errors.status && <span className={styles.error}>{errors.status.message as string}</span>}
           </label>
-          <label className={styles.label}>
+          {/* <label className={styles.label}>
             Przypisany pracownik
             <select
               className={styles.select}
@@ -133,7 +135,7 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
               <option value="other">Inny pracownik</option>
             </select>
             {errors.assignedEmployee && <span className={styles.error}>{errors.assignedEmployee.message as string}</span>}
-          </label>
+          </label> */}
         </div>
         <div className={styles.row}>
           <label className={styles.label}>
@@ -213,7 +215,7 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
                 />
                 {errors.nip && <span className={styles.error}>{errors.nip.message as string}</span>}
               </label>
-              <button className={styles.button} type="button" onClick={handleFetchData}>
+              <button className={styles.addEmailButton} type="button" onClick={handleFetchData}>
                 Pobierz dane z REGON
               </button>
             </div>

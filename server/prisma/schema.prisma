@@ -98,9 +98,9 @@ model Clients {
   registration_date DateTime @default(now())
   first_name String
   second_name String
-  regon String @default("brak") @unique
-  nip String @default("brak") @unique
-  krs String @default("brak") @unique
+  regon String @default("brak") 
+  nip String @default("brak") 
+  krs String @default("brak") 
   company_name String @default("brak")
   address String
   

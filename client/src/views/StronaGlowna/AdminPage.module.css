@@ -81,3 +81,18 @@
 .dateRangeForm button:hover {
   background-color: #24304f;
 }
+
+.endButton {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.endButton:hover {
+  background-color: #45a049;
+}

@@ -36,4 +36,27 @@ SHADOW_DATABASE_URL="mysql://User_name:password@host:port/database2_name"
 to run mirations:
 -npm run migrate
 
+## 1.Client .env file example
+
+# Serwer API URL
+VITE_API_SERVER_URL=http://localhost:3000
+
+
+## 2.Server .env file example
+
+# Connetion to database
+PORT=3000
+DATABASE_URL="mysql://roottest:passwordtest@localhost:3306/admin_test"
+SHADOW_DATABASE_URL="mysql://roottest:passwordtest@localhost:3306/admin_test"
+REACT_APP_API_BASE_URL=http://localhost:3000
+
+
+# mail connection data (nodemailer)
+EMAIL_HOST=test
+EMAIL_PORT=test
+EMAIL_SECURE=true
+EMAIL_USER=test
+EMAIL_PASS=test
+
+
 

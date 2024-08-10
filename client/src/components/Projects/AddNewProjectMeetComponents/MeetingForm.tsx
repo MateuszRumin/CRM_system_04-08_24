@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './MettingForm.module.css';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface MeetingFormProps {
   meeting?: any; // Zastąp `any` bardziej szczegółowym typem, jeśli masz
   projectId?: number; // Dodaj projekt_id
@@ -64,7 +66,7 @@ const MeetingForm: React.FC<MeetingFormProps> = ({ meeting, projectId, onSave, o
       const formattedDate = new Date(formState.date).toISOString();
       if (meeting) {
         // Edytuj istniejące spotkanie
-        await axios.put(`http://localhost:3000/projects/meeting/${meeting.meeting_id}`, {
+        await axios.put(`${apiServerUrl}/projects/meeting/${meeting.meeting_id}`, {
           date: formattedDate,
           time_spent: Number(formState.timeSpent),
           meeting_description: formState.description,
@@ -77,7 +79,7 @@ const MeetingForm: React.FC<MeetingFormProps> = ({ meeting, projectId, onSave, o
         });
       } else if (projectId) {
         // Dodaj nowe spotkanie
-        const response = await axios.post('http://localhost:3000/projects/meeting/new', {
+        const response = await axios.post(`${apiServerUrl}/projects/meeting/new`, {
           date: formattedDate,
           time_spent: Number(formState.timeSpent),
           meeting_description: formState.description,

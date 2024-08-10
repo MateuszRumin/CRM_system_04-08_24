@@ -8,6 +8,7 @@ import { ProjectDataProvider } from './contexts/ProjectDataContext.tsx';
 import { UserProvider } from './contexts/UserContext.tsx';
 // import { Kreator } from './views/Kreator/Kreator.tsx';
 import { Faktury } from './views/Faktury/Faktury.tsx';
+import { NewInvoiceForm } from './components/Invoice/NewInvoiceForm.tsx';
 import { Umowy } from './views/Umowy/Umowy.tsx';
 import { Projekty } from './views/Projekty/Projekty.tsx';
 import { Pracownicy } from './views/Pracownicy/Pracownicy.tsx';
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
             element: <AuthRoute allowedRoles={['Admin']}><InvoiceDetails /></AuthRoute>,
           },
         ],
+      },
+      {
+        path: 'faktury/new',
+        element: <AuthRoute allowedRoles={['Admin']}><NewInvoiceForm /></AuthRoute>,
       },
       {
         path: 'umowy/new',

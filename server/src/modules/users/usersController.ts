@@ -490,7 +490,7 @@ export const loginUser = async (req: Request, res: Response) => {
             token: token,
             startTime: new Date(),
             active: true,
-            expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000), //waznosc do 8h od zalogowania
+            expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000), //waznosc do 8h od
             },
         });
 
@@ -672,6 +672,39 @@ export const getWorkSessionsUser = async (req: Request, res: Response): Promise<
         res.json(workSessions);
     } catch (error) {
         console.error('Error fetching work sessions:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const endSessionById = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const sessionId = parseInt(req.params.session_id, 10); // Pobierz session_id z parametrów URL
+
+        if (isNaN(sessionId)) {
+            res.status(400).json({ message: 'Invalid session_id' });
+            return;
+        }
+
+        // Znajdź sesję na podstawie session_id
+        const session = await prisma.workSessions.findUnique({
+            where: { session_id: sessionId }
+        });
+
+        if (session && session.active) {
+            // Zaktualizuj sesję, kończąc ją
+            await prisma.workSessions.update({
+                where: { session_id: sessionId },
+                data: {
+                    endTime: new Date(),
+                    active: false,
+                },
+            });
+            res.json({ message: 'Session ended successfully.' });
+        } else {
+            res.status(404).json({ message: 'Session not found or already ended.' });
+        }
+    } catch (error) {
+        console.error('Error ending session:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };

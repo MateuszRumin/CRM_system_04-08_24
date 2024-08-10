@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createUser, getAllUsers, getUserById, updateUser, deleteUser, loginUser, logoutUser, getWorkSessionsUser, getWorkSessions, deleteSessionsByMonth, deleteSessionById, selectAllCompanyPositions, assignUserToProject, removeUserFromProject } from '../modules/users/usersController';
+import { createUser, getAllUsers, getUserById, updateUser, deleteUser, loginUser, logoutUser, getWorkSessionsUser, endSessionById,  getWorkSessions, deleteSessionsByMonth, deleteSessionById, selectAllCompanyPositions, assignUserToProject, removeUserFromProject } from '../modules/users/usersController';
 import {authenticateToken} from '../middleware/authenticateToken';
 import {authorizePermission} from '../middleware/authorizePermission';
 
@@ -19,6 +19,8 @@ router.get('/session/workSessions', getWorkSessions);
 router.delete('/session/deleteByMonth', deleteSessionsByMonth);
 router.get('/session/:user_id', getWorkSessionsUser);
 router.delete('/session/:session_id', deleteSessionById);
+// Route do kończenia sesji po session_id
+router.post('/session/:session_id', endSessionById);
 
 //zakomentowane do pozniejszego wdrozenia autoryzacji
 

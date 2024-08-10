@@ -1,8 +1,8 @@
-// AddDocumentationModal.tsx
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import styles from './AddDocumentationModal.module.css';
+
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
 
 interface AddDocumentationModalProps {
   projectId: number;
@@ -16,7 +16,7 @@ export const AddDocumentationModal: React.FC<AddDocumentationModalProps> = ({ pr
   const [link, setLink] = useState<string>('');
 
   const handleAdd = () => {
-    axios.post(`http://localhost:3000/projects/doc`, {
+    axios.post(`${apiServerUrl}/projects/doc`, {
       project_id: projectId,
       file_name: fileName,
       doc_description: docDescription,

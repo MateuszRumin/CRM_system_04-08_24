@@ -194,9 +194,7 @@ export const Umowy = () => {
 
   return (
     <div className={styles.body}>
-      {isNewContractFormOpen ? (
-        <NewContractForm onClose={closeNewContractForm} />
-      ) : (
+      
         <div>
           {/* Topbar */}
           <div className={styles.topbar}>
@@ -344,7 +342,7 @@ export const Umowy = () => {
           {/* Filter Settings Modal */}
           {isModalOpen && <FilterSettingsModal onClose={closeModal} />}
         </div>
-      )}
+      
     </div>
   );
 };

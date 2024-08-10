@@ -4,6 +4,8 @@ import styles from './MettingsList.module.css';
 import MeetingForm from '../AddNewProjectMeetComponents/MeetingForm';
 import MeetingDetails from '../DetailsMeetProjectComponents/MeetingDetails';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Meeting {
   meeting_id: number;
   project_id: number;
@@ -34,7 +36,7 @@ const MeetingsList: React.FC<MeetingsListProps> = ({ projectId }) => {
     if (projectId !== undefined) {
       const fetchMeetings = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/projects/${projectId}`);
+          const response = await axios.get(`${apiServerUrl}/projects/${projectId}`);
           setMeetings(response.data.ProjectMeeting);
         } catch (err) {
           setError('Failed to fetch meetings');
@@ -54,7 +56,7 @@ const MeetingsList: React.FC<MeetingsListProps> = ({ projectId }) => {
 
   const handleEditMeeting = async (meeting: Meeting) => {
     try {
-      const response = await axios.get(`http://localhost:3000/projects/meeting/${meeting.meeting_id}`);
+      const response = await axios.get(`${apiServerUrl}/projects/meeting/${meeting.meeting_id}`);
       setSelectedMeeting(response.data);
       setView('edit');
     } catch (err) {
@@ -69,7 +71,7 @@ const MeetingsList: React.FC<MeetingsListProps> = ({ projectId }) => {
 
   const handleDeleteMeeting = async (meetingId: number) => {
     try {
-      const response = await axios.delete(`http://localhost:3000/projects/meeting/${meetingId}`);
+      const response = await axios.delete(`${apiServerUrl}/projects/meeting/${meetingId}`);
       console.log(response.data.message); // Potwierdzenie usunięcia
       setMeetings(meetings.filter(meeting => meeting.meeting_id !== meetingId));
       setView('list');

@@ -110,6 +110,8 @@ export const UserPage = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [meetingDetails, setMeetingDetails] = useState<MeetingDetails | null>(null);
 
+  const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+  
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -117,11 +119,11 @@ export const UserPage = () => {
         const userId = user.userId;
 
         if (userId) {
-          const response = await axios.get(`http://localhost:3000/employees/${userId}`);
+          const response = await axios.get(`${apiServerUrl}/employees/${userId}`);
           const projectAssignments = response.data.ProjectAssignment;
           const projectIds = projectAssignments.map((assignment: any) => assignment.project_id);
 
-          const projectDetailsPromises = projectIds.map((id: number) => axios.get(`http://localhost:3000/projects/${id}`));
+          const projectDetailsPromises = projectIds.map((id: number) => axios.get(`${apiServerUrl}/projects/${id}`));
           const projectDetailsResponses = await Promise.all(projectDetailsPromises);
 
           const fetchedProjects = projectDetailsResponses.map((res) => res.data);
@@ -129,7 +131,6 @@ export const UserPage = () => {
 
           if (fetchedProjects.length > 0) {
             setSelectedProject(fetchedProjects[0]);
-            fetchMeetingDetails(fetchedProjects[0].project_id);
           }
         }
       } catch (error) {
@@ -138,28 +139,29 @@ export const UserPage = () => {
     };
 
     fetchProjects();
-  }, []);
+  }, [apiServerUrl]);
 
   useEffect(() => {
     if (selectedProject) {
-      setMeetingDetails(null);  // Clear the previous meeting details
-      fetchMeetingDetails(selectedProject.project_id);
-    }
-
-    async function fetchMeetingDetails(projectId: number) {
-      try {
-        const response = await axios.get(`http://localhost:3000/projects/meeting/${projectId}`);
-        if (response.data && response.data.meeting_id) {
-          setMeetingDetails(response.data);
-        } else {
+      const fetchMeetingDetails = async (projectId: number) => {
+        try {
+          const response = await axios.get(`${apiServerUrl}/projects/meeting/${projectId}`);
+          if (response.data && response.data.meeting_id) {
+            setMeetingDetails(response.data);
+          } else {
+            setMeetingDetails(null);
+          }
+        } catch (error) {
+          console.error('Error fetching meeting details:', error);
           setMeetingDetails(null);
         }
-      } catch (error) {
-        console.error('Error fetching meeting details:', error);
-        setMeetingDetails(null);
-      }
+      };
+
+      fetchMeetingDetails(selectedProject.project_id);
+    } else {
+      setMeetingDetails(null);
     }
-  }, [selectedProject]);
+  }, [selectedProject, apiServerUrl]);
 
   if (!selectedProject) {
     return <div>Loading...</div>;
@@ -171,7 +173,11 @@ export const UserPage = () => {
 
       <div className={styles.projectSwitcher}>
         <h3>Wybierz projekt:</h3>
-        <select onChange={(e) => setSelectedProject(projects.find(p => p.project_id === +e.target.value) || null)} className={styles.projectSelect}>
+        <select 
+          onChange={(e) => setSelectedProject(projects.find(p => p.project_id === +e.target.value) || null)}
+          className={styles.projectSelect}
+        >
+          <option value="">-- Wybierz projekt --</option>
           {projects.map(project => (
             <option key={project.project_id} value={project.project_id}>
               {project.name}
@@ -261,6 +267,6 @@ export const UserPage = () => {
       )}
     </div>
   );
-}
+};
 
 export default UserPage;

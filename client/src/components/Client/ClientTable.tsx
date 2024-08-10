@@ -5,6 +5,8 @@ import { ClientRow } from './ClientRow';
 import Pagination from './Pagination';
 import { parseISO, format } from 'date-fns';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Client {
   id: number;
   name: string;
@@ -17,9 +19,10 @@ interface Client {
 interface ClientTableProps {
   searchTerm: string;
   filterOptions: { [key: string]: string };
+  refresh: boolean;
 }
 
-export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOptions }) => {
+export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOptions, refresh }) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -28,7 +31,7 @@ export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOpti
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/client/');
+      const response = await axios.get(`${apiServerUrl}/client/`);
       const clientData = response.data.data.map((client: any) => ({
         id: client.client_id,
         name: client.first_name ? `${client.first_name} ${client.second_name}` : client.company_name,
@@ -46,7 +49,7 @@ export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOpti
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [refresh]);
 
   const parseDate = (dateString: string) => {
     const [day, month, year] = dateString.split('.').map(Number);
