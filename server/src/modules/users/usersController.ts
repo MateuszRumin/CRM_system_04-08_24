@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { userInfo } from 'os';
+import { sendEmail } from '../../service/emailService'; // Importujemy funkcję do wysyłania emaili
 
 const prisma = new PrismaClient();
 
@@ -199,101 +200,106 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 export const createUser = async (req: Request, res: Response) => {
-    const { username, email, password, userData, userRoles } = req.body;
-
+    const { email, userData, userRoles, username } = req.body;
+  
     try {
-        // Sprawdzenie istnienia emaila
-        const existingUserByEmail = await prisma.users.findUnique({
-            where: { email },
-        });
-
-        if (existingUserByEmail) {
-            return res.status(400).json({ error: 'Email already exists' });
+      const existingUserByEmail = await prisma.users.findUnique({
+        where: { email },
+      });
+  
+      if (existingUserByEmail) {
+        return res.status(400).json({ error: 'Email already exists' });
+      }
+  
+      // Sprawdź unikalność username
+      const existingUserByUsername = await prisma.users.findUnique({
+        where: { username },
+      });
+  
+      if (existingUserByUsername) {
+        return res.status(400).json({ error: 'Username already exists' });
+      }
+  
+      const tempPassword = uuidv4().slice(0, 12);
+      const hashedPassword = await bcrypt.hash(tempPassword, 10);
+  
+      if (userRoles) {
+        const roleChecks = await Promise.all(userRoles.map(async (role: { role_id: number }) => {
+          const existingRole = await prisma.roles.findUnique({
+            where: { role_id: role.role_id },
+          });
+          return existingRole !== null;
+        }));
+  
+        if (roleChecks.includes(false)) {
+          return res.status(400).json({ error: 'One or more roles do not exist' });
         }
-
-        const uniqueUsername = username || `emp_${uuidv4().slice(0, 4)}`;
-
-        const tempPassword = password || 'securePass123';
-        const hashedPassword = await bcrypt.hash(tempPassword, 10);
-
-        // Sprawdzenie istnienia roli w firmie, jeśli zostały podane w zapytaniu
-        if (userRoles) {
-            const roleChecks = await Promise.all(userRoles.map(async (role: { role_id: number }) => {
-                const existingRole = await prisma.roles.findUnique({
-                    where: { role_id: role.role_id },
-                });
-                return existingRole !== null;
-            }));
-
-            if (roleChecks.includes(false)) {
-                return res.status(400).json({ error: 'One or more roles do not exist' });
-            }
+      }
+  
+      if (userData) {
+        const positionIds = Array.isArray(userData) ? userData.map(data => data.position_id) : [userData.position_id];
+  
+        const positionChecks = await Promise.all(positionIds.map(async (position_id) => {
+          const existingPosition = await prisma.companyPositions.findUnique({
+            where: { position_id },
+          });
+          return existingPosition !== null;
+        }));
+  
+        if (positionChecks.includes(false)) {
+          return res.status(400).json({ error: 'One or more positions do not exist within the company' });
         }
-
-        // Sprawdzenie istnienia stanowiska w firmie, jeśli userData zostały podane
-        if (userData) {
-            const positionIds = Array.isArray(userData) ? userData.map(data => data.position_id) : [userData.position_id];
-
-            const positionChecks = await Promise.all(positionIds.map(async (position_id) => {
-                const existingPosition = await prisma.companyPositions.findUnique({
-                    where: { position_id },
-                });
-                return existingPosition !== null;
-            }));
-
-            if (positionChecks.includes(false)) {
-                return res.status(400).json({ error: 'One or more positions do not exist within the company' });
-            }
-        }
-
-        // Tworzenie nowego użytkownika
-        const newUser = await prisma.users.create({
-            data: {
-                username: uniqueUsername,
-                email,
-                password: hashedPassword,
-                UserData: userData ? {
-                    create: Array.isArray(userData) ? userData : [userData],
-                } : undefined,
-                UserRole: userRoles ? {
-                    create: userRoles.map((role: { role_id: number }) => ({ role_id: role.role_id })),
-                } : undefined,
-            },
+      }
+  
+      const newUser = await prisma.users.create({
+        data: {
+          username,
+          email,
+          password: hashedPassword,
+          UserData: userData ? {
+            create: Array.isArray(userData) ? userData : [userData],
+          } : undefined,
+          UserRole: userRoles ? {
+            create: userRoles.map((role: { role_id: number }) => ({ role_id: role.role_id })),
+          } : undefined,
+        },
+        include: {
+          UserRole: {
             include: {
-                UserRole: {
-                    include: {
-                        Role: {
-                            select: {
-                                role_id:true,
-                                name:true,
-                            }
-                        }
-                    },
-                },
-                UserData: {
-                    include: {
-                        Position: {
-                            select: {
-                                position_id:true,
-                                name:true,
-                            }
-                        }
-                    }
-                }
+              Role: {
+                              select: {
+                                  role_id:true,
+                                  name:true,
+                              }
+                          }
             },
-        });
-
-        res.status(201).json({
-            newUser: {
-                ...newUser,
-                password: tempPassword
-            },
-            username: uniqueUsername,
-            password: tempPassword,
-        });
+          },
+          UserData: {
+            include: {
+              Position: {
+                              select: {
+                                  position_id:true,
+                                  name:true,
+                              }
+                          }
+            }
+          }
+        },
+      });
+  
+      await sendEmail(email, 'Twoje dane do logowania', `Login: ${username}\nHasło: ${tempPassword}`);
+  
+      res.status(201).json({
+        newUser: {
+          ...newUser,
+          password: tempPassword
+        },
+        username,
+        password: tempPassword,
+      });
     } catch (error) {
-        console.error('Error creating user:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error creating user:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 
