@@ -152,8 +152,8 @@
   justify-content: flex-start; 
   align-items: flex-start; 
   gap: 30px; 
-  display: inline-flex;
-  
+  display: flex;
+  flex-wrap: wrap;
 }
 .ogolne_column {
   width: 100%; 
@@ -193,6 +193,13 @@
   line-height: 24px; 
   word-wrap: break-word
 }
+
+.header_input_wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .input {
   align-self: stretch; 
   height: 40px;

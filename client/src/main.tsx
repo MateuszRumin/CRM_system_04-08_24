@@ -19,7 +19,7 @@ import { Layout } from './components/Layout/Layout.tsx';
 import { AddNewClient } from './views/Klienci/Dodaj_nowego_klienta/AddNewClient.tsx';
 import { EditClient } from './views/Klienci/Edytuj_klienta/EditClient.tsx';
 import { Logowanie } from './views/Logowanie/Logowanie.tsx';
-import { Ustawienia } from './views/Ustawienia/Ustawienia.tsx';
+// import { Ustawienia } from './views/Ustawienia/Ustawienia.tsx';
 import { NewContractForm } from './components/Contracts/NewContractForm.tsx';
 import { AddNewEmployee } from './views/Pracownicy/Dodaj_nowego_pracownika/AddNewEmployee.tsx';
 import { EditEmployee } from './views/Pracownicy/Edytuj_pracownika/EditEmployee.tsx';
@@ -32,6 +32,7 @@ import { EditProject } from './views/Projekty/Edytuj_projekt/EditProject.tsx';
 import { InvoiceDetails } from './views/Faktury/InvoiceDetails.tsx';
 import { AuthRoute } from './components/auth/auth.tsx';
 import { DetailsClient } from './components/Client/ClientDetailsComponents/DetailsClient.tsx'
+import { InvoiceSettings } from './components/Invoice/InvoiceSettings.tsx'
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
             path: 'details-invoice/:invoice_id',
             element: <AuthRoute allowedRoles={['Admin']}><InvoiceDetails /></AuthRoute>,
           },
+          // {
+          //   path: 'new',
+          //   element: <AuthRoute allowedRoles={['Admin']}><NewInvoiceForm /></AuthRoute>,
+          // },
         ],
       },
       {
@@ -142,7 +147,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'ustawienia',
-        element: <AuthRoute allowedRoles={['Admin']}><Ustawienia /></AuthRoute>,
+        element: <AuthRoute allowedRoles={['Admin']}><InvoiceSettings /></AuthRoute>,
       },
     ],
   },

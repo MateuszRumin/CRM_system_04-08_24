@@ -33,13 +33,7 @@ export const getClientById = async (req: Request, res: Response) => {
                     }
                 },
                 //ClientContact: true,
-                Invoice: {
-                    include: {
-                        InvoiceType: true,
-                        // Project: true,
-                        Status: true
-                    }
-                },
+                Invoice: true,
                 ClientEmail: true,
                 ClientPhone: true
             }
