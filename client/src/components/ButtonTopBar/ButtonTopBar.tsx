@@ -20,7 +20,7 @@ export const ButtonTopBar: React.FC<ButtonTopBarProps> = ({ src, alt, path, onCl
   };
 
   return (
-    <button className={style.buttontopbar} onClick={onClick}>
+    <button className={style.buttontopbar} onClick={handleClick}>
       <img src={src} alt={alt} />
     </button>
   );

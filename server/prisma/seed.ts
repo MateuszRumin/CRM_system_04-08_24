@@ -232,10 +232,10 @@ create:{
 }
 })
 await prisma.invoiceTypes.upsert({
-where:{invoice_type:"Vat"},
+where:{invoice_type:"VAT"},
 update:{},
 create:{
-  invoice_type:"Vat",
+  invoice_type:"VAT",
   enabled:true,
   Marker:{ connect:{marker_name:"FV"}}
 }
