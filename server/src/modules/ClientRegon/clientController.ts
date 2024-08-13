@@ -34,7 +34,7 @@ export const fetchRegonData = async (req: Request, res: Response) => {
             headers: { 'Content-Type': 'application/soap+xml' }
         });
 
-        console.log('Login Response:', loginResponse.data);
+        // console.log('Login Response:', loginResponse.data);
 
         const parser = new xml2js.Parser();
         const loginResponseClean = cleanXML(loginResponse.data);

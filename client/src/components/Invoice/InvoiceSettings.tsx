@@ -28,7 +28,7 @@ export const InvoiceSettings: React.FC = () => {
 
   // Automatyczne Generowanie Faktur
   const [autoGenerowanieFaktur, setAutoGenerowanieFaktur] = useState(false);
-  const [czestotliwoscGenerowania, setCzestotliwoscGenerowania] = useState('kwartalnie');
+  const [czestotliwoscGenerowania, setCzestotliwoscGenerowania] = useState('');
   const [autoGenerateVat, setAutoGenerateVat] = useState(false);
   const [autoGenerateZaliczkowa, setAutoGenerateZaliczkowa] = useState(false);
   const [autoGenerateKoncowa, setAutoGenerateKoncowa] = useState(false);
@@ -38,11 +38,11 @@ export const InvoiceSettings: React.FC = () => {
   // Podatki i Opłaty
   const [procentZaliczkowy, setProcentZaliczkowy] = useState('');
   const [procentPodatku, setProcentPodatku] = useState('');
-  const [rodzajOpodatkowania, setRodzajOpodatkowania] = useState('zwolniony');
+  const [rodzajOpodatkowania, setRodzajOpodatkowania] = useState('');
   const [domyslnaStawkaVAT, setDomyslnaStawkaVAT] = useState('');
 
   // Powiadomienia
-  const [przypomnienieONiezaplacanych, setPrzypomnienieONiezaplacanych] = useState(true);
+  const [przypomnienieONiezaplacanych, setPrzypomnienieONiezaplacanych] = useState(false);
   const [czestotliwoscPowiadomienONiezaplacanych, setCzestotliwoscPowiadomienONiezaplacanych] = useState('');
   const [trescPowiadomien, setTrescPowiadomien] = useState('');
   const [kanalKomunikacjiEmail, setKanalKomunikacjiEmail] = useState(false);
@@ -58,6 +58,16 @@ export const InvoiceSettings: React.FC = () => {
       setAutoGenerateKoncowa(false);
       setAutoGenerateProforma(false);
       setAutoGenerateOkresowa(false);
+    }
+  };
+
+  const handlePrzypomnienieONiezaplacanych = (checked: boolean) => {
+    setPrzypomnienieONiezaplacanych(checked);
+    if (!checked) {
+      // Jeśli główny checkbox jest OFF, resetujemy inne checkboxy
+      setKanalKomunikacjiEmail(false);
+      setKanalKomunikacjiSMS(false);
+      setKanalKomunikacjiPush(false);
     }
   };
 
@@ -105,24 +115,24 @@ export const InvoiceSettings: React.FC = () => {
       invoiceTypes: [
         {
           invoice_type_id: 1, // VAT
-          enabled: autoGenerateVat,
-        },
-        {
-          invoice_type_id: 2, // Zaliczkowa
           enabled: autoGenerateZaliczkowa,
         },
         {
-          invoice_type_id: 3, // Końcowa
+          invoice_type_id: 2, // Zaliczkowa
+          enabled: autoGenerateVat,
+        },
+        {
+          invoice_type_id: 3, // okresowa
+          enabled: autoGenerateOkresowa,
+        },
+        {
+          invoice_type_id: 4, // koncowa
           enabled: autoGenerateKoncowa,
         },
-        {
-          invoice_type_id: 4, // Proforma
-          enabled: autoGenerateProforma,
-        },
-        {
-          invoice_type_id: 5, // Okresowa
-          enabled: autoGenerateOkresowa,
-        }
+        // {
+        //   invoice_type_id: 5, // Okresowa
+        //   enabled: autoGenerateOkresowa,
+        // }
       ],
       companySettings: {
         company_id: 1, // Or other relevant IDs
@@ -202,43 +212,64 @@ export const InvoiceSettings: React.FC = () => {
     const fetchInitialData = async () => {
       try {
         const response = await axios.get('http://localhost:3000/invoices/settings');
-        const data = response.data;
+        const data = response.data.data; 
+        
+        console.log('Ustawienia faktur:', data);
+    
+        // Dane Firmy
+        if (data.companySettings) {
+          setNazwaFirmy(data.companySettings.name);
+          setNip(data.companySettings.nip);
+          setRegon(data.companySettings.regon);
+          setAdresFirmy(data.companySettings.address);
+          setKrs(data.companySettings.krs);
+        } else {
+          console.warn('Brak danych dla companySettings');
+        }
+    
+        // ogolne ustawienia Generowanie Faktur
+        if (data.invoiceSettings) {
+          setAutoGenerowanieFaktur(data.invoiceSettings.periodic_auto_generate);
+          setCzestotliwoscGenerowania(data.invoiceSettings.periodic_frequency);
+          setDomyslnaWaluta(data.invoiceSettings.default_currency);
+          setTerminPlatnosci(data.invoiceSettings.payment_term);
+          setPrzypomnienieONiezaplacanych(data.invoiceSettings.unpaid_reminder_enabled);
+          setCzestotliwoscPowiadomienONiezaplacanych(data.invoiceSettings.reminder_frequency);
+          setTrescPowiadomien(data.invoiceSettings.reminder_content);
+          setKanalKomunikacjiEmail(data.invoiceSettings.email_notification);
+          setKanalKomunikacjiSMS(data.invoiceSettings.sms_notification);
+          setKanalKomunikacjiPush(data.invoiceSettings.push_notification);
+        } else {
+          console.warn('Brak danych dla invoice settings');
+        }
 
-        // setNumeracjaFormat(data.numeracjaFormat || 'FV/{rok}/{miesiąc}/{numer}');
-        setBiezacyNumerFaktury(data.biezacyNumerFaktury || '');
-        setDomyslnaWaluta(data.domyslnaWaluta || 'PLN');
-        // setSzablonFaktury(data.szablonFaktury || 'klasyczny');
-        setTerminPlatnosci(data.terminPlatnosci || '');
-
-        // Company Data
-        setNazwaFirmy(data.companySettings.name || '');
-        setNip(data.companySettings.nip || '');
-        setRegon(data.companySettings.regon || '');
-        setAdresFirmy(data.companySettings.address || '');
-        setKrs(data.companySettings.krs || '');
-
-        // Auto Generowanie Faktur
-        setAutoGenerowanieFaktur(data.invoiceSettings.periodic_auto_generate || false);
-        setCzestotliwoscGenerowania(data.invoiceSettings.periodic_frequency || 'kwartalnie');
-        setAutoGenerateVat(data.invoiceTypes.some(type => type.invoice_type_id === 1 && type.enabled) || false);
-        setAutoGenerateZaliczkowa(data.invoiceTypes.some(type => type.invoice_type_id === 2 && type.enabled) || false);
-        setAutoGenerateKoncowa(data.invoiceTypes.some(type => type.invoice_type_id === 3 && type.enabled) || false);
-        setAutoGenerateProforma(data.invoiceTypes.some(type => type.invoice_type_id === 4 && type.enabled) || false);
-        setAutoGenerateOkresowa(data.invoiceTypes.some(type => type.invoice_type_id === 5 && type.enabled) || false);
-
-        // Payment Settings
-        setProcentZaliczkowy(data.invoicePaymentSettings.advancement_rate || '');
-        setProcentPodatku(data.invoicePaymentSettings.tax_rate || '23');
-        setRodzajOpodatkowania(data.invoicePaymentSettings.tax_type || '');
-        setDomyslnaStawkaVAT(data.invoicePaymentSettings.default_vat_amount || '23');
-
-        // Notifications
-        setPrzypomnienieONiezaplacanych(data.invoiceSettings.unpaid_reminder_enabled || true);
-        setCzestotliwoscPowiadomienONiezaplacanych(data.invoiceSettings.reminder_frequency || '');
-        setTrescPowiadomien(data.invoiceSettings.reminder_content || '');
-        setKanalKomunikacjiEmail(data.invoiceSettings.email_notification || false);
-        setKanalKomunikacjiSMS(data.invoiceSettings.sms_notification || false);
-        setKanalKomunikacjiPush(data.invoiceSettings.push_notification || false);
+        const invoiceMarker = data.invoiceMarkers.find(marker => marker.marker_id === 1);
+        if (invoiceMarker) {
+          setBiezacyNumerFaktury(invoiceMarker.current_number_sequence);
+        } else {
+          console.warn('Brak danych dla invoice marker z marker_id 1');
+        }
+    
+        if (data.invoiceTypes) {
+          setAutoGenerateVat(data.invoiceTypes.some(type => type.invoice_type_id === 2 && type.enabled) || false);
+          setAutoGenerateZaliczkowa(data.invoiceTypes.some(type => type.invoice_type_id === 1 && type.enabled) || false);
+          setAutoGenerateKoncowa(data.invoiceTypes.some(type => type.invoice_type_id === 4 && type.enabled) || false);
+          setAutoGenerateProforma(data.invoiceTypes.some(type => type.invoice_type_id === 5 && type.enabled) || false);
+          setAutoGenerateOkresowa(data.invoiceTypes.some(type => type.invoice_type_id === 3 && type.enabled) || false);
+        } else {
+          console.warn('Brak danych dla invoice types');
+        }
+    
+        // Ustawienia Płatności
+        if (data.invoicePaymentSettings) {
+          setProcentZaliczkowy(data.invoicePaymentSettings.advancement_rate);
+          setProcentPodatku(data.invoicePaymentSettings.tax_rate || '23');
+          setRodzajOpodatkowania(data.invoicePaymentSettings.tax_type);
+          setDomyslnaStawkaVAT(data.invoicePaymentSettings.default_vat_amount);
+        } else {
+          console.warn('Brak danych dla invoice payment settings');
+        }
+    
       } catch (error) {
         console.error('Error loading initial data:', error);
       }
@@ -418,10 +449,11 @@ export const InvoiceSettings: React.FC = () => {
             </div>
             <div className={styles.ogolne_row}>
               <div className={styles.ogolne_column}>
-                <div className={styles.header_input}>Rodaj opodatkowania</div>
+                <div className={styles.header_input}>Rodzaj opodatkowania</div>
                 <select className={styles.input} value={rodzajOpodatkowania} onChange={(e) => setRodzajOpodatkowania(e.target.value)}>
                   <option value="zwolniony">Zwolniony</option>
-                  <option value="inne">Inne...</option>
+                  <option value="ogolny">Ogólny</option>
+                  <option value="inne">Inny...</option>
                 </select>
                 
               </div>
@@ -448,7 +480,7 @@ export const InvoiceSettings: React.FC = () => {
                 <div className={styles.header_input}>Przypominanie o niezapłaconych fakturach:</div>
                 <OnOffSwitch 
                   checked={przypomnienieONiezaplacanych} 
-                  onChange={setPrzypomnienieONiezaplacanych}
+                  onChange={(checked) => handlePrzypomnienieONiezaplacanych(checked)}
                 />
               </div>
             </div>

@@ -24,17 +24,18 @@ export const updateAllSettings = async (req: Request, res: Response, next: NextF
                 enabled: type.enabled !== undefined ? type.enabled : existingType.enabled,
               },
             });
-          } else {
-            // Insert new record
-            await prisma.invoiceTypes.create({
-              data: {
-                invoice_type_id: type.invoice_type_id, // Zakładając, że używasz ID jako auto-generated, może być potrzebna modyfikacja
-                invoice_type: type.invoice_type,
-                marker_id: type.marker_id,
-                enabled: type.enabled,
-              },
-            });
-          }
+          } 
+          // else {
+          //   // Insert new record
+          //   await prisma.invoiceTypes.create({
+          //     data: {
+          //       invoice_type_id: type.invoice_type_id,
+          //       // invoice_type: type.invoice_type,
+          //       // marker_id: type.marker_id,
+          //       enabled: type.enabled,
+          //     },
+          //   });
+          // }
         }
       }
   
