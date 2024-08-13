@@ -241,14 +241,7 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
                 <input
                   className={styles.input}
                   type="text"
-                  {...register('krs', {
-                    minLength: { value: 9, message: 'KRS musi mieć co najmniej 9 znaków.' },
-                    maxLength: { value: 14, message: 'KRS musi mieć maksymalnie 14 znaków.' },
-                    pattern: {
-                      value: /^[0-9]+$/,
-                      message: 'KRS może zawierać tylko cyfry.',
-                    },
-                  })}
+                  {...register('krs')} 
                 />
                 {errors.krs && <span className={styles.error}>{errors.krs.message as string}</span>}
               </label>
@@ -312,7 +305,7 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
                     },
                   })}
                 />
-                <button className={styles.button} type="button" onClick={() => handleRemoveEmail(index)}>
+                <button className={styles.addEmailButton} type="button" onClick={() => handleRemoveEmail(index)}>
                   Usuń
                 </button>
                 {errors.emails && errors.emails[index] && (
@@ -338,7 +331,7 @@ export function ClientDataForm({ onSubmit, formId }: ClientDataFormProps) {
                     pattern: { value: /^[0-9]+$/, message: 'Numer telefonu może zawierać tylko cyfry.' },
                   })}
                 />
-                <button className={styles.button} type="button" onClick={() => handleRemovePhone(index)}>
+                <button className={styles.addEmailButton} type="button" onClick={() => handleRemovePhone(index)}>
                   Usuń
                 </button>
                 {errors.phones && errors.phones[index] && (

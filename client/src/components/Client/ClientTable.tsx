@@ -16,6 +16,24 @@ interface Client {
   addedOn: string;
 }
 
+interface Invoice {
+  invoice_id: number;
+  block: boolean;
+  year: number;
+  month: number;
+  invoice_number: string;
+  status_id: number;
+  invoice_type_id: number;
+  client_id: number;
+  issue_date: string;
+  due_date: string;
+  prize_netto: number;
+  prize_brutto: number;
+  tax_ammount: number;
+  comments: string;
+}
+
+
 interface ClientTableProps {
   searchTerm: string;
   filterOptions: { [key: string]: string };
@@ -43,28 +61,40 @@ export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOpti
   const fetchData = async () => {
     try {
       const response = await axios.get(`${apiServerUrl}/client/`);
+  
       const clientData = await Promise.all(
         response.data.data.map(async (client: any) => {
-          const projects = await fetchProjectNames(client.Project);
+          const clientDetailsResponse = await axios.get(`${apiServerUrl}/client/${client.client_id}/get`);
+          const clientDetails = clientDetailsResponse.data;
+  
+          const unpaidInvoices: Invoice[] = clientDetails.Invoice.filter((invoice: Invoice) => invoice.status_id === 10);
+  
+          const nextPaymentDate = unpaidInvoices.length > 0
+            ? unpaidInvoices.reduce((closest: Invoice, invoice: Invoice) => {
+                return new Date(invoice.due_date) < new Date(closest.due_date) ? invoice : closest;
+              }, unpaidInvoices[0])
+            : null;
+  
           return {
             id: client.client_id,
             name: client.first_name ? `${client.first_name} ${client.second_name}` : client.company_name,
             status: client.Status.name,
-            projects: projects || 'Brak projektów', // Provide default message here
-            nextPayment: 'jeszcze brak z backendu',
+            projects: await fetchProjectNames(clientDetails.Project) || 'Brak projektów',
+            nextPayment: nextPaymentDate ? format(parseISO(nextPaymentDate.due_date), 'dd.MM.yyyy') : 'Brak nadchodzących płatności',
             addedOn: format(parseISO(client.registration_date), 'dd.MM.yyyy'),
           };
         })
       );
-      
+  
       setClients(clientData);
       setFilteredClients(clientData);
-      // Check if there are no clients and update the noProjectsMessage state
       setNoProjectsMessage(clientData.length === 0 ? 'Brak projektów' : null);
     } catch (error) {
       console.error("There was an error fetching the clients!", error);
     }
   };
+  
+  
 
   useEffect(() => {
     fetchData();
