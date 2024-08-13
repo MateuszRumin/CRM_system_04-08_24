@@ -3,6 +3,8 @@ import axios from 'axios';
 import styles from './AdminPage.module.css';
 import Pagination from './Pagination';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface WorkSession {
     session_id: number;
     user_id: number;
@@ -57,7 +59,7 @@ export const AdminPage = () => {
     useEffect(() => {
         const fetchSessions = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/employees/session/workSessions');
+                const response = await axios.get(`${apiServerUrl}/employees/session/workSessions`);
                 const { activeSessions, endedSessions } = response.data;
                 setActiveSessions(activeSessions);
                 setEndedSessions(endedSessions);
@@ -122,9 +124,9 @@ export const AdminPage = () => {
 
     const handleEndSession = async (sessionId: number) => {
         try {
-            await axios.post(`http://localhost:3000/employees/session/${sessionId}`);
+            await axios.post(`${apiServerUrl}/employees/session/${sessionId}`);
             // Refresh sessions after ending
-            const response = await axios.get('http://localhost:3000/employees/session/workSessions');
+            const response = await axios.get(`${apiServerUrl}/employees/session/workSessions`);
             const { activeSessions, endedSessions } = response.data;
             setActiveSessions(activeSessions);
             setEndedSessions(endedSessions);
@@ -135,9 +137,9 @@ export const AdminPage = () => {
 
     const handleDeleteSession = async (sessionId: number) => {
         try {
-            await axios.delete(`http://localhost:3000/employees/session/${sessionId}`);
+            await axios.delete(`${apiServerUrl}/employees/session/${sessionId}`);
             // Refresh sessions after deletion
-            const response = await axios.get('http://localhost:3000/employees/session/workSessions');
+            const response = await axios.get(`${apiServerUrl}/employees/session/workSessions`);
             const { activeSessions, endedSessions } = response.data;
             setActiveSessions(activeSessions);
             setEndedSessions(endedSessions);
@@ -155,7 +157,7 @@ export const AdminPage = () => {
         const [year, month] = selectedMonthYear.split('-').map(Number);
 
         try {
-            await axios.delete('http://localhost:3000/employees/session/deleteByMonth', {
+            await axios.delete(`${apiServerUrl}/employees/session/deleteByMonth`, {
                 data: {
                     month: month.toString().padStart(2, '0'), // Ensure format "MM"
                     year: year.toString()                      // Ensure format "YYYY"
@@ -163,7 +165,7 @@ export const AdminPage = () => {
             });
 
             // Refresh sessions after deletion
-            const response = await axios.get('http://localhost:3000/employees/session/workSessions');
+            const response = await axios.get(`${apiServerUrl}/employees/session/workSessions`);
             const { activeSessions, endedSessions } = response.data;
             setActiveSessions(activeSessions);
             setEndedSessions(endedSessions);

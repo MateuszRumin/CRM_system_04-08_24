@@ -79,11 +79,25 @@
   color:white;
 }
 
+.edit_delete_Button {
+  display: flex;
+  height: 30px;
+  padding: 5px 10px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  border: none;
+  background-color: #24304F;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 .edit_delete_Button{
   padding: 10px 20px;
   margin-left: 5px;
   margin-top: 5px;
-  background-color: #007BFF;
+  background-color: #24304F;
   color: white;
   border: none;
   border-radius: 5px;

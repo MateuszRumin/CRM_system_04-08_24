@@ -43,9 +43,25 @@ export function EmployeeDetails() {
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [signatureImage, setSignatureImage] = useState<string | null>(null);
 
+  const [employeeName, setEmployeeName] = useState<string>('');
+
   const signatureRef = useRef<SignatureCanvas | null>(null);
 
   useEffect(() => {
+    const fetchEmployeeDetails = async () => {
+      if (employee?.id) {
+        try {
+          const response = await axios.get(`${apiServerUrl}/employees/${employee.id}`);
+          const employeeData = response.data;
+          const firstName = employeeData.UserData[0]?.first_name || '';
+          const lastName = employeeData.UserData[0]?.second_name || '';
+          setEmployeeName(`${firstName} ${lastName}`);
+        } catch (error) {
+          console.error('Error fetching employee details:', error);
+        }
+      }
+    };
+
     const fetchWorkSessions = async () => {
       try {
         const response = await axios.get(`${apiServerUrl}/employees/session/${employee?.id}`);
@@ -54,6 +70,7 @@ export function EmployeeDetails() {
         console.error('Error fetching work sessions:', error);
       }
     };
+    
 
     const fetchProjects = async () => {
       try {
@@ -65,6 +82,7 @@ export function EmployeeDetails() {
     };
 
     if (employee) {
+      fetchEmployeeDetails();
       fetchWorkSessions();
       fetchProjects();
     }
@@ -134,7 +152,6 @@ export function EmployeeDetails() {
 
   const handleDisplayProject = (projectId: string) => {
     console.log(`Przechodzę do projektu o ID: ${projectId}`);
-    // Możesz dodać kod do nawigacji do szczegółów projektu
   };
 
   const isAssignProjectRoute = location.pathname.includes('assign-project-to-employee');
@@ -151,19 +168,46 @@ export function EmployeeDetails() {
 
   const generatePDF = () => {
     if (!selectedDate) {
-      console.log("Brak wybranej daty, nie generujemy PDF-a");
-      return;
+        console.log("Brak wybranej daty, nie generujemy PDF-a");
+        return;
     }
 
     const selectedDateString = format(selectedDate, 'dd.MM.yyyy');
     const daysInMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
 
-    const tableData = Array.from({ length: daysInMonth }, (_, i) => [
-      `${i + 1}`,
-      `${5 + i % 8} H`,
-      signatureImage ? { content: signatureImage, type: 'image' } : '',
-      ''
-    ]);
+    // Funkcja przeliczająca godziny dziesiętne na godziny i minuty
+    const convertToHoursAndMinutes = (decimalHours) => {
+        const hours = Math.floor(decimalHours);
+        const minutes = Math.round((decimalHours - hours) * 60);
+        return `${hours} h ${minutes} min`;
+    };
+
+    // Nowa tablica przechowująca rzeczywiste dane godzin pracy z pełnymi datami
+    const tableData = Array.from({ length: daysInMonth }, (_, i) => {
+        const date = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), i + 1);
+        const formattedDate = format(date, 'yyyy-MM-dd');
+        const displayDate = format(date, 'dd.MM.yyyy');
+
+        // Znajdź sesje, które pasują do tego dnia
+        const sessionForDay = workSessions.find(session =>
+            format(new Date(session.startTime), 'yyyy-MM-dd') === formattedDate
+        );
+
+        // Jeśli znaleziono sesje, oblicz godziny pracy
+        const hoursWorked = sessionForDay ?
+            ((new Date(sessionForDay.endTime).getTime() - new Date(sessionForDay.startTime).getTime()) / (1000 * 60 * 60)) :
+            0;
+
+        // Przelicz godziny pracy na format godzin i minut
+        const formattedHoursWorked = convertToHoursAndMinutes(hoursWorked);
+
+        return [
+            displayDate,  // Zamiast numeru dnia, wyświetlamy pełną datę
+            formattedHoursWorked,
+            signatureImage ? { content: signatureImage, type: 'image' } : '',
+            ''
+        ];
+    });
 
     const doc = new jsPDF();
     doc.setFontSize(18);
@@ -173,13 +217,13 @@ export function EmployeeDetails() {
     doc.setFillColor(233, 233, 233);
     doc.rect(0, 0, doc.internal.pageSize.width, 20, 'F');
 
-    doc.text('Wykaz godzin', 15, 12);
+    doc.text(`Wykaz godzin:  ${employeeName}`, 15, 12);
 
     autoTable(doc, {
-      head: [['Dzien', 'Ilosc godzin', 'Podpis zleceniodawcy', 'Podpis zleceniobiorcy']],
-      body: tableData,
-      startY: 30,
-      theme: 'grid',
+        head: [['Data', 'Ilosc godzin', 'Podpis zleceniodawcy', 'Podpis zleceniobiorcy']],
+        body: tableData,
+        startY: 30,
+        theme: 'grid',
     });
 
     const pdfOutput = doc.output('blob');
@@ -242,20 +286,22 @@ export function EmployeeDetails() {
     signatureRef.current?.clear();
   };
 
+  
+
   return (
     <div className={styles.container}>
       {!isAssignProjectRoute && !isRemoveEmployeeRoute ? (
         <>
           <div className={styles.header}>
-            <h1>Szczegóły pracownika - {employee.name}</h1>
+            <h1>Szczegóły pracownika - {employeeName}</h1>
             <IconButton onClick={toggleDrawer(true)} className={styles.calendarButton}>
               <img src={CalendarIcon} alt="Kalendarz" />
             </IconButton>
           </div>
           <div className={styles.detailsContainer}>
             <div className={styles.details}>
-              <p><strong>Imię:</strong> {employee.name.split(' ')[0]}</p>
-              <p><strong>Nazwisko:</strong> {employee.name.split(' ')[1]}</p>
+              <p><strong>Imię:</strong> {employeeName.split(' ')[0]}</p>
+              <p><strong>Nazwisko:</strong> {employeeName.split(' ')[1]}</p>
               <p><strong>Umowa:</strong> {employee.contract}</p>
               <p><strong>Liczba przepracowanych godzin:</strong> {employee.hoursWorked}</p>
               <p><strong>Przepracowane godziny w wybranym dniu ({selectedDate ? format(selectedDate, 'dd.MM.yyyy') : 'Nie wybrano daty'}):</strong> {hoursWorkedOnDate}</p>
@@ -263,32 +309,32 @@ export function EmployeeDetails() {
             </div>
             <div className={styles.imageContainer}>
               <h2>Zdjęcie pracownika</h2>
-              <img src={ExaxmpleProfilePicture} alt={`Zdjęcie ${employee.name}`} className={styles.employeeImage} />
+              <img src={ExaxmpleProfilePicture} alt={`Zdjęcie ${employeeName}`} className={styles.employeeImage} />
               <button onClick={handleModify} className={styles.modifyButton}>
                 Modyfikuj pracownika
               </button>
               <button className={styles.deleteButton} onClick={handleRemoveEmployee}>
-                Usuń pracownika
+                Usuń pracownika z projektu
               </button>
             </div>
             <div className={styles.projectsContainer}>
-              <h2>Projekty</h2>
-              {projects.length > 0 ? (
-                projects.map((project) => (
-                  <div key={project.project_id} className={styles.projectRow}>
-                    <span className={styles.projectName}>{project.name}</span>
-                    <button onClick={() => handleDisplayProject(project.project_id)} className={styles.showButton}>
-                      Wyświetl
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <p>Brak przypisanych projektów.</p>
-              )}
-              <button className={styles.addButton} onClick={handleAssignProjectToEmployee}>
-                Dodaj
-              </button>
-            </div>
+            <h2>Projekty</h2>
+            {projects.length > 0 ? (
+              projects.map((project) => (
+                <div key={project.project_id} className={styles.projectRow}>
+                  <span className={styles.projectName}>{project.name}</span>
+                  {/* <button onClick={() => handleDisplayProject(project.project_id)} className={styles.showButton}>
+                    Wyświetl
+                  </button> */}
+                </div>
+              ))
+            ) : (
+              <p>Brak przypisanych projektów.</p>
+            )}
+            <button className={styles.addButton} onClick={handleAssignProjectToEmployee}>
+              Dodaj
+            </button>
+          </div>
           </div>
         </>
       ) : (
