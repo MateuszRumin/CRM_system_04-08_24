@@ -280,7 +280,7 @@ enum invoiceTypeNames {
   Zaliczkowa 
   Koncowa
   Okresowa 
-  Vat 
+  VAT
 }
 
 model Markers {
@@ -307,9 +307,6 @@ model CompanySettings {
   regon String @default("brak") 
   nip String @default("brak") 
   krs String @default("brak")
-
-  InvoicePaymentSetting InvoicePaymentSettings[]
-  InvoiceSetting InvoiceSettings[]
 }
 
 enum currencyTypeValues {
@@ -330,10 +327,6 @@ model InvoiceSettings {
   unpaid_reminder_enabled   Boolean
   reminder_frequency        Int
   reminder_content          String
-
-  company_id                Int
-
-  CompanySetting                CompanySettings @relation(fields: [company_id], references: [company_id])
 }
 
 model InvoicePaymentSettings {
@@ -342,9 +335,6 @@ model InvoicePaymentSettings {
   tax_rate           Int
   tax_type           String @default("brak")
   default_vat_amount Int
-  company_id         Int
-
-  CompanySetting CompanySettings @relation(fields: [company_id], references: [company_id])
 }
 
 model Projects {

@@ -81,12 +81,12 @@ export const NewInvoiceForm = () => {
     try {
       const invoiceResponse = await axios.post('http://localhost:3000/invoices/newInvoice', {
         main: {
-          status_id: 51,
-          invoice_type_id: type,
+          status_id: 13,
+          invoice_type_id: 2,
           due_date: dueDate,
         },
         client: {
-          client_id: 4, // Stały klient id
+          client_id: 1, // Stały klient id
         },
         summary,
       });

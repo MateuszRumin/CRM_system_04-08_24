@@ -5,9 +5,7 @@ import { Request, Response } from 'express';
 const apiKey = 'a001e1f2bcdf414abc83';
 const wsdlUrl = 'https://wyszukiwarkaregon.stat.gov.pl/wsBIR/UslugaBIRzewnPubl.svc';
 
-// Funkcja czyszcząca odpowiedź z nagłówków MIME
 const cleanXML = (xmlString: string) => {
-    // Znajdź początek tagu XML
     const startTagIndex = xmlString.indexOf('<s:Envelope');
     if (startTagIndex === -1) {
         return '';
@@ -19,7 +17,6 @@ export const fetchRegonData = async (req: Request, res: Response) => {
     const { nip } = req.body;
 
     try {
-        // Logowanie
         const loginResponse = await axios.post(wsdlUrl, `
             <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                 xmlns:ns="http://CIS/BIR/PUBL/2014/07">
@@ -44,7 +41,6 @@ export const fetchRegonData = async (req: Request, res: Response) => {
         const loginResult = await parser.parseStringPromise(loginResponseClean);
         const sid = loginResult['s:Envelope']['s:Body'][0]['ZalogujResponse'][0]['ZalogujResult'][0];
 
-        // Wyszukiwanie danych
         const searchResponse = await axios.post(wsdlUrl, `
             <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                 xmlns:ns="http://CIS/BIR/PUBL/2014/07" xmlns:dat="http://CIS/BIR/PUBL/2014/07/DataContract">
@@ -69,11 +65,12 @@ export const fetchRegonData = async (req: Request, res: Response) => {
 
         console.log('Search Response:', searchResponse.data);
 
-        // Wyciąganie XML z odpowiedzi
         const searchResponseClean = cleanXML(searchResponse.data);
         const searchResult = await parser.parseStringPromise(searchResponseClean);
 
-        // Parsowanie wyniku
+        // Wyświetl pełny wynik XML
+        console.log('Search Result:', searchResult);
+
         const daneSzukajPodmiotyResult = searchResult['s:Envelope']['s:Body'][0]['DaneSzukajPodmiotyResponse'][0]['DaneSzukajPodmiotyResult'][0];
         const daneXML = new xml2js.Parser();
         const daneResult = await daneXML.parseStringPromise(daneSzukajPodmiotyResult);
@@ -81,9 +78,8 @@ export const fetchRegonData = async (req: Request, res: Response) => {
         if (daneResult && daneResult.root && daneResult.root.dane) {
             const companyData = daneResult.root.dane[0];
 
-            // Przygotowanie danych
             const regon = companyData.Regon[0] || 'Brak danych REGON';
-            const krs = companyData.Krs ? companyData.Krs[0] : ''; // Upewnij się, że numer KRS jest dostępny
+            const krs = companyData.Krs ? companyData.Krs[0] : 'Brak danych KRS';
             const name = companyData.Nazwa[0] || 'Brak danych nazwy';
             const street = companyData.Ulica[0] || '';
             const number = companyData.NrNieruchomosci[0] || '';
@@ -95,7 +91,6 @@ export const fetchRegonData = async (req: Request, res: Response) => {
                 krs,
                 name,
                 address: `${street} ${number}, ${city}, ${postcode}`,
-                // Pozostałe dane
                 wojewodztwo: companyData.Wojewodztwo[0] || 'Brak danych województwa',
                 powiat: companyData.Powiat[0] || 'Brak danych powiatu',
                 gmina: companyData.Gmina[0] || 'Brak danych gminy',

@@ -20,7 +20,7 @@ router.get('/', getAllInvoices);//
 router.put('/status', updateInvoiceStatus);//
 router.get('/settings', getAllSettings);
 router.put('/settings/update', updateAllSettings);//
-router.put('/settings/add', updateAllSettings);//
+// router.put('/settings/add', updateAllSettings);//
 router.delete('/:invoice_id', deleteInvoice);
 
 
