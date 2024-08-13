@@ -28,20 +28,39 @@ export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOpti
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const itemsPerPageOptions: number[] = [10, 20, 30, 50];
+  const [noProjectsMessage, setNoProjectsMessage] = useState<string | null>(null);
+
+  const fetchProjectNames = async (projects: any[]) => {
+    const projectNames = await Promise.all(
+      projects.map(async (project: any) => {
+        const response = await axios.get(`${apiServerUrl}/projects/${project.project_id}`);
+        return response.data.name;
+      })
+    );
+    return projectNames.join(', ');
+  };
 
   const fetchData = async () => {
     try {
       const response = await axios.get(`${apiServerUrl}/client/`);
-      const clientData = response.data.data.map((client: any) => ({
-        id: client.client_id,
-        name: client.first_name ? `${client.first_name} ${client.second_name}` : client.company_name,
-        status: client.Status.name,
-        projects: 'jeszcze brak z backendu',
-        nextPayment: 'jeszcze brak z backendu',
-        addedOn: format(parseISO(client.registration_date), 'dd.MM.yyyy'),
-      }));
+      const clientData = await Promise.all(
+        response.data.data.map(async (client: any) => {
+          const projects = await fetchProjectNames(client.Project);
+          return {
+            id: client.client_id,
+            name: client.first_name ? `${client.first_name} ${client.second_name}` : client.company_name,
+            status: client.Status.name,
+            projects: projects || 'Brak projektów', // Provide default message here
+            nextPayment: 'jeszcze brak z backendu',
+            addedOn: format(parseISO(client.registration_date), 'dd.MM.yyyy'),
+          };
+        })
+      );
+      
       setClients(clientData);
       setFilteredClients(clientData);
+      // Check if there are no clients and update the noProjectsMessage state
+      setNoProjectsMessage(clientData.length === 0 ? 'Brak projektów' : null);
     } catch (error) {
       console.error("There was an error fetching the clients!", error);
     }
@@ -116,6 +135,8 @@ export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOpti
 
     setFilteredClients(results);
     setCurrentPage(1);
+    // Update the noProjectsMessage state based on the filtered results
+    setNoProjectsMessage(results.length === 0 ? 'Brak projektów' : null);
   }, [searchTerm, filterOptions, clients]);
 
   const indexOfLastClient: number = currentPage * itemsPerPage;
@@ -136,33 +157,39 @@ export const ClientTable: React.FC<ClientTableProps> = ({ searchTerm, filterOpti
 
   return (
     <div className={styles.tableContainer}>
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Imię i nazwisko / Firma</th>
-            <th>Status</th>
-            <th>Projekty</th>
-            <th>Nadchodząca płatność</th>
-            <th>Dodano</th>
-            <th>Więcej</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentClients.map((client) => (
-            <ClientRow key={client.id} client={client} onDelete={handleDeleteClient} />
-          ))}
-        </tbody>
-      </table>
-      <div>
-        <Pagination
-          itemsPerPageOptions={itemsPerPageOptions}
-          itemsPerPage={itemsPerPage}
-          totalItems={filteredClients.length}
-          currentPage={currentPage}
-          paginate={paginate}
-          changeItemsPerPage={changeItemsPerPage}
-        />
-      </div>
+      {noProjectsMessage ? (
+        <p>{noProjectsMessage}</p>
+      ) : (
+        <>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Imię i nazwisko / Firma</th>
+                <th>Status</th>
+                <th>Projekty</th>
+                <th>Nadchodząca płatność</th>
+                <th>Dodano</th>
+                <th>Więcej</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentClients.map((client) => (
+                <ClientRow key={client.id} client={client} onDelete={handleDeleteClient} />
+              ))}
+            </tbody>
+          </table>
+          <div>
+            <Pagination
+              itemsPerPageOptions={itemsPerPageOptions}
+              itemsPerPage={itemsPerPage}
+              totalItems={filteredClients.length}
+              currentPage={currentPage}
+              paginate={paginate}
+              changeItemsPerPage={changeItemsPerPage}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };
