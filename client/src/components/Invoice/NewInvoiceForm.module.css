@@ -257,3 +257,10 @@
     height: auto; 
     border: 1px #24304F solid;
 }
+.show {
+  visibility: visible;
+}
+
+.hide {
+  visibility: hidden;
+}

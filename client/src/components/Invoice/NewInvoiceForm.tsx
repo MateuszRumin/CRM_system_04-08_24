@@ -6,17 +6,49 @@ import MinusIcon from '../../../public/icons/Minus_Square.svg';
 import AddIcon from '../../../public/icons/Add_Plus_Square.svg';
 import { useNavigate } from 'react-router-dom';
 
+interface Project {
+  project_id: number;
+  name: string;
+  status_id: number;
+}
+
+interface Client {
+  client_id: number;
+  nip: string;
+  regon: string;
+  company_name: string;
+  krs: string;
+  address: string;
+  displayName: string;
+  Project: Project[];
+  first_name?: string; 
+  second_name?: string;
+}
+
 export const NewInvoiceForm = () => {
   const navigate = useNavigate();
-  const [number] = useState(''); // State for invoice number
-  const [type, setType] = useState<number | undefined>(); // Typ faktury (id = 6)
-  const [issueDate, setIssueDate] = useState(''); // State for issue date
-  const [dueDate] = useState(new Date(new Date().setDate(new Date().getDate() + 7)).toISOString()); // 7 dni na płatność
-
+  const [number] = useState('');
+  const [type, setType] = useState<number>();
+  const [issueDate, setIssueDate] = useState('');
+  const [dueDate] = useState(new Date(new Date().setDate(new Date().getDate() + 7)).toISOString());
+  const [statusId, setStatusId] = useState<number | undefined>();
   const [selectedOption, setSelectedOption] = useState<'firma' | 'osobaPrywatna'>('firma');
   const [serviceSections, setServiceSections] = useState<{ id: string; product_name: string; unit_price: number; product_count: number; prize: number; tax: number }[]>([
     { id: 'section1', product_name: '', unit_price: 0, product_count: 1, prize: 0, tax: 0 }
   ]);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [privateClients, setPrivateClients] = useState<Client[]>([]);
+  const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
+  const [availableProjects, setAvailableProjects] = useState<{ project_id: number; name: string; }[]>([]);
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+
+  const [clientNIP, setClientNIP] = useState('');
+  const [clientRegon, setClientRegon] = useState('');
+  const [clientCompanyName, setClientCompanyName] = useState('');
+  const [clientKRS, setClientKRS] = useState('');
+  const [clientAddress, setClientAddress] = useState('');
+  const [clientFirstName, setClientFirstName] = useState(''); 
+  const [clientLastName, setClientLastName] = useState('');
 
   const [summary, setSummary] = useState({
     prize_netto: 0,
@@ -24,6 +56,146 @@ export const NewInvoiceForm = () => {
     tax_ammount: 0,
     comments: '',
   });
+  const [invoiceTypes, setInvoiceTypes] = useState<{ invoice_type_id: number; invoice_type: string; }[]>([]);
+
+  const fetchStatusId = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/statuses/invoice');
+      const statuses = response.data;
+      const status = statuses.find((status: { name: string }) => status.name === 'Nie oplacona' || 'Nie opłacona');
+
+      if (status) {
+        setStatusId(status.status_id);
+      } else {
+        console.error('Status "Nie oplacona" nie został znaleziony');
+      }
+    } catch (error) {
+      console.error('Błąd przy pobieraniu statusów:', error);
+    }
+  };
+
+  const fetchClients = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/client');
+      const clientsData = response.data.data;
+
+      const filteredClientsFirma = clientsData.filter((client: { client_type: string; }) => client.client_type === 'Firma');
+      const filteredClientsPrywatny = clientsData.filter((client: { client_type: string; }) => client.client_type === 'Prywatny');
+
+      const clientOptionsFirma = filteredClientsFirma.map((client: { client_id: number; nip: string; regon: string; company_name: string; krs: string; address: string; first_name: string; second_name: string; Project: Project[] }) => ({
+        client_id: client.client_id,
+        nip: client.nip,
+        regon: client.regon,
+        company_name: client.company_name,
+        krs: client.krs,
+        address: client.address,
+        displayName: `${client.first_name} ${client.second_name} - ${client.company_name}`,
+        Project: client.Project
+      }));
+
+      const clientOptionsPrywatny = filteredClientsPrywatny.map((client: { client_id: number; first_name: string; second_name: string; address: string; Project: Project[] }) => ({
+        client_id: client.client_id,
+        first_name: client.first_name,
+        second_name: client.second_name,
+        address: client.address,
+        displayName: `${client.first_name} ${client.second_name}`,
+        Project: client.Project
+      }));
+
+      setClients(clientOptionsFirma);
+      setPrivateClients(clientOptionsPrywatny);
+    } catch (error) {
+      console.error('Błąd podczas pobierania klientów:', error);
+    }
+  };
+
+
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    setIssueDate(today);
+
+    axios.get('http://localhost:3000/invoices/settings')
+      .then(response => {
+        setInvoiceTypes(response.data.data.invoiceTypes);
+      })
+      .catch(error => {
+        console.error('Error fetching invoice types:', error);
+      });
+
+    fetchStatusId();
+    fetchClients();
+  }, []);
+
+  const handleClientChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const clientId = Number(event.target.value);
+    setSelectedClientId(clientId);
+
+    let selectedClient = clients.find(client => client.client_id === clientId);
+    if (selectedOption === 'osobaPrywatna') {
+      selectedClient = privateClients.find(client => client.client_id === clientId);
+    }
+
+    if (selectedClient) {
+      setAvailableProjects(selectedClient.Project);
+      
+      if (selectedOption === 'firma') {
+        setClientNIP(selectedClient.nip || '');
+        setClientRegon(selectedClient.regon || '');
+        setClientCompanyName(selectedClient.company_name || '');
+        setClientKRS(selectedClient.krs || '');
+      } else {
+        setClientFirstName(selectedClient.first_name || '');
+        setClientLastName(selectedClient.second_name || '');
+      }
+      setClientAddress(selectedClient.address || '');
+    } else {
+      setAvailableProjects([]);
+      setClientNIP('');
+      setClientRegon('');
+      setClientCompanyName('');
+      setClientKRS('');
+      setClientFirstName('');
+      setClientLastName('');
+      setClientAddress('');
+    }
+  };
+
+
+
+  const areFieldsDisabled = Boolean(selectedClientId);
+  const handleProjectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedProjectId(Number(event.target.value));
+  };
+
+
+
+  // Funkcje obsługujące zmiany w polach
+  const handleNIPChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setClientNIP(event.target.value);
+  };
+
+  const handleRegonChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setClientRegon(event.target.value);
+  };
+
+  const handleCompanyNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setClientCompanyName(event.target.value);
+  };
+
+  const handleKRSChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setClientKRS(event.target.value);
+  };
+
+  const handleAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setClientAddress(event.target.value);
+  };
+  const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setClientFirstName(event.target.value);
+  };
+
+  const handleLastNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setClientLastName(event.target.value);
+  };
 
   const toggleOption = (option: 'firma' | 'osobaPrywatna') => {
     setSelectedOption(option);
@@ -81,12 +253,12 @@ export const NewInvoiceForm = () => {
     try {
       const invoiceResponse = await axios.post('http://localhost:3000/invoices/newInvoice', {
         main: {
-          status_id: 13,
-          invoice_type_id: 2,
+          status_id: statusId,
+          invoice_type_id: type,
           due_date: dueDate,
         },
         client: {
-          client_id: 1, // Stały klient id
+          client_id: selectedClientId, 
         },
         summary,
       });
@@ -96,7 +268,7 @@ export const NewInvoiceForm = () => {
       await axios.post('http://localhost:3000/invoices/addInvoiceProduct', {
         invoice_id:  invoiceId,
         products: serviceSections.map(section => ({
-          project_id: 1, // Możesz dostosować project_id w zależności od Twojej logiki
+          project_id: selectedProjectId, 
           product_name: section.product_name,
           unit_price: section.unit_price,
           product_count: section.product_count,
@@ -112,13 +284,15 @@ export const NewInvoiceForm = () => {
     }
   };
 
-  useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    setIssueDate(today);
-  }, []);
+  
+
+  
+
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setType(Number(event.target.value)); // Konwertowanie wartości na liczbę
   };
+
+
 
   const handleCancel = () => {
     navigate(-1);
@@ -163,10 +337,12 @@ export const NewInvoiceForm = () => {
           <div className={styles.ogolne_column}>
             <div className={styles.header_input}>Rodzaj Faktury</div>
             <select className={styles.input} value={type} onChange={handleTypeChange}>
-              <option value="6">VAT</option> 
-              <option value="5">Zaliczkowa</option> 
-              <option value="7">Okresowa</option> 
-              <option value="8">Końcowa</option> 
+              <option value="">Wybierz typ faktury</option>
+              {invoiceTypes.map((invoiceType) => (
+                <option key={invoiceType.invoice_type_id} value={invoiceType.invoice_type_id}>
+                  {invoiceType.invoice_type}
+                </option>
+              ))}
             </select>
           </div>
           <div className={styles.ogolne_column}>
@@ -205,55 +381,103 @@ export const NewInvoiceForm = () => {
           <>
             <div className={styles.ogolne_row}>
               <div className={styles.ogolne_column}>
-                <div className={styles.header_input}>NIP</div>
-                <input className={styles.input} />
+                <div className={styles.header_input}>&nbsp;</div>
+                <select className={styles.input} value={selectedClientId || ''} onChange={handleClientChange}>
+            <option value="">Wybierz klienta</option>
+            {clients.map(client => (
+              <option key={client.client_id} value={client.client_id}>
+                {client.displayName}
+              </option>
+            ))}
+          </select>
               </div>
-              <div className={styles.ogolne_column}>
-                <div className={styles.header_input}>REGON</div>
-                <input className={styles.input} />
+              <div className={`${styles.ogolne_column} ${selectedClientId ? styles.show : styles.hide}`}>
+                <div className={styles.header_input}>&nbsp;</div>
+                <select className={styles.input} value={selectedProjectId || ''} onChange={handleProjectChange}>
+                  <option value="">Wybierz projekt</option>
+                  {availableProjects.map(project => (
+                    <option key={project.project_id} value={project.project_id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className={styles.ogolne_row}>
-              <div className={styles.ogolne_column}>
-                <div className={styles.header_input}>Nazwa Firmy</div>
-                <input className={styles.input} />
-              </div>
-              <div className={styles.ogolne_column}>
-                <div className={styles.header_input}>KRS</div>
-                <input className={styles.input} />
-              </div>
-            </div>
-            <div className={styles.ogolne_row}>
-              <div className={styles.ogolne_column}>
-                <div className={styles.header_input}>Adres Firmy</div>
-                <input className={styles.input} />
-              </div>
-              <div className={styles.ogolne_column}></div>
+        <div className={styles.ogolne_column}>
+          <div className={styles.header_input}>NIP</div>
+          <input className={styles.input} value={clientNIP} onChange={handleNIPChange}  disabled={areFieldsDisabled} />
+        </div>
+        <div className={styles.ogolne_column}>
+          <div className={styles.header_input}>REGON</div>
+          <input className={styles.input} value={clientRegon} onChange={handleRegonChange} disabled={areFieldsDisabled} />
+        </div>
+      </div>
+      <div className={styles.ogolne_row}>
+        <div className={styles.ogolne_column}>
+          <div className={styles.header_input}>Nazwa Firmy</div>
+          <input className={styles.input} value={clientCompanyName} onChange={handleCompanyNameChange} disabled={areFieldsDisabled} />
+        </div>
+        <div className={styles.ogolne_column}>
+          <div className={styles.header_input}>KRS</div>
+          <input className={styles.input} value={clientKRS} onChange={handleKRSChange}  disabled={areFieldsDisabled} />
+        </div>
+      </div>
+      <div className={styles.ogolne_row}>
+        <div className={styles.ogolne_column}>
+          <div className={styles.header_input}>Adres Firmy</div>
+          <input className={styles.input} value={clientAddress} onChange={handleAddressChange}  disabled={areFieldsDisabled} />
+        </div>
+        <div className={styles.ogolne_column}></div>
             </div>
           </>
         )}
         
         {selectedOption === 'osobaPrywatna' && (
-          <>
-            <div className={styles.ogolne_row}>
-              <div className={styles.ogolne_column}>
-                <div className={styles.header_input}>Imię</div>
-                <input className={styles.input} />
-              </div>
-              <div className={styles.ogolne_column}>
-                <div className={styles.header_input}>Nazwisko</div>
-                <input className={styles.input} />
-              </div>
+        <>
+          <div className={styles.ogolne_row}>
+            <div className={styles.ogolne_column}>
+              <div className={styles.header_input}>&nbsp;</div>
+              <select className={styles.input} value={selectedClientId || ''} onChange={handleClientChange}>
+                <option value="">Wybierz klienta</option>
+                {privateClients.map(client => (
+                  <option key={client.client_id} value={client.client_id}>
+                    {client.displayName}
+                  </option>
+                ))}
+              </select>
             </div>
-            <div className={styles.ogolne_row}>
-              <div className={styles.ogolne_column}>
-                <div className={styles.header_input}>Adres</div>
-                <input className={styles.input} />
+            <div className={`${styles.ogolne_column} ${selectedClientId ? styles.show : styles.hide}`}>
+              <div className={styles.header_input}>&nbsp;</div>
+              <select className={styles.input} value={selectedProjectId || ''} onChange={handleProjectChange}>
+                <option value="">Wybierz projekt</option>
+                {availableProjects.map(project => (
+                  <option key={project.project_id} value={project.project_id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
               </div>
-              <div className={styles.ogolne_column}></div>
+          </div>
+          <div className={styles.ogolne_row}>
+            <div className={styles.ogolne_column}>
+              <div className={styles.header_input}>Imię</div>
+              <input className={styles.input} value={clientFirstName} onChange={handleFirstNameChange} disabled={areFieldsDisabled} />
             </div>
-          </>
-        )}
+            <div className={styles.ogolne_column}>
+              <div className={styles.header_input}>Nazwisko</div>
+              <input className={styles.input} value={clientLastName} onChange={handleLastNameChange} disabled={areFieldsDisabled} />
+            </div>
+          </div>
+          <div className={styles.ogolne_row}>
+            <div className={styles.ogolne_column}>
+              <div className={styles.header_input}>Adres</div>
+              <input className={styles.input} value={clientAddress} onChange={handleAddressChange} disabled={areFieldsDisabled} />
+            </div>
+            <div className={styles.ogolne_column}></div>
+          </div>
+        </>
+      )}
       </div>
 
       {serviceSections.map((section) => (

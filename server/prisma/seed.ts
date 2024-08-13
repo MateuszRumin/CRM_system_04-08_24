@@ -181,7 +181,7 @@ for (let userData  of users){
   
   for (let clientData  of clientCompanyDatas){
               
-        const existCheck = await prisma.clients.findUnique({
+        const existCheck = await prisma.clients.findFirst({
           where:{
             nip:clientData.nip
           }

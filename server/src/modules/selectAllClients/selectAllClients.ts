@@ -14,6 +14,11 @@ exports.selectAllClients = async (req: Request, res: Response, next: NextFunctio
                 first_name:true,
                 second_name:true,
                 company_name:true,
+                nip:true,
+                client_type:true,
+                krs:true,
+                regon:true,
+                address:true,
                 Status:{
                     select:{
                         status_id:true,
@@ -23,6 +28,7 @@ exports.selectAllClients = async (req: Request, res: Response, next: NextFunctio
                 Project:{
                     select:{
                         project_id:true,
+                        name:true,
                         status_id:true
                     }
                 },
