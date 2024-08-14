@@ -21,6 +21,9 @@ router.use('/projects', projectRouter);
 const statusRouter = require('./statusRouter');
 router.use('/statuses', statusRouter);
 
+const emailRouter = require('./emailRouter');
+router.use('/email', emailRouter);
+
 router.get('/test', (req,res,next) =>{
     res.status(200).json({error : "Witamy w crm"});
 })

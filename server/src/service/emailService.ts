@@ -10,13 +10,28 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendEmail = (to: string, subject: string, text: string) => {
-  const mailOptions = {
+export const sendEmail = (
+  to: string,
+  subject: string,
+  text: string,
+  attachment?: { filename: string; content: string; encoding: string }
+) => {
+  const mailOptions: any = {
     from: process.env.EMAIL_USER,
     to,
     subject,
     text,
   };
+
+  if (attachment) {
+    mailOptions.attachments = [
+      {
+        filename: attachment.filename,
+        content: attachment.content,
+        encoding: attachment.encoding,
+      },
+    ];
+  }
 
   return transporter.sendMail(mailOptions);
 };

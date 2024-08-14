@@ -5,6 +5,7 @@
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
+  position: relative; /* Added to position notification correctly */
 }
 
 h1 {
@@ -84,4 +85,38 @@ h1 {
   font-size: 1.2em;
   color: #999;
   margin-top: 20px;
+}
+
+.button {
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  font-size: 1em;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background-color 0.3s;
+}
+
+.button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.notification {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #28a745;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
