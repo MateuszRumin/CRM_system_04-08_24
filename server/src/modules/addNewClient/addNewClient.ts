@@ -3,28 +3,41 @@ import { IResponse } from '../../../../globalTypes/iResponce';
 
 exports.addNewClient = async (req: Request, res: Response, next: NextFunction) => {
     const prisma = req.app.get('prisma');
+
     try {
         const initData = req.body.client;
 
-        console.log('Received client data:', initData);
+        if (!initData) {
+            return res.status(400).json({ error: 'Brak danych klienta' });
+        }
 
-        // Pobierz status klienta na podstawie status_id
+        // Sprawdź, czy NIP lub KRS już istnieją
+        const existingClient = await prisma.Clients.findFirst({
+            where: {
+                OR: [
+                    { nip: initData.nip },
+                    { krs: initData.krs },
+                    { regon: initData.regon }
+                ]
+            }
+        });
+
+        if (existingClient) {
+            return res.status(409).json({ error: 'NIP, KRS lub REGON już istnieje' });
+        }
+
         const status = await prisma.Statuses.findFirst({
-            select: {
-                status_id: true
-            },
+            select: { status_id: true },
             where: {
                 status_id: initData.status_id,
-                status_type: "Klient",
+                status_type: "Klient"
             }
         });
 
         if (!status) {
-            console.log('Status not found');
             return res.status(404).json({ error: 'Status not found' });
         }
 
-        // dane do stworzenia nowego klienta
         const insertData = {
             status_id: status.status_id,
             user_id: initData.user_id,
@@ -39,25 +52,16 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
             company_name: initData.company_name || 'brak'
         };
 
-        console.log('Insert data:', insertData);
-
-        // Stwórz nowego klienta
         const client = await prisma.Clients.create({
             data: insertData
         });
 
-        console.log('Client created:', client);
-
-        // Przekaż client_id dalej
         req.body.client_id = client.client_id;
         req.body.user_id = client.user_id;
 
         return next();
 
-        // res.status(201).json({ message: 'Client added successfully', client });
     } catch (error) {
-        console.error('Error adding new client:', error);
-
         const response: IResponse = {
             status: 'error',
             display: true,

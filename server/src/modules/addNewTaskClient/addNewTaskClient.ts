@@ -5,42 +5,39 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 exports.addNewTaskClient = async (req: Request, res: Response, next: NextFunction) => {
-   
-    const prisma = req.app.get('prisma')
+    const prisma = req.app.get('prisma');
 
-    try{
-        const user_id = req.body.user_id
-        
-        const client_id = req.body.client_id
-        const taskDatas = req.body.tasks
-        
-        for ( let taskData of taskDatas){
+    try {
+        const user_id = req.body.user_id;
+        const client_id = req.body.client_id;
+        const taskDatas = req.body.tasks || [];
 
+        if (taskDatas.length === 0) {
+            return next(); // Jeśli nie ma zadań, przejdź do następnego middleware
+        }
+
+        for (let taskData of taskDatas) {
             const status = await prisma.Statuses.findFirst({
-                select:{
-                    status_id:true
-                },
-                where:{
-                    status_type:'Zadanie',
-                    name:taskData.status_name
-                }
-    
-            })            
-            
+                select: { status_id: true },
+                where: { status_type: 'Zadanie', name: taskData.status_name }
+            });
+
+            if (!status) {
+                return res.status(404).json({ error: `Status '${taskData.status_name}' not found` });
+            }
+
             let insertData = {
-                status_id:status.status_id,
-                task_text:taskData.task_text,
-                user_id:user_id
-            } 
-
-            taskData.task_name ? Object.assign(insertData, {task_name:taskData.task_name}):void 0
-            taskData.deadline ? Object.assign(insertData, {deadline:taskData.deadline}):void 0
-            taskData.created_at ? Object.assign(insertData, {created_at:taskData.created_at}):void 0
-
+                status_id: status.status_id,
+                task_text: taskData.task_text,
+                user_id: user_id,
+                task_name: taskData.task_name || undefined,
+                deadline: taskData.deadline || undefined,
+                created_at: taskData.created_at || undefined
+            };
 
             let task = await prisma.Tasks.create({
-                data:insertData
-            })
+                data: insertData
+            });
 
             await prisma.ClientTasks.create({
                 data: {
@@ -48,35 +45,23 @@ exports.addNewTaskClient = async (req: Request, res: Response, next: NextFunctio
                     task_id: task.task_id
                 }
             });
-
         }
-
-        const response: IResponse = {
-            status: 'info',
-            display: true,
-            error: null,
-            message: 'Dodano, klięta, notatki,zadania',
-            devmessage: `Fill database Succes`,
-            data: null
-        };
 
         next();
 
-    }catch (error){
-
+    } catch (error) {
         const response: IResponse = {
             status: 'error',
             display: true,
-            error: {error},
-            message: 'Błąd dodawania taskow nowego klięta',
+            error: { error },
+            message: 'Błąd dodawania zadań nowego klienta',
             devmessage: `${error}`,
             data: null
-        };   
+        };
 
-
-        res.status(404).json(response)
+        res.status(500).json(response);
     }
-}
+};
 
 export const addNewTaskClientbyId = async (req: Request, res: Response, next: NextFunction) => {
     const { client_id } = req.params;

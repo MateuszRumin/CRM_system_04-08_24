@@ -25,7 +25,22 @@ router.post('/test', (req, res, next) => {
 
 // Dodanie nowego klienta wraz z innymi danymi
 router.post('/new', addNewClient, addNewNoteClient, addNewTaskClient, addClientMailTel, (req, res) => {
-    res.status(201).json({ message: 'Client, notes, tasks, and contacts added successfully' });
+    let message = 'Dodano nowego klienta';
+
+    if (req.body.notes && req.body.notes.length > 0) {
+        message += ' + notatki';
+    }
+    if (req.body.tasks && req.body.tasks.length > 0) {
+        message += ' + zadania';
+    }
+    if (req.body.emails && req.body.emails.length > 0) {
+        message += ' + e-maile';
+    }
+    if (req.body.phones && req.body.phones.length > 0) {
+        message += ' + telefony';
+    }
+
+    res.status(201).json({ message });
 });
 
 // Notatki

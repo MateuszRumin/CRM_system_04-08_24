@@ -3,28 +3,29 @@ import { IResponse } from '../../../../globalTypes/iResponce';
 import { PrismaClient } from '@prisma/client';
 
 exports.addNewNoteClient = async (req: Request, res: Response, next: NextFunction) => {
-    const prisma = req.app.get('prisma')
+    const prisma = req.app.get('prisma');
 
-    try{
-        // const user_id = req.body.user_id
+    try {
         const user_id = req.body.user_id;
-        
-        const client_id = req.body.client_id
-        const noteDatas = req.body.notes
+        const client_id = req.body.client_id;
+        const noteDatas = req.body.notes || [];
+
+        if (noteDatas.length === 0) {
+            return next(); // Jeśli nie ma notatek, przejdź do następnego middleware
+        }
+
         for (let noteData of noteDatas) {
-            
             let insertData = {
-                user_id: user_id,     
-                note_text: noteData.note_text
-            }
-            
-            noteData.note_name ? Object.assign(insertData, {note_name:noteData.note_name}):void 0
-            noteData.data_link ? Object.assign(insertData, {data_link:noteData.data_link}):void 0
-            noteData.created_at ? Object.assign(insertData, {created_at:noteData.created_at}):void 0    
-             
+                user_id: user_id,
+                note_text: noteData.note_text,
+                note_name: noteData.note_name || undefined,
+                data_link: noteData.data_link || undefined,
+                created_at: noteData.created_at || undefined
+            };
+
             let note = await prisma.Notes.create({
-                data:insertData
-            })
+                data: insertData
+            });
 
             await prisma.ClientNotes.create({
                 data: {
@@ -32,25 +33,23 @@ exports.addNewNoteClient = async (req: Request, res: Response, next: NextFunctio
                     note_id: note.note_id
                 }
             });
-
         }
-        
+
         next();
 
-    } catch (error){
-
+    } catch (error) {
         const response: IResponse = {
             status: 'error',
             display: true,
-            error: {error},
-            message: 'Błąd dodawania notatek nowego klięta',
+            error: { error },
+            message: 'Błąd dodawania notatek nowego klienta',
             devmessage: `${error}`,
             data: null
-        };   
+        };
 
-        res.status(404).json(response)
+        res.status(500).json(response);
     }
-}
+};
 
 const prisma = new PrismaClient();
 
