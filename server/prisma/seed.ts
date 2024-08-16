@@ -259,11 +259,11 @@ create:{
 }
 })
 
-  let position = await prisma.companyPositions.create({
-    data: {
-      name: 'Programista',
-    },
-  });
+let position = await prisma.companyPositions.upsert({
+  where: { name: 'Programista' },
+  update: {},
+  create: { name: 'Programista' },
+});
   position = await prisma.companyPositions.create({
     data: {
       name: 'Sieciowiec',

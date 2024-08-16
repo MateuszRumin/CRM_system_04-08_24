@@ -249,107 +249,122 @@ export const NewInvoiceForm = () => {
     });
   };
 
+  function generateRandomString(length: number) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
+  
+
   const handleSave = async () => {
     if (validateForm()) {
-    try {
-      let clientId = selectedClientId;
-      let projectId = selectedProjectId;
-  
-      // Jeśli klient nie jest wybrany, zapisz nowego klienta
-      if (!selectedClientId) {
-        console.log('Fetching client statuses...');
-        const clientStatusResponse = await axios.get('http://localhost:3000/statuses/client');
-        const clientStatuses = clientStatusResponse.data;
-        const clientStatus = clientStatuses.find((status: { status_type: string, name: string }) => 
-          status.name === 'W trakcie' && status.status_type === 'Klient'
-        );
-  
-        if (!clientStatus) {
-          console.error('Status "W trakcie" dla klienta nie został znaleziony');
-          return;
+        try {
+            let clientId = selectedClientId;
+            let projectId = selectedProjectId;
+
+            // Jeśli klient nie jest wybrany, zapisz nowego klienta
+            if (!selectedClientId) {
+                console.log('Fetching client statuses...');
+                const clientStatusResponse = await axios.get('http://localhost:3000/statuses/client');
+                const clientStatuses = clientStatusResponse.data;
+                const clientStatus = clientStatuses.find((status: { status_type: string, name: string }) => 
+                    status.name === 'W trakcie' && status.status_type === 'Klient'
+                );
+
+                if (!clientStatus) {
+                    console.error('Status "W trakcie" dla klienta nie został znaleziony');
+                    return;
+                }
+
+                console.log('Fetching project statuses...');
+                const projectStatusResponse = await axios.get('http://localhost:3000/statuses/project');
+                const projectStatuses = projectStatusResponse.data;
+                const projectStatus = projectStatuses.find((status: { status_type: string, name: string }) => 
+                    status.name === 'Nie rozpoczęty' && status.status_type === 'Projekt'
+                );
+
+                if (!projectStatus) {
+                    console.error('Status "Nie rozpoczęty" dla projektu nie został znaleziony');
+                    return;
+                }
+
+                console.log('Creating new client...');
+                const newClientResponse = await axios.post('http://localhost:3000/client/new', {
+                    client: {
+                        user_id: 1,
+                        status_id: clientStatus.status_id,
+                        client_type: selectedOption === 'firma' ? 'Firma' : 'Prywatny',
+                        first_name: clientFirstName,
+                        second_name: clientLastName,
+                        address: clientAddress,
+                        regon: clientRegon,
+                        nip: clientNIP,
+                        krs: clientKRS,
+                        company_name: clientCompanyName
+                    }
+                });
+
+                // Tutaj uzyskujesz ID nowo dodanego klienta
+                clientId = newClientResponse.data.data.client_id;
+
+                console.log('Creating new project...');
+                const randomString = generateRandomString(5); // Generowanie losowego ciągu
+                const newProjectName = `Nowy projekt - ${randomString}`; // Dodanie losowego ciągu do nazwy projektu
+                
+                const newProjectResponse = await axios.post('http://localhost:3000/projects/new', {
+                  name: newProjectName,
+                  client_id: clientId,
+                  status_id: projectStatus.status_id,
+                  description: 'Opis nowego projektu',
+                  projectDetails: {
+                    cost: 10000.0,
+                    deadline: new Date().toISOString()
+                  }
+                });
+
+                projectId = newProjectResponse.data.project_id;
+              }
+
+            console.log('Creating new invoice...');
+            const invoiceResponse = await axios.post('http://localhost:3000/invoices/newInvoice', {
+                main: {
+                    status_id: statusId,
+                    invoice_type_id: type,
+                    due_date: dueDate,
+                },
+                client: {
+                    client_id: clientId,
+                },
+                summary,
+            });
+
+            const invoiceId = invoiceResponse.data.data.invoice_id;
+
+            console.log('Adding products to invoice...');
+            await axios.post('http://localhost:3000/invoices/addInvoiceProduct', {
+                invoice_id: invoiceId,
+                products: serviceSections.map(section => ({
+                    project_id: projectId,
+                    product_name: section.product_name,
+                    unit_price: section.unit_price,
+                    product_count: section.product_count,
+                    prize: section.prize,
+                    tax: section.tax,
+                })),
+            });
+
+            console.log('Faktura oraz produkty zostały dodane pomyślnie');
+            navigate(-1);
+        } catch (error) {
+            console.error('Błąd przy zapisywaniu faktury, klienta lub produktów:', error);
         }
-  
-        console.log('Fetching project statuses...');
-        const projectStatusResponse = await axios.get('http://localhost:3000/statuses/project');
-        const projectStatuses = projectStatusResponse.data;
-        const projectStatus = projectStatuses.find((status: { status_type: string, name: string }) => 
-          status.name === 'Nie rozpoczęty' && status.status_type === 'Projekt'
-        );
-  
-        if (!projectStatus) {
-          console.error('Status "Nie rozpoczęty" dla projektu nie został znaleziony');
-          return;
-        }
-  
-        console.log('Creating new client...');
-        const newClientResponse = await axios.post('http://localhost:3000/client/new', {
-          client: {
-            user_id: 1,
-            status_id: clientStatus.status_id,
-            client_type: selectedOption === 'firma' ? 'Firma' : 'Prywatny',
-            first_name: clientFirstName,
-            second_name: clientLastName,
-            address: clientAddress,
-            regon: clientRegon,
-            nip: clientNIP,
-            krs: clientKRS,
-            company_name: clientCompanyName
-          }
-        });
-  
-        clientId = newClientResponse.data.data.client_id;
-  
-        console.log('Creating new project...');
-        const newProjectResponse = await axios.post('http://localhost:3000/projects/new', {
-          name: 'Nowy projekt',
-          client_id: clientId,
-          status_id: projectStatus.status_id,
-          description: 'Opis nowego projektu',
-          projectDetails: {
-            cost: 10000.0,
-            deadline: new Date().toISOString()
-          }
-        });
-  
-        projectId = newProjectResponse.data.data.project_id;
-      }
-  
-      console.log('Creating new invoice...');
-      const invoiceResponse = await axios.post('http://localhost:3000/invoices/newInvoice', {
-        main: {
-          status_id: statusId,
-          invoice_type_id: type,
-          due_date: dueDate,
-        },
-        client: {
-          client_id: clientId,
-        },
-        summary,
-      });
-  
-      const invoiceId = invoiceResponse.data.data.invoice_id;
-  
-      console.log('Adding products to invoice...');
-      await axios.post('http://localhost:3000/invoices/addInvoiceProduct', {
-        invoice_id: invoiceId,
-        products: serviceSections.map(section => ({
-          project_id: projectId,
-          product_name: section.product_name,
-          unit_price: section.unit_price,
-          product_count: section.product_count,
-          prize: section.prize,
-          tax: section.tax,
-        })),
-      });
-  
-      console.log('Faktura oraz produkty zostały dodane pomyślnie');
-      navigate(-1);
-    } catch (error) {
-      console.error('Błąd przy zapisywaniu faktury, klienta lub produktów:', error);
     }
-  }
-  };
-  
+};
+
   
   
 
