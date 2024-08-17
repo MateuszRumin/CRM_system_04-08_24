@@ -51,6 +51,7 @@ export const NewInvoiceForm = () => {
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [availableProjects, setAvailableProjects] = useState<{ project_id: number; name: string; }[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  
 
   const [clientNIP, setClientNIP] = useState('');
   const [clientRegon, setClientRegon] = useState('');
