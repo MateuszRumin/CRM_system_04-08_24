@@ -11,7 +11,7 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
             return res.status(400).json({ error: 'Brak danych klienta' });
         }
 
-        // Sprawdź, czy NIP lub KRS już istnieją
+        // Sprawdź, czy NIP, KRS lub REGON już istnieją
         const existingClient = await prisma.Clients.findFirst({
             where: {
                 OR: [
@@ -56,6 +56,17 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
             data: insertData
         });
 
+        // Zwracanie odpowiedzi z client_id do klienta
+        res.status(201).json({
+            status: 'success',
+            message: 'Klient dodany pomyślnie',
+            data: {
+                client_id: client.client_id,
+                user_id: client.user_id
+            }
+        });
+
+        // Przekazanie danych do kolejnego middleware'a
         req.body.client_id = client.client_id;
         req.body.user_id = client.user_id;
 
