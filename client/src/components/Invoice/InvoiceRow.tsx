@@ -4,8 +4,13 @@ import styles from './InvoiceRow.module.css';
 import ThreeDotsSettings from '../../assets/ClientPage/three_dots_settings.svg';
 import axios from 'axios';
 
+// interface InvoicePayment {
+//   payment_id: number;
+//   status: string;
+// }
+
 interface Invoice {
-    invoice_id: number;
+  invoice_id: number;
   invoice_number: string | null;
   client_name: string;
   invoice_type: string;
@@ -13,7 +18,9 @@ interface Invoice {
   due_date: string | null;
   prize_brutto: number;
   status: string;
+  payment_status: string;
 }
+
 
 interface InvoiceRowProps {
   invoice: Invoice;
@@ -44,11 +51,6 @@ export const InvoiceRow: React.FC<InvoiceRowProps> = ({ invoice, onDelete }) => 
     setIsMenuOpen(prev => !prev);
   };
 
-  const handleEdit = () => {
-    // Assuming there's a route for editing invoices
-    navigate(`/faktury/edit-invoice/${invoice.invoice_id}`, { state: { invoice } });
-  };
-
   const handleDelete = () => {
     setIsModalOpen(true);
   };
@@ -64,30 +66,33 @@ export const InvoiceRow: React.FC<InvoiceRowProps> = ({ invoice, onDelete }) => 
   };
 
   const handleDetails = () => {
-    // Assuming there's a route for viewing invoice details
     navigate(`/faktury/details-invoice/${invoice.invoice_id}`, { state: { invoice } });
   };
 
-//   const handleDetails = () => {
-//     const modifiedName = invoice.invoice_number
-//       .normalize('NFD')
-//       .replace(/[\u0300-\u036f]/g, '')
-//       .replace(/\s+/g, '-');
+  const handleEdit = () => {
+    navigate(`/faktury/edit-invoice/${invoice.invoice_id}`, { state: { invoice } });
+  };
 
-//     navigate(`/faktury/details-invoice/${modifiedName}`, { state: { invoice } });
-//   };
+  const formatInvoiceNumber = (invoiceNumber: string | null, invoiceType: string) => {
+    if (!invoiceNumber) return 'N/A';
+    
+    // Dodaje znacznik FV lub FZ przed numerem faktury
+    return invoiceType === 'Zaliczkowa'
+      ? `FZ/${invoiceNumber}`
+      : `FV/${invoiceNumber}`;
+  };
 
   return (
     <>
       <tr className={`${styles.row} ${styles.invoiceRow}`}>
-        <td>{invoice.invoice_number ?? 'N/A'}</td>
+      <td>{formatInvoiceNumber(invoice.invoice_number, invoice.invoice_type)}</td>
         <td>{invoice.client_name ?? 'N/A'}</td>
         <td>{invoice.invoice_type ?? 'N/A'}</td>
         <td>{invoice.status ?? 'N/A'}</td>
         <td>{invoice.issue_date ? new Date(invoice.issue_date).toLocaleDateString() : 'N/A'}</td>
         <td>{invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : 'N/A'}</td>
         <td>{invoice.prize_brutto.toFixed(2)} PLN</td>
-        <td>{invoice.status ?? 'N/A'}</td>
+        <td>{invoice.payment_status ?? 'N/A'}</td>
         <td className={styles.settingsContainer}>
           {/* <button className={styles.detailsButton} onClick={handleDetails}>Szczegóły</button> */}
           <img

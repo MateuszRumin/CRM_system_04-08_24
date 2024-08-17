@@ -103,9 +103,7 @@ export const InvoiceSettings: React.FC = () => {
 
   const handleChange = (e) => {
     const { value } = e.target;
-    // Ustaw wartość NIP, nie wprowadzaj walidacji na tym etapie
     setNip(value);
-    // Resetowanie błędu, jeśli zmieniają się dane
     setError('');
   };
 

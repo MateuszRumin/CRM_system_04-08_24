@@ -66,9 +66,9 @@ for (let userData  of users){
   }
 
   const statusesProject = [
-    {name:'Nie rozpoczęty'},
+    {name:'Nie rozpoczety'},
     {name:'W trakcie realizacji'},    
-    {name:'Zakończony'},    
+    {name:'Zakonczony'},    
   ]
   
   for (let statusProject  of statusesProject){
@@ -98,7 +98,7 @@ for (let userData  of users){
     {name:'Nie zaczety'},
     {name:'W trakcie'},
     {name:'Zrobiony'},
-    {name:'Porażka'}        
+    {name:'Porazka'}        
   ]
   
   
@@ -126,9 +126,6 @@ for (let userData  of users){
   
   const statusesInvoice = [
     {name:'Nie wystawiona'},
-    {name:'Nie oplacona'},
-    {name:'Oplacona'},
-    {name:'Oczekuje na platnosc'},
     {name:'Wystawiona'},
     {name:'Zaksiegowana'}            
   ]
@@ -154,12 +151,40 @@ for (let userData  of users){
     }
   
   }
+////////////////////////////////////////
+  const statusesInvoicePayment = [
+    {name:'Oczekuje na platnosc'},
+    {name:'Oplacona'},
+    {name:'Nie oplacona'},           
+  ]
+
+  for (let statusInvoicePayment  of statusesInvoicePayment){
+    
+    const existCheck = await prisma.statuses.findFirst({
+      where:{
+        status_type:'Platnosc',
+        default:true,
+        name:statusInvoicePayment.name
+      }
+    })
+  
+  if (!existCheck){
+      await prisma.statuses.create({
+        data:{
+          status_type:'Platnosc',
+          default:true,
+          name:statusInvoicePayment.name
+        }
+      })
+    }
+  
+  }
   
   const statusForClientNiepodjent = await prisma.statuses.findFirst({
     where:{
       status_type:'Klient',
       default:true,
-      name:"Niepodjęty"
+      name:"Niepodjety"
     }
   })
   

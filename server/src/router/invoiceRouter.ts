@@ -34,7 +34,7 @@ router.post('/calculateProduct', caculateInvProducts);//
 router.get('/:invoice_id', getInvoiceDetails);//
 
 //update
-router.post("/updateInvoice", updateInvoice); //
+router.put("/updateInvoice", updateInvoice); //
 
 
 

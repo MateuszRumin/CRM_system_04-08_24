@@ -30,6 +30,7 @@ import { ProjectDetails } from './views/Projekty/ProjectDetails.tsx';
 import { AddNewProject } from './views/Projekty/Dodaj_nowy_projekt/AddNewProject.tsx';
 import { EditProject } from './views/Projekty/Edytuj_projekt/EditProject.tsx';
 import { InvoiceDetails } from './views/Faktury/InvoiceDetails.tsx';
+import { EditInvoice } from './views/Faktury/EditInvoice.tsx';
 import { AuthRoute } from './components/auth/auth.tsx';
 import { DetailsClient } from './components/Client/ClientDetailsComponents/DetailsClient.tsx'
 import { InvoiceSettings } from './components/Invoice/InvoiceSettings.tsx'
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
           {
             path: 'details-invoice/:invoice_id',
             element: <AuthRoute allowedRoles={['Admin']}><InvoiceDetails /></AuthRoute>,
+          },
+          {
+            path: 'edit-invoice/:invoice_id',
+            element: <AuthRoute allowedRoles={['Admin']}><EditInvoice /></AuthRoute>,
           },
           // {
           //   path: 'new',

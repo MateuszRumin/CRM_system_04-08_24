@@ -67,8 +67,16 @@ interface Invoice {
   prize_brutto: number;
   Status: Status;
   InvoiceType: InvoiceType;
+  InvoicePayment: InvoicePayment;
   Client: Client;
   InvoiceProduct: InvoiceProduct[];
+}
+
+interface InvoicePayment {
+  payment_id: number;
+  invoice_id: number; // Dodano invoice_id
+  status_id: number;
+  Status: Status;
 }
 
 export function InvoiceDetails() {
@@ -263,6 +271,13 @@ export function InvoiceDetails() {
           <p><strong>Termin opłaty:</strong> {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : 'N/A'}</p>
           <p><strong>Kwota brutto:</strong> ${invoice.prize_brutto.toFixed(2)}</p>
           <p><strong>Status:</strong> {invoice.Status?.name || 'N/A'}</p>
+          <p><strong>Status płatności: </strong> 
+          {invoice.InvoicePayment.length > 0 ? (
+            invoice.InvoicePayment.map(payment => (
+              <span key={payment.payment_id}>{payment.Status.name}{' '}</span>
+            ))
+          ) : 'Brak płatności'}
+        </p>
         </div>
 
         <div className={styles.section}>

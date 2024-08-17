@@ -18,6 +18,11 @@ export const getInvoiceDetails = async (req: Request, res: Response) => {
           include: {
             Project: true       
           }
+        },
+        InvoicePayment: {
+          include: {
+            Status:true,
+          }
         }
       }
     });

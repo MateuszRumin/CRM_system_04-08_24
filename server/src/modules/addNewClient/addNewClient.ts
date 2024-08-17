@@ -59,6 +59,11 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
         req.body.client_id = client.client_id;
         req.body.user_id = client.user_id;
 
+        res.status(200).json({
+            status: 'success',
+            data: {client},
+        });
+
         return next();
 
     } catch (error) {

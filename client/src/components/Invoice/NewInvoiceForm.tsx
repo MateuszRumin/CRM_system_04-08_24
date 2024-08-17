@@ -12,6 +12,14 @@ interface Project {
   status_id: number;
 }
 
+interface InvoiceMarker {
+  marker_id: number;
+  marker_name: string;
+  current_month_sequence: number;
+  current_year_sequence: number;
+  current_number_sequence: number;
+}
+
 interface Client {
   client_id: number;
   nip: string;
@@ -27,10 +35,12 @@ interface Client {
 
 export const NewInvoiceForm = () => {
   const navigate = useNavigate();
-  const [number] = useState('');
+  const [number, setNumber] = useState('');
+  const [paymentTerm, setDefaultPaymentTerm] = useState('');
   const [type, setType] = useState<number>();
+  const [invoiceMarkers, setInvoiceMarkers] = useState<InvoiceMarker[]>([]);
   const [issueDate, setIssueDate] = useState('');
-  const [dueDate] = useState(new Date(new Date().setDate(new Date().getDate() + 7)).toISOString());
+  const [dueDate, setDueDate] = useState(new Date(new Date().setDate(new Date().getDate() + 7)).toISOString());
   const [statusId, setStatusId] = useState<number | undefined>();
   const [selectedOption, setSelectedOption] = useState<'firma' | 'osobaPrywatna'>('firma');
   const [serviceSections, setServiceSections] = useState<{ id: string; product_name: string; unit_price: number; product_count: number; prize: number; tax: number }[]>([
@@ -49,6 +59,7 @@ export const NewInvoiceForm = () => {
   const [clientAddress, setClientAddress] = useState('');
   const [clientFirstName, setClientFirstName] = useState(''); 
   const [clientLastName, setClientLastName] = useState('');
+  const [error, setError] = useState('');
 
   const [summary, setSummary] = useState({
     prize_netto: 0,
@@ -56,7 +67,7 @@ export const NewInvoiceForm = () => {
     tax_ammount: 0,
     comments: '',
   });
-  const [invoiceTypes, setInvoiceTypes] = useState<{ invoice_type_id: number; invoice_type: string; }[]>([]);
+  const [invoiceTypes, setInvoiceTypes] = useState<{ invoice_type_id: number; invoice_type: string; marker_id: number }[]>([]);
 
   const fetchStatusId = async () => {
     try {
@@ -117,6 +128,18 @@ export const NewInvoiceForm = () => {
     axios.get('http://localhost:3000/invoices/settings')
       .then(response => {
         setInvoiceTypes(response.data.data.invoiceTypes);
+        setInvoiceMarkers(response.data.data.invoiceMarkers);
+        // setDefaultPaymentTerm(response.data.data.invoiceSettings.payment_term);
+        if (invoiceTypes.length > 0) {
+          setType(invoiceTypes[0].invoice_type_id);
+        }
+
+        // Ustawienie wartości dueDate na podstawie payment_term
+        const paymentTerm = response.data.data.invoiceSettings.payment_term;
+        setDefaultPaymentTerm(paymentTerm);
+        const calculatedDueDate = new Date();
+        calculatedDueDate.setDate(calculatedDueDate.getDate() + paymentTerm);
+        setDueDate(calculatedDueDate.toISOString().split('T')[0]);
       })
       .catch(error => {
         console.error('Error fetching invoice types:', error);
@@ -125,6 +148,23 @@ export const NewInvoiceForm = () => {
     fetchStatusId();
     fetchClients();
   }, []);
+
+  useEffect(() => {
+    if (type && invoiceMarkers.length > 0) {
+      const selectedInvoiceType = invoiceTypes.find(invoiceType => invoiceType.invoice_type_id === type);
+      
+      if (selectedInvoiceType) {
+        const selectedMarker = invoiceMarkers.find(marker => marker.marker_id === selectedInvoiceType.marker_id);
+
+        if (selectedMarker) {
+          const currentNumber = selectedMarker.current_number_sequence;
+          const month = new Date().getMonth() + 1; // Bieżący miesiąc
+          const year = new Date().getFullYear(); // Bieżący rok
+          setNumber(`${selectedMarker.marker_name}/${year}/${month.toString().padStart(2, '0')}/${currentNumber}`);
+        }
+      }
+    }
+  }, [type, invoiceMarkers, invoiceTypes]);
 
   const handleClientChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const clientId = Number(event.target.value);
@@ -170,9 +210,9 @@ export const NewInvoiceForm = () => {
 
 
   // Funkcje obsługujące zmiany w polach
-  const handleNIPChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setClientNIP(event.target.value);
-  };
+  // const handleNIPChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setClientNIP(event.target.value);
+  // };
 
   const handleRegonChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setClientRegon(event.target.value);
@@ -215,7 +255,7 @@ export const NewInvoiceForm = () => {
     calculateSummary(newSections);
   };
 
-  const handleInputChange = (sectionId: string, field: string, value: string | number) => {
+  const handleInputChange = (sectionId: string, field: string, value: number | string) => {
     const newSections = serviceSections.map((section) => {
       if (section.id === sectionId) {
         const updatedSection = { ...section, [field]: value };
@@ -236,6 +276,31 @@ export const NewInvoiceForm = () => {
     calculateSummary(newSections);
   };
 
+  // const handleInputChange = (sectionId: string, field: string, value: number | string) => {
+  //   const newSections = serviceSections.map((section) => {
+  //       if (section.id === sectionId) {
+  //           const updatedSection = { ...section, [field]: value };
+
+  //           // Aktualizuj prize i tax tylko dla pól unit_price, product_count, i tax
+  //           if (field === 'unit_price' || field === 'product_count' || field === 'tax') {
+  //               const prize = updatedSection.unit_price * updatedSection.product_count;
+  //               const vatRate = updatedSection.tax; // VAT rate as percentage (e.g., 23 for 23%)
+  //               const taxAmount = prize * (vatRate / 100); // Kwota podatku VAT
+  //               const prizeBrutto = prize + taxAmount; // Kwota brutto (z VAT)
+
+  //               updatedSection.prize = prizeBrutto;
+  //               updatedSection.tax = taxAmount; // Przechowujemy kwotę VAT zamiast stawki procentowej
+  //           }
+
+  //           return updatedSection;
+  //       }
+  //       return section;
+  //   });
+
+  //   setServiceSections(newSections);
+  //   calculateSummary(newSections);
+  // };
+
   const calculateSummary = (sections: typeof serviceSections) => {
     const prize_netto = sections.reduce((total, section) => total + section.prize, 0);
     const tax_ammount = sections.reduce((total, section) => total + section.tax, 0);
@@ -249,107 +314,169 @@ export const NewInvoiceForm = () => {
     });
   };
 
-  const handleSave = async () => {
-    if (validateForm()) {
-    try {
-      let clientId = selectedClientId;
-      let projectId = selectedProjectId;
-  
-      // Jeśli klient nie jest wybrany, zapisz nowego klienta
-      if (!selectedClientId) {
-        console.log('Fetching client statuses...');
-        const clientStatusResponse = await axios.get('http://localhost:3000/statuses/client');
-        const clientStatuses = clientStatusResponse.data;
-        const clientStatus = clientStatuses.find((status: { status_type: string, name: string }) => 
-          status.name === 'W trakcie' && status.status_type === 'Klient'
-        );
-  
-        if (!clientStatus) {
-          console.error('Status "W trakcie" dla klienta nie został znaleziony');
-          return;
-        }
-  
-        console.log('Fetching project statuses...');
-        const projectStatusResponse = await axios.get('http://localhost:3000/statuses/project');
-        const projectStatuses = projectStatusResponse.data;
-        const projectStatus = projectStatuses.find((status: { status_type: string, name: string }) => 
-          status.name === 'Nie rozpoczęty' && status.status_type === 'Projekt'
-        );
-  
-        if (!projectStatus) {
-          console.error('Status "Nie rozpoczęty" dla projektu nie został znaleziony');
-          return;
-        }
-  
-        console.log('Creating new client...');
-        const newClientResponse = await axios.post('http://localhost:3000/client/new', {
-          client: {
-            user_id: 1,
-            status_id: clientStatus.status_id,
-            client_type: selectedOption === 'firma' ? 'Firma' : 'Prywatny',
-            first_name: clientFirstName,
-            second_name: clientLastName,
-            address: clientAddress,
-            regon: clientRegon,
-            nip: clientNIP,
-            krs: clientKRS,
-            company_name: clientCompanyName
-          }
-        });
-  
-        clientId = newClientResponse.data.data.client_id;
-  
-        console.log('Creating new project...');
-        const newProjectResponse = await axios.post('http://localhost:3000/projects/new', {
-          name: 'Nowy projekt',
-          client_id: clientId,
-          status_id: projectStatus.status_id,
-          description: 'Opis nowego projektu',
-          projectDetails: {
-            cost: 10000.0,
-            deadline: new Date().toISOString()
-          }
-        });
-  
-        projectId = newProjectResponse.data.data.project_id;
-      }
-  
-      console.log('Creating new invoice...');
-      const invoiceResponse = await axios.post('http://localhost:3000/invoices/newInvoice', {
-        main: {
-          status_id: statusId,
-          invoice_type_id: type,
-          due_date: dueDate,
-        },
-        client: {
-          client_id: clientId,
-        },
-        summary,
-      });
-  
-      const invoiceId = invoiceResponse.data.data.invoice_id;
-  
-      console.log('Adding products to invoice...');
-      await axios.post('http://localhost:3000/invoices/addInvoiceProduct', {
-        invoice_id: invoiceId,
-        products: serviceSections.map(section => ({
-          project_id: projectId,
-          product_name: section.product_name,
-          unit_price: section.unit_price,
-          product_count: section.product_count,
-          prize: section.prize,
-          tax: section.tax,
-        })),
-      });
-  
-      console.log('Faktura oraz produkty zostały dodane pomyślnie');
-      navigate(-1);
-    } catch (error) {
-      console.error('Błąd przy zapisywaniu faktury, klienta lub produktów:', error);
+  function generateRandomString(length: number) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
+    return result;
   }
+
+  const validateNIP = (clientNIP: string): boolean => {
+    const nipPattern = /^\d{10}$/; // Zakładając, że NIP ma 10 cyfr
+    return nipPattern.test(clientNIP);
+  };
+
+  // const handleNIPChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { value } = event.target;
+  //   setClientNIP(value);
+  //   setError('');
+  // };
+
+  const handleNIPChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setClientNIP(event.target.value);
+    setError('');
+  };
+
+  const handleFetchCompanyData = async () => {
+
+    if (!validateNIP(clientNIP)) {
+      setError('Numer NIP musi zawierać tylko cyfry i mieć 10 cyfr.');
+      return;
+    }
+
+    try {
+      // const nip = clientNIP;
+      const response = await axios.post('http://localhost:3000/client/fetch-regon-data', { nip : clientNIP });
+      const { name, address, regon, krs } = response.data;
+
+      setClientCompanyName(name);
+      setClientAddress(address);
+      setClientRegon(regon);
+      setClientKRS(krs);
+      setError('');
+      console.log(response);
+    } catch (error) {
+      setError('Wystąpił błąd podczas pobierania danych.');
+    }
   };
   
+
+  const handleSave = async () => {
+    if (validateForm()) {
+        try {
+            let clientId = selectedClientId;
+            let projectId = selectedProjectId;
+
+            // Jeśli klient nie jest wybrany, zapisz nowego klienta
+            if (!selectedClientId) {
+                console.log('Fetching client statuses...');
+                const clientStatusResponse = await axios.get('http://localhost:3000/statuses/client');
+                const clientStatuses = clientStatusResponse.data;
+                const clientStatus = clientStatuses.find((status: { status_type: string, name: string }) => 
+                    status.name === 'W trakcie' && status.status_type === 'Klient'
+                );
+
+                if (!clientStatus) {
+                    console.error('Status "W trakcie" dla klienta nie został znaleziony');
+                    return;
+                }
+
+                console.log('Fetching project statuses...');
+                const projectStatusResponse = await axios.get('http://localhost:3000/statuses/project');
+                const projectStatuses = projectStatusResponse.data;
+                const projectStatus = projectStatuses.find((status: { status_type: string, name: string }) => 
+                    status.name === 'Nie rozpoczęty' && status.status_type === 'Projekt'
+                );
+
+                console.log(projectStatusResponse);
+
+                if (!projectStatus) {
+                    console.error('Status "Nie rozpoczęty" dla projektu nie został znaleziony');
+                    return;
+                }
+
+                console.log('Creating new client...');
+                const newClientResponse = await axios.post('http://localhost:3000/client/new', {
+                    client: {
+                        user_id: 1,
+                        status_id: clientStatus.status_id,
+                        client_type: selectedOption === 'firma' ? 'Firma' : 'Prywatny',
+                        first_name: clientFirstName,
+                        second_name: clientLastName,
+                        address: clientAddress,
+                        regon: clientRegon,
+                        nip: clientNIP,
+                        krs: clientKRS,
+                        company_name: clientCompanyName
+                    }
+                });
+
+                // Tutaj uzyskujesz ID nowo dodanego klienta
+                console.log("id nowego klienta:", newClientResponse.data.data.client.client_id);
+                clientId = parseInt(newClientResponse.data.data.client.client_id);
+                console.log('Creating new project...');
+                const randomString = generateRandomString(5); // Generowanie losowego ciągu
+                const newProjectName = `Nowy projekt - ${randomString}`; // Dodanie losowego ciągu do nazwy projektu
+                
+                const newProjectResponse = await axios.post('http://localhost:3000/projects/new', {
+                  name: newProjectName,
+                  client_id: clientId,
+                  status_id: projectStatus.status_id,
+                  description: 'Opis nowego projektu',
+                  projectDetails: {
+                    cost: 10000.0,
+                    deadline: new Date().toISOString()
+                  }
+                });
+
+                projectId = newProjectResponse.data.project_id;
+                console.log(newProjectResponse);
+              }
+
+            console.log('Creating new invoice...');
+            const invoiceResponse = await axios.post('http://localhost:3000/invoices/newInvoice', {
+                main: {
+                    status_id: statusId,
+                    invoice_type_id: type,
+                    issue_date: new Date(issueDate).toISOString(),
+                    due_date: new Date(dueDate).toISOString(),
+                },
+                client: {
+                    client_id: clientId,
+                },
+                summary,
+            });
+
+            const invoiceId = invoiceResponse.data.data.invoice.invoice_id;
+
+            console.log('Adding products to invoice...');
+            await axios.post('http://localhost:3000/invoices/addInvoiceProduct', {
+                invoice_id: invoiceId,
+                products: serviceSections.map(section => ({
+                    project_id: projectId,
+                    product_name: section.product_name,
+                    unit_price: section.unit_price,
+                    product_count: section.product_count,
+                    prize: section.prize,
+                    tax: section.tax,
+                })),
+            });
+
+            console.log('Faktura oraz produkty zostały dodane pomyślnie');
+            navigate(-1);
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response?.status === 409) {
+              setError('NIP, KRS lub REGON już istnieje w systemie');
+          } else {
+              console.error('Błąd przy zapisywaniu faktury, klienta lub produktów:', error);
+          }
+      }
+    }
+  };
+
   
   
 
@@ -436,7 +563,7 @@ export const NewInvoiceForm = () => {
         <div className={styles.ogolne_row}>
           <div className={styles.ogolne_column}>
             <div className={styles.header_input}>Numer Faktury (automatycznie)</div>
-            <input className={styles.input} readOnly value={number || 'FV/06/2024/1001'} disabled />
+            <input className={styles.input} readOnly value={number || 'Nie wybrano typu faktury'} disabled />
           </div>
           <div className={styles.ogolne_column}>
             <div className={styles.header_input}>Data wystawienia</div>
@@ -462,7 +589,7 @@ export const NewInvoiceForm = () => {
           </div>
           <div className={styles.ogolne_column}>
             <div className={styles.header_input}>Termin płatności</div>
-            <input className={styles.input} readOnly value='7 dni' disabled />
+            <input className={styles.input} readOnly value={`${paymentTerm} dni`} disabled />
           </div>
         </div>
       </div>
@@ -470,7 +597,7 @@ export const NewInvoiceForm = () => {
       <div className={styles.ogolne_container}>
         <div className={styles.header_ogolne}>
           <div className={styles.text_ogolne}>Dane klienta</div>
-          <div className={styles.pobierz_z_regon}>POBIERZ DANE Z REGON</div>
+          <div className={styles.pobierz_z_regon} onClick={handleFetchCompanyData}>POBIERZ DANE Z REGON</div>
         </div>
         <div className={styles.ogolne_row}>
           <div className={styles.ogolne_column}>
@@ -521,7 +648,8 @@ export const NewInvoiceForm = () => {
             <div className={styles.ogolne_row}>
         <div className={styles.ogolne_column}>
           <div className={styles.header_input}>NIP</div>
-          <input className={styles.input} value={clientNIP} onChange={handleNIPChange}  disabled={areFieldsDisabled} />
+          <input className={styles.input} value={clientNIP} onChange={handleNIPChange}  disabled={areFieldsDisabled} 
+          placeholder="Wprowadź numer NIP"/>{error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
         <div className={styles.ogolne_column}>
           <div className={styles.header_input}>REGON</div>
@@ -660,9 +788,9 @@ export const NewInvoiceForm = () => {
                 onChange={(e) => handleInputChange(section.id, 'tax', +e.target.value)}
               >
                 <option value={0}>0%</option>
-                <option value={5}>5%</option>
-                <option value={8}>8%</option>
-                <option value={23}>23%</option>
+                <option value={50}>5%</option>
+                <option value={80}>8%</option>
+                <option value={230}>23%</option>
               </select>
             </div>
           </div>

@@ -143,6 +143,7 @@ enum statusTypeValues {
   Projekt
   Zadanie
   Faktura
+  Platnosc
 }
 
 model Statuses {
@@ -155,6 +156,16 @@ model Statuses {
   Task Tasks[]
   Invoice Invoices[]
   Project Projects[]
+  InvoicePayment InvoicePayments[]
+}
+
+model InvoicePayments {
+  payment_id Int @id @default(autoincrement())
+  invoice_id Int
+  status_id  Int
+
+  Status Statuses @relation(fields: [status_id], references: [status_id])
+  Invoice Invoices @relation(fields:[invoice_id], references: [invoice_id])
 }
 
 model Notes {
@@ -248,6 +259,7 @@ model Invoices {
   Client     Clients      @relation(fields: [client_id], references: [client_id])
   InvoiceProduct InvoiceProducts[]
   Status Statuses @relation(fields: [status_id],references: [status_id])
+  InvoicePayment InvoicePayments[]
 }
 
 model InvoiceProducts {

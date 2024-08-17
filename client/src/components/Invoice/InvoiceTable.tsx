@@ -5,7 +5,7 @@ import Pagination from './Pagination';
 import { InvoiceRow } from './InvoiceRow';
 
 interface Invoice {
-    invoice_id: number;
+  invoice_id: number;
   invoice_number: string | null;
   client_name: string;
   invoice_type: string;
@@ -13,6 +13,7 @@ interface Invoice {
   due_date: string | null;
   prize_brutto: number;
   status: string;
+  payment_status: string;
 }
 
 interface InvoiceTableProps {

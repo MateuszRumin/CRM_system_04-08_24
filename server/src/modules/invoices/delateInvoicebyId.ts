@@ -44,6 +44,11 @@ exports.deleteInvoice = async (req: Request, res: Response, next: NextFunction) 
       await prisma.invoiceProducts.deleteMany({
         where: { invoice_id: parseInt(invoice_id) },
       });
+
+      // Usunięcie powiązanych rekordów w InvoicePPayments
+      await prisma.invoicePayments.deleteMany({
+        where: { invoice_id: parseInt(invoice_id) },
+      });
   
       // Usunięcie faktury
       await prisma.invoices.delete({

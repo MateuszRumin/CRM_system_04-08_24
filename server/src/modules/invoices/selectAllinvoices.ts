@@ -8,13 +8,12 @@ export const getAllInvoices = async (req: Request, res: Response, next: NextFunc
   try {
     const invoices = await prisma.invoices.findMany({
       select: {
-        invoice_id:true,
+        invoice_id: true,
         invoice_number: true,
         issue_date: true,
         due_date: true,
         prize_netto: true,
         tax_ammount: true,
-        //note: true,
         Client: {
           select: {
             first_name: true,
@@ -31,21 +30,35 @@ export const getAllInvoices = async (req: Request, res: Response, next: NextFunc
           select: {
             name: true
           }
+        },
+        InvoicePayment: { // Zmiana z InvoicePayment na InvoicePayments
+          select: {
+            Status: { // Pobierz status płatności
+              select: {
+                name: true
+              }
+            }
+          }
         }
       }
     });
 
-    const formattedInvoices = invoices.map(invoice => ({
-      invoice_id:invoice.invoice_id,
-      invoice_number: invoice.invoice_number,
-      client_name: `${invoice.Client.first_name} ${invoice.Client.second_name} (${invoice.Client.company_name})`,
-      invoice_type: invoice.InvoiceType.invoice_type,
-      issue_date: invoice.issue_date,
-      due_date: invoice.due_date,
-      prize_brutto: invoice.tax_ammount,
-      status: invoice.Status.name,
-      //note: invoice.note
-    }));
+    const formattedInvoices = invoices.map(invoice => {
+      // Pobierz status płatności, jeśli istnieje
+      const paymentStatuses = invoice.InvoicePayment.map(payment => payment.Status.name).join(', ');
+
+      return {
+        invoice_id: invoice.invoice_id,
+        invoice_number: invoice.invoice_number,
+        client_name: `${invoice.Client.first_name} ${invoice.Client.second_name} (${invoice.Client.company_name})`,
+        invoice_type: invoice.InvoiceType.invoice_type,
+        issue_date: invoice.issue_date,
+        due_date: invoice.due_date,
+        prize_brutto: invoice.tax_ammount,
+        status: invoice.Status.name,
+        payment_status: paymentStatuses // Dodaj statusy płatności
+      };
+    });
 
     res.json(formattedInvoices);
   } catch (error) {
