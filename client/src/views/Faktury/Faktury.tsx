@@ -23,7 +23,7 @@ export const Faktury = () => {
       {shouldShowInvoiceList && (
         <div className={styles.container}>
           <div className={styles.header}>
-            <h1>Faktury</h1>
+            <h1 className={styles.title}>Faktury</h1>
             <div className={styles.actions}>
               <SearchInvoice onSearch={setSearchTerm} />
               <FilterInvoice onFilter={setFilterOptions} />

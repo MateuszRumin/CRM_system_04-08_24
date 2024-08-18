@@ -5,15 +5,68 @@
   .table {
     width: 100%;
     border-collapse: collapse;
+    overflow-x: auto;
+    margin: 15px 0px 62px;
   }
   
   .table th, .table td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 8px 15px;
   }
   
   .table th {
-    background-color: #ffffff;
+    color: black;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    border-radius: 5px;
+    user-select: none;
+    padding: 8px 15px;
     text-align: left;
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.table th:hover {
+  background-color: #f3f3f3;
+  cursor: pointer;
+}
+
+.table td {
+  color: black;
+  font-size: 15px;
+}
+
+.headerCell {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.statusCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Montserrat;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 22px;
+}
+
+.Oplacona {
+  color: #1f9254;
+  background-color: #ebf9f1;
+  font-size: 13px;
+}
+
+.Nieoplacona {
+  color: #a30d11;
+  font-size: 13px;
+  background-color: #fbe7e8;
+}
+
+.OczekujeNaPlatnosc {
+  color: #726d00;
+  background-color: #feffc0;
+  font-size: 13px;
 }
     

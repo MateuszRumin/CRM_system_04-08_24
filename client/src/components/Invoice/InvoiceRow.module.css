@@ -83,3 +83,10 @@
   background: var(--Colors-Main-Color-White-100, #FBFBFB);
 }
 
+.clientColumn {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}
+

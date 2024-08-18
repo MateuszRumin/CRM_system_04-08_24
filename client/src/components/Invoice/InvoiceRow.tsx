@@ -86,7 +86,7 @@ export const InvoiceRow: React.FC<InvoiceRowProps> = ({ invoice, onDelete }) => 
     <>
       <tr className={`${styles.row} ${styles.invoiceRow}`}>
       <td>{formatInvoiceNumber(invoice.invoice_number, invoice.invoice_type)}</td>
-        <td>{invoice.client_name ?? 'N/A'}</td>
+        <td className={styles.clientColumn}>{invoice.client_name ?? 'N/A'}</td>
         <td>{invoice.invoice_type ?? 'N/A'}</td>
         <td>{invoice.status ?? 'N/A'}</td>
         <td>{invoice.issue_date ? new Date(invoice.issue_date).toLocaleDateString() : 'N/A'}</td>

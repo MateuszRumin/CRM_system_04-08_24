@@ -1,142 +1,180 @@
-.filterClient {
-  display: flex;
-  align-items: center;
-}
-
-.filterButton {
-  display: flex;
-  height: 40px;
-  padding: 8px 16px;
-  align-items: center;
-  gap: 10px;
-  border-radius: 8px;
-  border: 1px solid #E0E0E0;
-  background: #FFF;
-}
-
-.handleSubmitButton {
-  display: flex;
-  height: 40px;
-  padding: 8px 16px;
-  align-items: center;
-  gap: 10px;
-  border-radius: 8px;
-  border: 1px solid #24304F;
-  background: #24304F;
-  color: #FBFBFB;
-}
-
-.handleClearFiltersButton {
-  display: flex;
-  height: 40px;
-  padding: 8px 16px;
-  align-items: center;
-  gap: 10px;
-  border-radius: 8px;
-  border: 1px solid #E0E0E0;
-}
-
-.toggleModalButton {
-  display: flex;
-  height: 40px;
-  padding: 8px 16px;
-  align-items: center;
-  gap: 10px;
-  border-radius: 8px;
-  border: 1px solid #E0E0E0;
-  background: #FFF;
-}
-
-
-
-.filterIcon {
-  margin-right: 5px;
-}
-
-.modalBackdrop {
+.overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal {
-  background: white;
+  width: 80%;
   padding: 20px;
-  border-radius: 10px;
-  width: 500px;
-  max-width: 90%;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.modal h2 {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-}
-
-.formGroup {
-  margin-bottom: 15px;
-}
-
-.formGroup label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-.formGroup input,
-.formGroup select {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
-}
-
-.formGroup input[type="date"] {
-  width: calc(100% - 10px); 
-}
-
-.modalButtons {
+  background: white;
+  border-radius: 8px;
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  flex-direction: column;
 }
 
-.modalButtons button {
-  padding: 10px 20px;
-  border-radius: 5px;
+.container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  background: #F9F9F9;
+}
+
+.sectionGroup {
+  flex: 1;
+  background: #F3F3F3; /* Ustawienie tła dla każdej kolumny */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  color: black;
+  font-size: 16px;
+  font-family: Inter, sans-serif;
+  font-weight: 700;
+  line-height: 24px;
+  margin-bottom: 10px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
   cursor: pointer;
 }
 
-.submit_filter {
-  background-color: #007bff;
-  color: white;
-  border: none;
+.checkbox {
+  width: 28px;
+  height: 28px;
+  background: white;
+  border-radius: 4px;
+  border: 1px #E1E1E1 solid;
 }
 
-.close_filter {
-  background-color: #dc3545;
-  color: white;
-  border: none;
+.checkboxSelected {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  background: url('./checkbox.svg') no-repeat center center;
+  background-size: cover;
 }
 
-.filter_buttons_container {
+.optionText {
+  color: #505050;
+  font-size: 16px;
+  font-family: Roboto, sans-serif;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.dateContainer {
+  margin-top: 10px;
+}
+
+.dateInput {
+  width: 100%;
+  height: 40px;
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  border: 1px #E0E0E0 solid;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dateLabel {
+  color: black;
+  font-size: 16px;
+  font-family: Inter, sans-serif;
+  font-weight: 700;
+  line-height: 24px;
+  margin-bottom: 8px;
+}
+
+.inputField {
+  width: 100%;
+  height: 100%;
+  padding: 8px 16px;
+  border: none;
+  outline: none;
+  background: transparent;
+  border-radius: 8px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 15px;
+  gap: 16px;
+  margin-top: 20px;
 }
 
-@media (max-width: 600px) {
-  .modal {
-    width: 90%;
-  }
+.buttonFilter {
+  padding: 14px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  font-family: Montserrat, sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.buttonFilter {
+  background: #24304F;
+  color: #FBFBFB;
+}
+
+.buttonCancel {
+  background: #E0E0E0;
+  color: #24304F;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.filterBox {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #E1E1E1;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.icon {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+}
+
+.filterText {
+  font-size: 16px;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  color: #505050;
+}
+
+.filterBox:hover {
+  background-color: #e0e0e0;
+  border-color: #cccbcb;
 }

@@ -416,8 +416,8 @@ export const NewInvoiceForm = () => {
                 });
 
                 // Tutaj uzyskujesz ID nowo dodanego klienta
-                console.log("id nowego klienta:", newClientResponse.data.data.client.client_id);
-                clientId = parseInt(newClientResponse.data.data.client.client_id);
+                console.log("id nowego klienta:", newClientResponse.data.data.client_id);
+                clientId = parseInt(newClientResponse.data.data.client_id);
                 console.log('Creating new project...');
                 const randomString = generateRandomString(5); // Generowanie losowego ciągu
                 const newProjectName = `Nowy projekt - ${randomString}`; // Dodanie losowego ciągu do nazwy projektu
@@ -432,9 +432,8 @@ export const NewInvoiceForm = () => {
                     deadline: new Date().toISOString()
                   }
                 });
-
-                projectId = newProjectResponse.data.project_id;
-                console.log(newProjectResponse);
+                projectId = parseInt(newProjectResponse.data.project_id);
+                console.log(projectId);
               }
 
             console.log('Creating new invoice...');

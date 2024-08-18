@@ -78,15 +78,15 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
         return next();
 
     } catch (error) {
-        const response: IResponse = {
-            status: 'error',
-            display: true,
-            error: { error },
-            message: 'Błąd dodawania nowego klienta',
-            devmessage: `${error}`,
-            data: null
-        };
+        // const response: IResponse = {
+        //     status: 'error',
+        //     display: true,
+        //     error: { error },
+        //     message: 'Błąd dodawania nowego klienta',
+        //     devmessage: `${error}`,
+        //     data: null
+        // };
 
-        res.status(500).json(response);
+        res.status(500).json();
     }
 };

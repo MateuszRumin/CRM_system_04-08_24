@@ -47,7 +47,11 @@ export const InvoiceTable: React.FC<InvoiceTableProps> = ({ searchTerm, filterOp
     if (Object.keys(filterOptions).length > 0) {
       results = results.filter(invoice => {
         return Object.entries(filterOptions).every(([key, value]) => {
-          return invoice[key as keyof Invoice]?.toString().toLowerCase().includes(value.toLowerCase()) ?? false;
+          if (!value) return true; 
+          const valuesArray = value.split(','); 
+          const invoiceValue = invoice[key as keyof Invoice]?.toString() || ''; 
+
+          return valuesArray.some(val => invoiceValue.toLowerCase().includes(val.toLowerCase())); 
         });
       });
     }
@@ -68,7 +72,6 @@ export const InvoiceTable: React.FC<InvoiceTableProps> = ({ searchTerm, filterOp
   };
 
   const handleDelete = (invoiceNumber: string | null) => {
-    // Remove invoice from the local state after successful deletion
     setInvoices(prevInvoices => prevInvoices.filter(invoice => invoice.invoice_number !== invoiceNumber));
     setFilteredInvoices(prevInvoices => prevInvoices.filter(invoice => invoice.invoice_number !== invoiceNumber));
   };

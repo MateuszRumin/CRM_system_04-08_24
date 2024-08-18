@@ -1,69 +1,65 @@
 .paginationContainer {
+  width: 100%;
+  background-color: white;
+  padding: 10px 20px; /* Padding górny/dolny 10px, lewy/prawy 20px */
   display: flex;
-  padding: 10px;
   justify-content: flex-end;
   align-items: center;
-  gap: 20px;
-  align-self: stretch;
+  z-index: 1000;
 }
 
 .itemsPerPage {
   display: flex;
   align-items: center;
-}
-
-.itemsPerPageText {
-  margin-right: 8px;
-  color: #999;
-
-  font-family: Montserrat;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
+  gap: 5px;
+  margin-right: 20px;
 }
 
 .itemsPerPage select {
-  margin-left: 8px;
-  display: flex;
-padding: 8px 9px;
-align-items: center;
-gap: 4px;
-border-radius: 8px;
-background: #E0E0E0;
-border: none;
-outline: none;
+  padding: 8px;
+  border-radius: 8px;
+  background: #E0E0E0;
+  color: black;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  border: none;
+}
+
+.itemsPerPageText {
+  color: #999999;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
 }
 
 .pagination {
   display: flex;
-justify-content: center;
-align-items: center;
-gap: 12px;
+  align-items: center;
+  gap: 5px;
 }
 
 .pageLink {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 9px;
+  padding: 8px;
   border-radius: 8px;
-  background: var(--Colors-Items-border-color-300, #D2D2D2);
-  color: #000000;
-  text-decoration: none;
-  transition: background 0.3s ease;
+  text-align: center;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  width: 37px;
   border: none;
-  outline: none;
-  margin-left: 6px; 
 }
 
-.pageLink:hover {
-  background: black;
+.pageLink.active {
+  background: #24304F;
   color: white;
+  height: 42px;
+  border: none;
 }
 
-.active {
-  background: black;
-  color: white;
+.pageLink:not(.active) {
+  background: #D2D2D2;
+  color: black;
+  height: 37px;
 }

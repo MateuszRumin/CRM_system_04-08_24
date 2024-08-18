@@ -1,18 +1,23 @@
 .addNewInvoiceButton {
-  display: flex;
-  height: 40px;
-  padding: 16px;
-  justify-content: center;
-  align-items: center;
-
-  border-radius: 8px;
-  border: 1px solid #24304F;
-
-  background: #24304F;
-
-  color:white;
+  width: 204px;
+    height: 40px;
+    padding: 8px 16px;
+    background: #24304f;
+    border-radius: 8px;
+    border: 1px #24304f solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fbfbfb;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .addNewInvoiceButton:hover {
-  background-color: gray; 
+  background: #182034;
+  box-shadow: 1px 1px 5px #242a3b;
 }
