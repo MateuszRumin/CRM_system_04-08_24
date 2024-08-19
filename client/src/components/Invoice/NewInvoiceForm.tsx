@@ -372,7 +372,7 @@ export const NewInvoiceForm = () => {
             let projectId = selectedProjectId;
 
             // Jeśli klient nie jest wybrany, zapisz nowego klienta
-            if (!selectedClientId) {
+            if (!clientId) {
                 console.log('Fetching client statuses...');
                 const clientStatusResponse = await axios.get('http://localhost:3000/statuses/client');
                 const clientStatuses = clientStatusResponse.data;
@@ -382,20 +382,6 @@ export const NewInvoiceForm = () => {
 
                 if (!clientStatus) {
                     console.error('Status "W trakcie" dla klienta nie został znaleziony');
-                    return;
-                }
-
-                console.log('Fetching project statuses...');
-                const projectStatusResponse = await axios.get('http://localhost:3000/statuses/project');
-                const projectStatuses = projectStatusResponse.data;
-                const projectStatus = projectStatuses.find((status: { status_type: string, name: string }) => 
-                    status.name === 'Nie rozpoczęty' && status.status_type === 'Projekt'
-                );
-
-                console.log(projectStatusResponse);
-
-                if (!projectStatus) {
-                    console.error('Status "Nie rozpoczęty" dla projektu nie został znaleziony');
                     return;
                 }
 
@@ -415,9 +401,25 @@ export const NewInvoiceForm = () => {
                     }
                 });
 
-                // Tutaj uzyskujesz ID nowo dodanego klienta
-                console.log("id nowego klienta:", newClientResponse.data.data.client_id);
-                clientId = parseInt(newClientResponse.data.data.client_id);
+                // Ustawienie ID nowo dodanego klienta
+                clientId = parseInt(newClientResponse.data.data.client_id, 10);
+                console.log("id nowego klienta:", clientId);
+            }
+
+            // Jeśli klient jest wybrany, ale projekt nie jest, twórz nowy projekt
+            if (clientId && !projectId) {
+                console.log('Fetching project statuses...');
+                const projectStatusResponse = await axios.get('http://localhost:3000/statuses/project');
+                const projectStatuses = projectStatusResponse.data;
+                const projectStatus = projectStatuses.find((status: { status_type: string, name: string }) => 
+                    status.name === 'Nie rozpoczęty' && status.status_type === 'Projekt'
+                );
+
+                if (!projectStatus) {
+                    console.error('Status "Nie rozpoczęty" dla projektu nie został znaleziony');
+                    return;
+                }
+
                 console.log('Creating new project...');
                 const randomString = generateRandomString(5); // Generowanie losowego ciągu
                 const newProjectName = `Nowy projekt - ${randomString}`; // Dodanie losowego ciągu do nazwy projektu
@@ -432,10 +434,12 @@ export const NewInvoiceForm = () => {
                     deadline: new Date().toISOString()
                   }
                 });
-                projectId = parseInt(newProjectResponse.data.project_id);
-                console.log(projectId);
-              }
 
+                projectId = parseInt(newProjectResponse.data.project_id, 10);
+                console.log("id nowego projektu:", projectId);
+            }
+
+            // Tworzenie nowej faktury
             console.log('Creating new invoice...');
             const invoiceResponse = await axios.post('http://localhost:3000/invoices/newInvoice', {
                 main: {
@@ -452,6 +456,7 @@ export const NewInvoiceForm = () => {
 
             const invoiceId = invoiceResponse.data.data.invoice.invoice_id;
 
+            // Dodawanie produktów do faktury
             console.log('Adding products to invoice...');
             await axios.post('http://localhost:3000/invoices/addInvoiceProduct', {
                 invoice_id: invoiceId,
@@ -468,14 +473,15 @@ export const NewInvoiceForm = () => {
             console.log('Faktura oraz produkty zostały dodane pomyślnie');
             navigate(-1);
         } catch (error) {
-          if (axios.isAxiosError(error) && error.response?.status === 409) {
-              setError('NIP, KRS lub REGON już istnieje w systemie');
-          } else {
-              console.error('Błąd przy zapisywaniu faktury, klienta lub produktów:', error);
-          }
-      }
+            if (axios.isAxiosError(error) && error.response?.status === 409) {
+                setError('NIP, KRS lub REGON już istnieje w systemie');
+            } else {
+                console.error('Błąd przy zapisywaniu faktury, klienta lub produktów:', error);
+            }
+        }
     }
   };
+
 
   
   
@@ -788,9 +794,9 @@ export const NewInvoiceForm = () => {
                 onChange={(e) => handleInputChange(section.id, 'tax', +e.target.value)}
               >
                 <option value={0}>0%</option>
-                <option value={50}>5%</option>
-                <option value={80}>8%</option>
-                <option value={230}>23%</option>
+                <option value={5}>5%</option>
+                <option value={8}>8%</option>
+                <option value={23}>23%</option>
               </select>
             </div>
           </div>
