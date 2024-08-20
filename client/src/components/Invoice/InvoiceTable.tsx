@@ -4,6 +4,8 @@ import styles from './InvoiceTable.module.css';
 import Pagination from './Pagination';
 import { InvoiceRow } from './InvoiceRow';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Invoice {
   invoice_id: number;
   invoice_number: string | null;
@@ -29,7 +31,7 @@ export const InvoiceTable: React.FC<InvoiceTableProps> = ({ searchTerm, filterOp
   const itemsPerPageOptions: number[] = [10, 20, 30, 50];
 
   useEffect(() => {
-    axios.get('http://localhost:3000/invoices')
+    axios.get(`${apiServerUrl}/invoices`)
       .then(response => {
         setInvoices(response.data);
         setFilteredInvoices(response.data);

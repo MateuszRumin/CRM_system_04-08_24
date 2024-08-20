@@ -6,6 +6,8 @@ import MinusIcon from '../../../public/icons/Minus_Square.svg';
 import AddIcon from '../../../public/icons/Add_Plus_Square.svg';
 import { useNavigate } from 'react-router-dom';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 interface Project {
   project_id: number;
   name: string;
@@ -72,7 +74,7 @@ export const NewInvoiceForm = () => {
 
   const fetchStatusId = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/statuses/invoice');
+      const response = await axios.get(`${apiServerUrl}/statuses/invoice`);
       const statuses = response.data;
       const status = statuses.find((status: { name: string }) => status.name === 'Nie oplacona' || 'Nie opłacona');
 
@@ -88,7 +90,7 @@ export const NewInvoiceForm = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/client');
+      const response = await axios.get(`${apiServerUrl}/client`);
       const clientsData = response.data.data;
 
       const filteredClientsFirma = clientsData.filter((client: { client_type: string; }) => client.client_type === 'Firma');
@@ -126,7 +128,7 @@ export const NewInvoiceForm = () => {
     const today = new Date().toISOString().split('T')[0];
     setIssueDate(today);
 
-    axios.get('http://localhost:3000/invoices/settings')
+    axios.get(`${apiServerUrl}/invoices/settings`)
       .then(response => {
         setInvoiceTypes(response.data.data.invoiceTypes);
         setInvoiceMarkers(response.data.data.invoiceMarkers);
@@ -350,7 +352,7 @@ export const NewInvoiceForm = () => {
 
     try {
       // const nip = clientNIP;
-      const response = await axios.post('http://localhost:3000/client/fetch-regon-data', { nip : clientNIP });
+      const response = await axios.post(`${apiServerUrl}/client/fetch-regon-data`, { nip : clientNIP });
       const { name, address, regon, krs } = response.data;
 
       setClientCompanyName(name);
@@ -374,7 +376,7 @@ export const NewInvoiceForm = () => {
             // Jeśli klient nie jest wybrany, zapisz nowego klienta
             if (!clientId) {
                 console.log('Fetching client statuses...');
-                const clientStatusResponse = await axios.get('http://localhost:3000/statuses/client');
+                const clientStatusResponse = await axios.get(`${apiServerUrl}/statuses/client`);
                 const clientStatuses = clientStatusResponse.data;
                 const clientStatus = clientStatuses.find((status: { status_type: string, name: string }) => 
                     status.name === 'W trakcie' && status.status_type === 'Klient'
@@ -386,7 +388,7 @@ export const NewInvoiceForm = () => {
                 }
 
                 console.log('Creating new client...');
-                const newClientResponse = await axios.post('http://localhost:3000/client/new', {
+                const newClientResponse = await axios.post(`${apiServerUrl}/client/new`, {
                     client: {
                         user_id: 1,
                         status_id: clientStatus.status_id,
@@ -409,7 +411,7 @@ export const NewInvoiceForm = () => {
             // Jeśli klient jest wybrany, ale projekt nie jest, twórz nowy projekt
             if (clientId && !projectId) {
                 console.log('Fetching project statuses...');
-                const projectStatusResponse = await axios.get('http://localhost:3000/statuses/project');
+                const projectStatusResponse = await axios.get(`${apiServerUrl}/statuses/project`);
                 const projectStatuses = projectStatusResponse.data;
                 const projectStatus = projectStatuses.find((status: { status_type: string, name: string }) => 
                     status.name === 'Nie rozpoczęty' && status.status_type === 'Projekt'
@@ -424,7 +426,7 @@ export const NewInvoiceForm = () => {
                 const randomString = generateRandomString(5); // Generowanie losowego ciągu
                 const newProjectName = `Nowy projekt - ${randomString}`; // Dodanie losowego ciągu do nazwy projektu
                 
-                const newProjectResponse = await axios.post('http://localhost:3000/projects/new', {
+                const newProjectResponse = await axios.post(`${apiServerUrl}/projects/new`, {
                   name: newProjectName,
                   client_id: clientId,
                   status_id: projectStatus.status_id,
@@ -441,7 +443,7 @@ export const NewInvoiceForm = () => {
 
             // Tworzenie nowej faktury
             console.log('Creating new invoice...');
-            const invoiceResponse = await axios.post('http://localhost:3000/invoices/newInvoice', {
+            const invoiceResponse = await axios.post(`${apiServerUrl}/invoices/newInvoice`, {
                 main: {
                     status_id: statusId,
                     invoice_type_id: type,
@@ -458,7 +460,7 @@ export const NewInvoiceForm = () => {
 
             // Dodawanie produktów do faktury
             console.log('Adding products to invoice...');
-            await axios.post('http://localhost:3000/invoices/addInvoiceProduct', {
+            await axios.post(`${apiServerUrl}/invoices/addInvoiceProduct`, {
                 invoice_id: invoiceId,
                 products: serviceSections.map(section => ({
                     project_id: projectId,

@@ -1,4 +1,5 @@
 import axios from 'axios';
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
 
 export const sendInvoiceEmail = async (email: string, pdf: Blob, filename: string) => {
   const reader = new FileReader();
@@ -8,7 +9,7 @@ export const sendInvoiceEmail = async (email: string, pdf: Blob, filename: strin
 
     if (base64data) {
       try {
-        await axios.post('http://localhost:3000/email/send-invoice-email', {
+        await axios.post(`${apiServerUrl}/email/send-invoice-email`, {
           to: email,
           subject: 'Twoja faktura',
           text: 'Proszę znaleźć załączoną fakturę.',

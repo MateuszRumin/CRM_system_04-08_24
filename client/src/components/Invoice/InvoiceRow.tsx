@@ -4,6 +4,8 @@ import styles from './InvoiceRow.module.css';
 import ThreeDotsSettings from '../../assets/ClientPage/three_dots_settings.svg';
 import axios from 'axios';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 // interface InvoicePayment {
 //   payment_id: number;
 //   status: string;
@@ -57,7 +59,7 @@ export const InvoiceRow: React.FC<InvoiceRowProps> = ({ invoice, onDelete }) => 
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/invoices/${invoice.invoice_id}`);
+      await axios.delete(`${apiServerUrl}/invoices/${invoice.invoice_id}`);
       onDelete(invoice.invoice_number); // Notify the parent component
     } catch (error) {
       console.error('There was a problem deleting the invoice:', error);

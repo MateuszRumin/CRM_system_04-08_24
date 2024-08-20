@@ -4,6 +4,8 @@ import OnOffSwitch from '../SwitchButton/OnOffSwitch';
 import styles from './InvoiceSettings.module.css';
 import axios from 'axios';
 
+const apiServerUrl = import.meta.env.VITE_API_SERVER_URL || 'http://localhost:3000';
+
 export const InvoiceSettings: React.FC = () => {
   const navigate = useNavigate();
 
@@ -163,7 +165,7 @@ export const InvoiceSettings: React.FC = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3000/invoices/settings/update', {
+      const response = await fetch(`${apiServerUrl}/invoices/settings/update`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +194,7 @@ export const InvoiceSettings: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/client/fetch-regon-data', { nip });
+      const response = await axios.post(`${apiServerUrl}/client/fetch-regon-data`, { nip });
       const { name, address, regon, krs } = response.data;
 
       setNazwaFirmy(name);
@@ -209,7 +211,7 @@ export const InvoiceSettings: React.FC = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/invoices/settings');
+        const response = await axios.get(`${apiServerUrl}/invoices/settings`);
         const data = response.data.data; 
         
         console.log('Ustawienia faktur:', data);
