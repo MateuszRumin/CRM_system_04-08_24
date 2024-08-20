@@ -70,23 +70,18 @@ exports.addNewClient = async (req: Request, res: Response, next: NextFunction) =
         req.body.client_id = client.client_id;
         req.body.user_id = client.user_id;
 
-        res.status(200).json({
-            status: 'success',
-            data: {client},
-        });
-
-        return next();
+        return next(); // Przekazanie kontroli do kolejnego middleware'a
 
     } catch (error) {
-        // const response: IResponse = {
-        //     status: 'error',
-        //     display: true,
-        //     error: { error },
-        //     message: 'Błąd dodawania nowego klienta',
-        //     devmessage: `${error}`,
-        //     data: null
-        // };
+        const response: IResponse = {
+            status: 'error',
+            display: true,
+            error: { error },
+            message: 'Błąd dodawania nowego klienta',
+            devmessage: `${error}`,
+            data: null
+        };
 
-        res.status(500).json();
+        res.status(500).json(response);
     }
 };
